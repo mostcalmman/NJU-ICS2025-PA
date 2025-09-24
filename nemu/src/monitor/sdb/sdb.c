@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <isa.h>
+#include <limits.h>
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -23,6 +24,21 @@ static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
+
+int strToUint64(char *str, uint64_t *dest){
+  char *endptr;
+  *dest = strtoull(str, &endptr, 0);
+
+  // check errors
+  if(endptr == str || (*endptr != '\0' && *endptr != '\n')){
+    return -1;
+  }
+  if(*dest == ULLONG_MAX){
+    return -2;
+  }
+  
+  return 0;
+};
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -55,6 +71,28 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_si(char *args){
+  if(args == NULL){
+    cpu_exec(1);
+    return 0;
+  }
+
+  uint64_t n;
+  int ret = strToUint64(args, &n);
+
+  if(ret == -1){
+    printf("Invalid input: Not a number\n");
+    return 0;
+  }
+  if(ret == -2){
+    printf("Invalid input: Number too large\n");
+    return 0;
+  }
+  if(n == 0){
+    printf("Invalid input: N should be a positive number\n");
+    return 0;
+  }
+
+  cpu_exec(n);
   return 0;
 }
 
@@ -84,7 +122,9 @@ static int cmd_d(char *args){
 }
 
 static int cmd_test(char *args) {
-  printf("%s\n", args);
+  if(*args != '\0'){
+    printf("%s\n", args);
+  }
   return 0;
 }
 
@@ -98,7 +138,7 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "Step the program for N instructions and then pause. (default N=1)", cmd_si },
+  { "si", "si N: Step the program for N instructions and then pause. (default N=1)", cmd_si },
   { "info", "Print the register status or the information of watchpoints", cmd_info },
   { "x", "Scan the memory", cmd_x },
   { "p", "Evaluate the expression EXPR and print its value", cmd_p },
