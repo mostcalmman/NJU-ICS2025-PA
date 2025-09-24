@@ -26,6 +26,10 @@ void init_regex();
 void init_wp_pool();
 
 int strToUint64(char *str, uint64_t *dest){
+  if(strchr(str, '-') != NULL){
+    return -3;
+  }
+
   char *endptr;
   *dest = strtoull(str, &endptr, 0);
 
@@ -85,6 +89,10 @@ static int cmd_si(char *args){
   }
   if(ret == -2){
     printf("Invalid input: Number too large\n");
+    return 0;
+  }
+  if(ret == -3){
+    printf("Invalid input: N should be a positive number\n");
     return 0;
   }
   if(n == 0){
