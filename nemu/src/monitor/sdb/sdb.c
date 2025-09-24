@@ -47,12 +47,45 @@ static int cmd_c(char *args) {
   return 0;
 }
 
-
 static int cmd_q(char *args) {
   // LSR: fix the problem mentioned in the doc, the second line seems ok, so leave it here
   nemu_state.state = NEMU_QUIT;
   // nemu_state.state = NEMU_END;
   return -1;
+}
+
+static int cmd_si(char *args){
+  return 0;
+}
+
+static int cmd_info(char *args){
+
+  return 0;
+}
+
+static int cmd_x(char *args){
+
+  return 0;
+}
+
+static int cmd_p(char *args){
+
+  return 0;
+}
+
+static int cmd_w(char *args){
+
+  return 0;
+}
+
+static int cmd_d(char *args){
+
+  return 0;
+}
+
+static int cmd_test(char *args) {
+  printf("%s\n", args);
+  return 0;
 }
 
 static int cmd_help(char *args);
