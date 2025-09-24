@@ -49,8 +49,9 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  // nemu_state.state = NEMU_QUIT;
-  nemu_state.state = NEMU_END;
+  // LSR: fix the problem mentioned in the doc, the second line seems good, so leave it here
+  nemu_state.state = NEMU_QUIT;
+  // nemu_state.state = NEMU_END;
   return -1;
 }
 
