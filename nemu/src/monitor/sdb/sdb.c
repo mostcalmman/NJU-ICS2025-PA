@@ -98,6 +98,13 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  { "si", "Step the program for N instructions and then pause. (default N=1)", cmd_si },
+  { "info", "Print the register status or the information of watchpoints", cmd_info },
+  { "x", "Scan the memory", cmd_x },
+  { "p", "Evaluate the expression EXPR and print its value", cmd_p },
+  { "w", "Set a watchpoint for an expression EXPR", cmd_w },
+  { "d", "Delete the watchpoint with the given number", cmd_d },
+  { "test", "A test command for demonstration", cmd_test }
 
   /* TODO: Add more commands */
 
