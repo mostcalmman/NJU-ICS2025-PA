@@ -148,7 +148,7 @@ static int cmd_x(char *args){
 
   for(int i = 0; i < len; i++){
     word_t data = paddr_read((paddr_t)(addr + i * 4), 4);
-    printf("0x%u\t0x%u\n", addr + i * 4, data);
+    printf("0x%x\t0x%x\n", addr + i * 4, data);
   }
   return 0;
 }
