@@ -105,6 +105,20 @@ static int cmd_si(char *args){
 }
 
 static int cmd_info(char *args){
+  if(args == NULL){
+    printf("Invalid input: Missing argument\n");
+    return 0;
+  }
+
+  if(strcmp(args, "r") == 0){
+    isa_reg_display();
+  }
+  else if(strcmp(args, "w") == 0){
+    printf("TODO: List all watchpoints here.\n");
+  }
+  else{
+    printf("Invalid input: Unknown argument '%s'\n", args);
+  }
 
   return 0;
 }
