@@ -141,12 +141,14 @@ static int cmd_x(char *args){
   if (end1 == end + 1 || (*end1 != '\0' && *end1 != '\n')) {
     printf("Invalid input: Addr should be a number\n");
     return 0;
+  }else{
+    printf("len: %ld\taddr: 0x%x:\n", len, addr);
   }
 
-  for(int i = 0; i < len; i++){
-    word_t data = paddr_read((paddr_t)(addr + i * 4), 4);
-    printf("0x%u\t0x%u\n", addr + i * 4, data);
-  }
+  // for(int i = 0; i < len; i++){
+  //   word_t data = paddr_read((paddr_t)(addr + i * 4), 4);
+  //   printf("0x%u\t0x%u\n", addr + i * 4, data);
+  // }
   return 0;
 }
 
