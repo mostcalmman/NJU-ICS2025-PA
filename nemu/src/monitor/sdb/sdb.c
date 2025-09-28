@@ -65,7 +65,7 @@ static char* rl_gets() {
 }
 
 static int cmd_c(char *args) {
-  cpu_exec(100);
+  cpu_exec(4);
   return 0;
 }
 
