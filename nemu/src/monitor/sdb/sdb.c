@@ -25,6 +25,8 @@ static int is_batch_mode = false;
 void init_regex();
 void init_wp_pool();
 
+word_t paddr_read(paddr_t addr, int len);
+
 int strToUint64(char *str, uint64_t *dest){
   if(strchr(str, '-') != NULL){
     return -3;
@@ -124,7 +126,27 @@ static int cmd_info(char *args){
 }
 
 static int cmd_x(char *args){
+  if(args == NULL){
+    printf("Invalid input: Missing argument\n");
+    return 0;
+  }
+  char *end;
+  unsigned long len = strtoul(args, &end, 10);
+  if (end == args || *end != ' ') {
+    printf("Invalid input: len should be a number\n");
+    return 0;
+  }
+  char *end1;
+  paddr_t addr = strtoul(end + 1, &end1, 16);
+  if (end1 == end + 1 || (*end1 != '\0' && *end1 != '\n')) {
+    printf("Invalid input: addr should be a number\n");
+    return 0;
+  }
 
+  for(int i = 0; i < len; i++){
+    word_t data = paddr_read((paddr_t)(addr + i * 4), 4);
+    printf("0x%u\t0x%u\n", addr + i * 4, data);
+  }
   return 0;
 }
 
