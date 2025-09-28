@@ -146,9 +146,9 @@ static int cmd_x(char *args){
   //   printf("len: %ld\taddr: 0x%x:\n", len, addr);
   // }
 
-  for(int i = 0; i < len; i++){
+  for(unsigned long i = 0; i < len; i++){
     word_t data = paddr_read(addr + i * 4, 4);
-    printf("0x%x\t0x%x\n", addr + i * 4, data);
+    printf("0x%lx\t0x%x\n", addr + i * 4, data);
   }
   return 0;
 }
