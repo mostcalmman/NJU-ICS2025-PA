@@ -133,13 +133,13 @@ static int cmd_x(char *args){
   char *end;
   unsigned long len = strtoul(args, &end, 10);
   if (end == args || *end != ' ') {
-    printf("Invalid input: len should be a number\n");
+    printf("Invalid input: Missing argument or len isn't a number\n");
     return 0;
   }
   char *end1;
   paddr_t addr = strtoul(end + 1, &end1, 16);
   if (end1 == end + 1 || (*end1 != '\0' && *end1 != '\n')) {
-    printf("Invalid input: addr should be a number\n");
+    printf("Invalid input: Addr should be a number\n");
     return 0;
   }
 
