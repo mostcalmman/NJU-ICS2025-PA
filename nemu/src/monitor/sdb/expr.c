@@ -22,6 +22,13 @@
 
 enum {
   TK_NOTYPE = 256, TK_EQ,
+  TK_PLUS = '+',
+  TK_MINUS = '-',
+  TK_MULTIPLY = '*',
+  TK_DIVIDE = '/',
+  TK_NUMBER = 'd',
+  TK_LPAREN = '(',
+  TK_RPAREN = ')',
 
   /* TODO: Add more token types */
 
@@ -36,15 +43,15 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"-", '-'},           // minus
-  {"\\*", '*'},         // multiply
-  {"/", '/'},           // divide
-  {"==", TK_EQ},        // equal
-  {"[0-9]+", 'd'},      // decimal number
-  {"\\(", '('},         // (
-  {"\\)", ')'},         // )
+  {" +", TK_NOTYPE},      // spaces
+  {"\\+", TK_PLUS},       // plus
+  {"-", TK_MINUS},        // minus
+  {"\\*", TK_MULTIPLY},   // multiply
+  {"/", TK_DIVIDE},       // divide
+  {"==", TK_EQ},          // equal
+  {"[0-9]+", TK_NUMBER},  // decimal number
+  {"\\(", TK_LPAREN},     // (
+  {"\\)", TK_RPAREN},     // )
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -101,7 +108,31 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
-          default: TODO();
+          case TK_NOTYPE:
+            break;
+
+          case TK_PLUS:
+          case TK_MINUS:
+          case TK_MULTIPLY:
+          case TK_DIVIDE:
+          case TK_EQ:
+          case TK_LPAREN:
+          case TK_RPAREN:
+            tokens[nr_token].type = rules[i].token_type;
+            nr_token++;
+            break;
+
+          case TK_NUMBER:
+            tokens[nr_token].type = rules[i].token_type;
+            assert(substr_len < 32);
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            ++nr_token;
+            break;
+
+          default:
+            printf("regex: something went wrong\n");
+            break;
         }
 
         break;
