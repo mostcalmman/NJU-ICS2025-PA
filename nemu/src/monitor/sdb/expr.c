@@ -107,6 +107,8 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
+        assert(nr_token < 32);
+
         switch (rules[i].token_type) {
           case TK_NOTYPE:
             break;
@@ -156,7 +158,9 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  for(int i = 0; i < nr_token; i++){
+    printf("tokens[%d]: type : %c(%d), str : %s\n", i, tokens[i].type, tokens[i].type, tokens[i].str);
+  }
 
   return 0;
 }

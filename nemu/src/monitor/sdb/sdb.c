@@ -175,6 +175,11 @@ static int cmd_test(char *args) {
   return 0;
 }
 
+static int cmd_regexTest(char *args){
+  expr(args, NULL);
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -191,7 +196,8 @@ static struct {
   { "p", "Evaluate the expression EXPR and print its value", cmd_p },
   { "w", "Set a watchpoint for an expression EXPR", cmd_w },
   { "d", "Delete the watchpoint with the given number", cmd_d },
-  { "test", "A test command for demonstration", cmd_test }
+  { "test", "A test command for demonstration", cmd_test },
+  { "regexTest", "A test command for regex", cmd_regexTest },
 
   /* TODO: Add more commands */
 
