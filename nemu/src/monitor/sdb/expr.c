@@ -134,6 +134,7 @@ static bool make_token(char *e) {
 
           default:
             printf("regex: something went wrong\n");
+            assert(0);
             break;
         }
 
@@ -203,11 +204,11 @@ word_t val(int p, int q, bool *success){
     }
   }
 
-  if(op.position == -1) assert(0);
   if(waiting != 0){
     *success = false;
     return 0;
   }
+  if(op.position == -1) assert(0);
 
   // calculate
   word_t val1 = val(p, op.position - 1, success);
