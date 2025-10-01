@@ -200,7 +200,14 @@ word_t val(int p, int q, bool *success){
     if(tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS){
       op.position = i;
       op.type = tokens[i].type;
-      if(tokens[i+1].type == TK_MINUS) ++i; // skip negative sign
+
+      if(tokens[i+1].type == TK_MINUS){
+        if(tokens[i+2].type == TK_MINUS || tokens[i+2].type == TK_PLUS){
+          *success = false;
+          return 0;
+        }
+        ++i; // skip negative sign
+      }
     }
     if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && op.type != TK_PLUS && op.type != TK_MINUS){
       op.position = i;
