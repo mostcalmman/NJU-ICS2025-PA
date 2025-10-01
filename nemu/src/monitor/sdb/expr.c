@@ -174,6 +174,9 @@ word_t val(int p, int q, bool *success){
     return strtoull(tokens[p].str, NULL, 10);
   }
 
+  // negative number
+  if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
+
   if (check_parentness(p, q)) {
     return val(p + 1, q - 1, success);
   }
@@ -195,6 +198,7 @@ word_t val(int p, int q, bool *success){
     if(waiting != 0) continue;
 
     if(tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS){
+      if(tokens[i+1].type == TK_MINUS) ++i; // skip negative sign
       op.position = i;
       op.type = tokens[i].type;
     }
@@ -204,11 +208,10 @@ word_t val(int p, int q, bool *success){
     }
   }
 
-  if(waiting != 0){
+  if(waiting != 0 || op.position == -1){
     *success = false;
     return 0;
   }
-  if(op.position == -1) assert(0);
 
   // calculate
   word_t val1 = val(p, op.position - 1, success);
