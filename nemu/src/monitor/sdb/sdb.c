@@ -176,7 +176,14 @@ static int cmd_test(char *args) {
 }
 
 static int cmd_regexTest(char *args){
-  expr(args, NULL);
+  bool success = true;
+  word_t result = expr(args, &success);
+  if(success){
+    printf("Result is %u\n", result);
+  }
+  else{
+    printf("The expression is illegal.\n");
+  }
   return 0;
 }
 

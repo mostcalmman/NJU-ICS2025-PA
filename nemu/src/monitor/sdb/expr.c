@@ -150,6 +150,81 @@ static bool make_token(char *e) {
   return true;
 }
 
+bool check_parentness(int p,int q){
+  if(tokens[p].type != TK_LPAREN || tokens[q].type != TK_RPAREN){
+    return false;
+  }
+  int waiting = 0;
+  for(int i = p + 1; i < q; i++){
+    if(tokens[i].type == TK_LPAREN) ++waiting;
+    if(tokens[i].type == TK_RPAREN) --waiting;
+    if(waiting < 0) return false;
+  }
+  return waiting == 0;
+}
+
+word_t val(int p, int q, bool *success){
+  if(p > q){
+    *success = false;
+    return 0;
+  }
+
+  if( p==q ){
+    return strtoull(tokens[p].str, NULL, 10);
+  }
+
+  if (check_parentness(p, q)) {
+    return val(p + 1, q - 1, success);
+  }
+
+  // find the main operator
+  typedef struct {
+    int position;
+    int type;
+  } Op;
+  Op op = { -1, -1 };
+  int waiting = 0;
+  for(int i = p; i <= q; i++ ){
+    if(tokens[i].type == TK_LPAREN) ++waiting;
+    if(tokens[i].type == TK_RPAREN) --waiting;
+    if(waiting < 0){
+      *success = false;
+      return 0;
+    }
+    if(waiting != 0) continue;
+
+    if(tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS){
+      op.position = i;
+      op.type = tokens[i].type;
+    }
+    if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && op.type != TK_PLUS && op.type != TK_MINUS){
+      op.position = i;
+      op.type = tokens[i].type;
+    }
+  }
+
+  if(op.position == -1) assert(0);
+  if(waiting != 0){
+    *success = false;
+    return 0;
+  }
+
+  // calculate
+  word_t val1 = val(p, op.position - 1, success);
+  word_t val2 = val(op.position + 1, q, success);
+  switch(op.type){
+    case TK_PLUS: return val1 + val2;
+    case TK_MINUS: return val1 - val2;
+    case TK_MULTIPLY: return val1 * val2;
+    case TK_DIVIDE: 
+      if(val2 == 0){
+        *success = false;
+        return 0;
+      }
+      return val1 / val2;
+    default: assert(0);
+  }
+}
 
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
@@ -161,6 +236,5 @@ word_t expr(char *e, bool *success) {
   for(int i = 0; i < nr_token; i++){
     printf("tokens[%d]: type : %c(%d), str : %s\n", i, tokens[i].type, tokens[i].type, tokens[i].str);
   }
-
-  return 0;
+  return val(0, nr_token - 1, success);
 }
