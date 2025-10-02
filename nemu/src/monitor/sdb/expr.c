@@ -231,7 +231,8 @@ word_t val(int p, int q, bool *success){
   // dereference
   if(tokens[p].type == TK_DEREF){
     if(q == p+1){
-      if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
+      // if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
+      if( tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
         *success = false;
         return 0;
       }
