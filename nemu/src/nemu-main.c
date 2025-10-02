@@ -36,6 +36,10 @@ int main(int argc, char *argv[]) {
   file = fopen("/home/liushengrui/ics2025/nemu/tools/gen-expr/build/input", "r");
   int i = 1;
   while(fgets(line, sizeof(line), file)) {
+    char *newline = strchr(line, '\n');
+    if (newline) {
+      *newline = '\0';
+    }
     bool success = true;
     char *start = strchr(line, ' ');
     word_t expected = strtoull(line, NULL, 10);
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
     i++;
   }
   fclose(file);
-  
+
   /* Start engine. */
   engine_start();
 
