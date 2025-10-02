@@ -20,8 +20,10 @@
  */
 #include <regex.h>
 
+word_t paddr_read(paddr_t addr, int len);
+
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256,
   TK_PLUS = '+',
   TK_MINUS = '-',
   TK_MULTIPLY = '*',
@@ -29,6 +31,13 @@ enum {
   TK_NUMBER = 'd',
   TK_LPAREN = '(',
   TK_RPAREN = ')',
+  TK_EQUAL = '=',   // ==
+  TK_UEQUAL = '!',  // !=
+  TK_AND = '&',     // &&
+  // TK_OR = '|',      // ||
+  TK_REG = '$',    // register
+  TK_HEX = 'h',    // 0x
+  TK_DEREF = 'p',  // *<expr>
 
   /* TODO: Add more token types */
 
@@ -43,15 +52,20 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},      // spaces
-  {"\\+", TK_PLUS},       // plus
-  {"-", TK_MINUS},        // minus
-  {"\\*", TK_MULTIPLY},   // multiply
-  {"/", TK_DIVIDE},       // divide
-  {"==", TK_EQ},          // equal
-  {"[0-9]+", TK_NUMBER},  // decimal number
-  {"\\(", TK_LPAREN},     // (
-  {"\\)", TK_RPAREN},     // )
+  {" +", TK_NOTYPE},              // spaces
+  {"\\+", TK_PLUS},               // plus
+  {"-", TK_MINUS},                // minus
+  {"\\*", TK_MULTIPLY},           // multiply
+  {"/", TK_DIVIDE},               // divide
+  {"==", TK_EQUAL},               // equal
+  {"!=", TK_UEQUAL},              // unequal
+  {"&&", TK_AND},                 // and
+  {"\\$[a-zA-Z]{1,2}", TK_REG},   // register
+  {"0[xX][0-9a-fA-F]+", TK_HEX},  // hexadecimal number
+  {"[0-9]+", TK_NUMBER},         // decimal number
+  {"\\(", TK_LPAREN},            // (
+  {"\\)", TK_RPAREN},            // )
+
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -80,7 +94,7 @@ typedef struct token {
   char str[32];
 } Token;
 
-// MARK: 暂时调大, 若有问题记得改回来
+// MARK: 暂时调大tokens
 static Token tokens[65536] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
@@ -118,16 +132,25 @@ static bool make_token(char *e) {
           case TK_MINUS:
           case TK_MULTIPLY:
           case TK_DIVIDE:
-          case TK_EQ:
           case TK_LPAREN:
           case TK_RPAREN:
+          case TK_EQUAL:
+          case TK_UEQUAL:
+          case TK_AND:
+          // case TK_OR:
             tokens[nr_token].type = rules[i].token_type;
             nr_token++;
             break;
 
           case TK_NUMBER:
-            tokens[nr_token].type = rules[i].token_type;
+          case TK_REG:
+          case TK_HEX:
+            if(rules[i].token_type == TK_HEX && substr_len > 10){
+              printf("The hexadecimal number is too long!\n");
+              return false;
+            }
             assert(substr_len < 32);
+            tokens[nr_token].type = rules[i].token_type;
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             tokens[nr_token].str[substr_len] = '\0';
             ++nr_token;
@@ -172,11 +195,23 @@ word_t val(int p, int q, bool *success){
   }
 
   if( p==q ){
-    return strtoull(tokens[p].str, NULL, 10);
+    if(tokens[p].type == TK_NUMBER) return strtoull(tokens[p].str, NULL, 10);
+    if(tokens[p].type == TK_HEX) return strtoull(tokens[p].str, NULL, 16);
+    if(tokens[p].type == TK_REG){
+      TODO();
+    }
   }
 
   // negative number
   if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
+
+  // dereference
+  if(tokens[p].type == TK_DEREF){
+    if(tokens[p+1].type == TK_LPAREN){
+      word_t addr = val(p + 2, q - 1, success);
+      return paddr_read(addr, 4);
+    }
+  }
 
   if (check_parentness(p, q)) {
     return val(p + 1, q - 1, success);
@@ -245,5 +280,20 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
+  // address dereference
+  for(int i = 0; i < nr_token; i++){
+    if(
+       tokens[i].type == TK_MULTIPLY &&
+       (
+        i == 0 || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS || 
+        tokens[i - 1].type == TK_MULTIPLY || tokens[i - 1].type == TK_DIVIDE || tokens[i - 1].type == TK_LPAREN || 
+        tokens[i - 1].type == TK_EQUAL || tokens[i - 1].type == TK_UEQUAL || tokens[i - 1].type == TK_AND
+       )
+      )
+      {
+      tokens[i].type = TK_DEREF;
+    }
+  }
+
   return val(0, nr_token - 1, success);
 }
