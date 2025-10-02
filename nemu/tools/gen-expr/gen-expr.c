@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
     int result;
     ret = fscanf(fp, "%d", &result);
     int status = pclose(fp);
-    if ( status == -1 || !WIFEXITED(status) ){
+    if ( status != 0 || !WIFEXITED(status) ){
       --i;
       continue;
     }
