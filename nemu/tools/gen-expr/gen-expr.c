@@ -31,8 +31,59 @@ static char *code_format =
 "  return 0; "
 "}";
 
+static uint32_t choose(uint32_t n) {
+  return rand() % n;
+}
+
+static uint32_t gen_num() {
+  return choose(256);
+}
+
+static void insert_space(int *length) {
+  *length = strlen(buf);
+  for(int i = 0; i < choose(10); i++){
+    sprintf(buf + *length + i, " ");
+  }
+  *length = strlen(buf);
+}
+
 static void gen_rand_expr() {
-  buf[0] = '\0';
+  int length = strlen(buf);
+  if(length > 65436) {
+    sprintf(buf + length, "%u", gen_num());
+    return;
+  }
+  switch(choose(3)){
+    case 0:
+      insert_space(&length);
+      sprintf(buf + length, "%u", gen_num());
+      insert_space(&length);
+      break;
+    case 1:
+      insert_space(&length);
+      sprintf(buf + length, "(");
+      insert_space(&length);
+      sprintf(buf + length, "%u", gen_num());
+      insert_space(&length);
+      sprintf(buf + length, ")");
+      insert_space(&length);
+      break;
+    case 2:
+    default:
+      gen_rand_expr();
+      insert_space(&length);
+      switch(choose(4)){
+        case 0: sprintf(buf + length, "+"); break;
+        case 1: sprintf(buf + length, "-"); break;
+        case 2: sprintf(buf + length, "*"); break;
+        case 3: sprintf(buf + length, "/"); break;
+        default: assert(0);
+      }
+      insert_space(&length);
+      gen_rand_expr();
+      break;
+  }
+  return;
 }
 
 int main(int argc, char *argv[]) {
@@ -44,6 +95,7 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+    memset(buf, '\0', sizeof(buf));
     gen_rand_expr();
 
     sprintf(code_buf, code_format, buf);
@@ -61,7 +113,11 @@ int main(int argc, char *argv[]) {
 
     int result;
     ret = fscanf(fp, "%d", &result);
-    pclose(fp);
+    int status = pclose(fp);
+    if ( status == -1 || !WIFEXITED(status) ){
+      --i;
+      continue;
+    }
 
     printf("%u %s\n", result, buf);
   }
