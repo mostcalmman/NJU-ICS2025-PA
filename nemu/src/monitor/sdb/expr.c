@@ -61,7 +61,7 @@ static struct rule {
   {"==", TK_EQUAL},               // equal
   {"!=", TK_UEQUAL},              // unequal
   {"&&", TK_AND},                 // and
-  {"\\$[a-zA-Z]{1,2}", TK_REG},   // register
+  {"\\$[0-9a-zA-Z]{1,3}", TK_REG},   // register
   {"0[xX][0-9a-fA-F]+", TK_HEX},  // hexadecimal number
   {"[0-9]+", TK_NUMBER},         // decimal number
   {"\\(", TK_LPAREN},            // (
@@ -200,7 +200,10 @@ word_t val(int p, int q, bool *success){
     if(tokens[p].type == TK_HEX) return strtoull(tokens[p].str, NULL, 16);
     if(tokens[p].type == TK_REG){
       word_t ret = isa_reg_str2val(tokens[p].str, success);
-      if(!*success) return 0;
+      if(!*success){
+        printf("Unknown register '%s'\n", tokens[p].str);
+        return 0;
+      }
       return ret;
     }
   }
