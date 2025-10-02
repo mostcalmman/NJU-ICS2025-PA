@@ -37,6 +37,7 @@ enum {
   // TK_OR = '|',      // ||
   TK_REG = '$',    // register
   TK_HEX = 'h',    // 0x
+  TK_NEGATIVE = 'n', // -<expr>
   TK_DEREF = 'p',  // *<expr>
 
   /* TODO: Add more token types */
@@ -198,16 +199,43 @@ word_t val(int p, int q, bool *success){
     if(tokens[p].type == TK_NUMBER) return strtoull(tokens[p].str, NULL, 10);
     if(tokens[p].type == TK_HEX) return strtoull(tokens[p].str, NULL, 16);
     if(tokens[p].type == TK_REG){
-      TODO();
+      word_t ret = isa_reg_str2val(tokens[p].str, success);
+      if(!*success) return 0;
+      return ret;
     }
   }
 
-  // negative number
-  if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
+  // // 不够完善的负号处理方案
+  // if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
+
+  // nagative
+  if(tokens[p].type == TK_NEGATIVE){
+    if(q == p + 1){
+      if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
+        *success = false;
+        return 0;
+      }
+      return -val(p + 1, q, success);
+    }
+
+    if(tokens[p+1].type == TK_LPAREN && check_parentness(p + 1, q)){
+      return -val(p + 2, q - 1, success);
+    }
+
+    if(q == p + 2 && tokens[p+1].type == TK_DEREF) return -val(p + 1, q, success);    
+  }
 
   // dereference
   if(tokens[p].type == TK_DEREF){
-    if(tokens[p+1].type == TK_LPAREN){
+    if(q == p+1){
+      if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
+        *success = false;
+        return 0;
+      }
+      word_t addr = val(p + 1, q, success);
+      return paddr_read(addr, 4);
+    }
+    if(tokens[p+1].type == TK_LPAREN && check_parentness(p + 1, q)){
       word_t addr = val(p + 2, q - 1, success);
       return paddr_read(addr, 4);
     }
@@ -237,13 +265,14 @@ word_t val(int p, int q, bool *success){
       op.position = i;
       op.type = tokens[i].type;
 
-      if(tokens[i+1].type == TK_MINUS){
-        if(tokens[i+2].type == TK_MINUS || tokens[i+2].type == TK_PLUS){
-          *success = false;
-          return 0;
-        }
-        ++i; // skip negative sign
-      }
+      // // 不够完善的负号处理方案
+      // if(tokens[i+1].type == TK_MINUS){
+      //   if(tokens[i+2].type == TK_MINUS || tokens[i+2].type == TK_PLUS){
+      //     *success = false;
+      //     return 0;
+      //   }
+      //   ++i; // skip negative sign
+      // }
     }
     if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && op.type != TK_PLUS && op.type != TK_MINUS){
       op.position = i;
@@ -280,17 +309,29 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  // address dereference
+  // address dereference and negative number
   for(int i = 0; i < nr_token; i++){
     if(
-       tokens[i].type == TK_MULTIPLY &&
+       tokens[i].type == TK_MINUS &&
        (
         i == 0 || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS || 
         tokens[i - 1].type == TK_MULTIPLY || tokens[i - 1].type == TK_DIVIDE || tokens[i - 1].type == TK_LPAREN || 
         tokens[i - 1].type == TK_EQUAL || tokens[i - 1].type == TK_UEQUAL || tokens[i - 1].type == TK_AND
        )
       )
-      {
+    {
+      tokens[i].type = TK_NEGATIVE;
+    }
+
+    if(
+       tokens[i].type == TK_MULTIPLY &&
+       (
+        i == 0 || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS || tokens[i - 1].type == TK_NEGATIVE || // 解引用前可以有负号
+        tokens[i - 1].type == TK_MULTIPLY || tokens[i - 1].type == TK_DIVIDE || tokens[i - 1].type == TK_LPAREN || 
+        tokens[i - 1].type == TK_EQUAL || tokens[i - 1].type == TK_UEQUAL || tokens[i - 1].type == TK_AND
+       )
+      )
+    {
       tokens[i].type = TK_DEREF;
     }
   }
