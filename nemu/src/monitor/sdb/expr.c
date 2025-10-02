@@ -231,16 +231,27 @@ word_t val(int p, int q, bool *success){
   // dereference
   if(tokens[p].type == TK_DEREF){
     if(q == p+1){
+      // MARK: 暂不允许十进制地址
       // if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
       if( tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
         *success = false;
         return 0;
       }
       word_t addr = val(p + 1, q, success);
+      if( addr < 0x80000000 || addr > 0x87ffffff ){
+        printf("Invalid address 0x%x\n", addr);
+        *success = false;
+        return 0;
+      }
       return paddr_read(addr, 4);
     }
     if(tokens[p+1].type == TK_LPAREN && check_parentness(p + 1, q)){
       word_t addr = val(p + 2, q - 1, success);
+      if( addr < 0x80000000 || addr > 0x87ffffff ){
+        printf("Invalid address 0x%x\n", addr);
+        *success = false;
+        return 0;
+      }
       return paddr_read(addr, 4);
     }
   }
