@@ -136,17 +136,28 @@ static int cmd_x(char *args){
     printf("Invalid input: Missing argument or len isn't a number\n");
     return 0;
   }
-  char *end1;
-  paddr_t addr = strtoul(end + 1, &end1, 16);
-  if (end1 == end + 1 || (*end1 != '\0' && *end1 != '\n')) {
-    printf("Invalid input: Addr should be a number\n");
+  if(len == 0){
+    printf("Invalid input: len should be a positive number\n");
     return 0;
   }
-  // else {
-  //   printf("len: %ld\taddr: 0x%x:\n", len, addr);
+  // char *end1;
+  // paddr_t addr = strtoul(end + 1, &end1, 16);
+  // if (end1 == end + 1 || (*end1 != '\0' && *end1 != '\n')) {
+  //   printf("Invalid input: Addr should be a number\n");
+  //   return 0;
   // }
+  bool success = true;
+  paddr_t addr = expr(end + 1, &success);
+  if(!success){
+    printf("The expression is illegal.\n");
+    return 0;
+  }
 
   for(unsigned long i = 0; i < len; i++){
+    if(addr + i * 4 < CONFIG_MBASE || addr + i * 4 > 0x87ffffff ){
+      printf("Invalid address 0x%lx\n", addr + i * 4);
+      return 0;
+    }
     word_t data = paddr_read(addr + i * 4, 4);
     printf("0x%lx\t0x%x\n", addr + i * 4, data);
   }
