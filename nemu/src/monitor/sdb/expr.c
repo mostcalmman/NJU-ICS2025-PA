@@ -211,7 +211,7 @@ word_t val(int p, int q, bool *success){
   // // 不够完善的负号处理方案
   // if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
 
-  // nagative
+  // negative
   if(tokens[p].type == TK_NEGATIVE){
     if(q == p + 1){
       if( tokens[p+1].type != TK_NUMBER && tokens[p+1].type != TK_HEX && tokens[p+1].type != TK_REG ){
@@ -276,7 +276,19 @@ word_t val(int p, int q, bool *success){
     }
     if(waiting != 0) continue;
 
-    if(tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS){
+    if(tokens[i].type == TK_AND){
+      op.position = i;
+      op.type = tokens[i].type;
+      break; // &&
+    }
+
+    if((tokens[i].type == TK_EQUAL || tokens[i].type == TK_UEQUAL) && op.type != TK_AND){
+      op.position = i;
+      op.type = tokens[i].type;
+      break; // ==  !=
+    }
+
+    if( (tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS) && (op.type != TK_AND && op.type != TK_EQUAL && op.type != TK_UEQUAL) ){
       op.position = i;
       op.type = tokens[i].type;
 
@@ -289,7 +301,7 @@ word_t val(int p, int q, bool *success){
       //   ++i; // skip negative sign
       // }
     }
-    if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && op.type != TK_PLUS && op.type != TK_MINUS){
+    if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && (op.type == TK_PLUS || op.type == TK_MINUS || op.type == -1) ){
       op.position = i;
       op.type = tokens[i].type;
     }
@@ -313,6 +325,9 @@ word_t val(int p, int q, bool *success){
         return 0;
       }
       return val1 / val2;
+    case TK_EQUAL: return val1 == val2;
+    case TK_UEQUAL: return val1 != val2;
+    case TK_AND: return val1 && val2;
     default: assert(0);
   }
 }
