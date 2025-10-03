@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   // }
 
   /* Start engine. */
-  printf("%lu", sizeof(word_t));
+
   engine_start();
 
   return is_exit_status_bad();

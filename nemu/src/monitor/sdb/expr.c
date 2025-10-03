@@ -13,14 +13,13 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "common.h"
 #include <isa.h>
 
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-
-word_t paddr_read(paddr_t addr, int len);
 
 enum {
   TK_NOTYPE = 256,
@@ -72,6 +71,23 @@ static struct rule {
 #define NR_REGEX ARRLEN(rules)
 
 static regex_t re[NR_REGEX] = {};
+word_t paddr_read(paddr_t addr, int len);
+
+static bool is_operator_or_lparen(int token_type) {
+    switch (token_type) {
+        case TK_PLUS:
+        case TK_MINUS:
+        case TK_MULTIPLY:
+        case TK_DIVIDE:
+        case TK_LPAREN:
+        case TK_EQUAL:
+        case TK_UEQUAL:
+        case TK_AND:
+            return true;
+        default:
+            return false;
+    }
+}
 
 /* Rules are used for many times.
  * Therefore we compile them only once before any usage.
@@ -146,7 +162,7 @@ static bool make_token(char *e) {
           case TK_NUMBER:
           case TK_REG:
           case TK_HEX:
-            if(rules[i].token_type == TK_HEX && substr_len > 10){
+            if(rules[i].token_type == TK_HEX && substr_len > 2 + 2*sizeof(word_t)){
               printf("The hexadecimal number is too long!\n");
               return false;
             }
@@ -189,24 +205,29 @@ bool check_parentness(int p,int q){
   return waiting == 0;
 }
 
+word_t address_value_token(int p, bool *success){
+  switch (tokens[p].type) {
+    case TK_NUMBER: return strtoull(tokens[p].str, NULL, 10);
+    case TK_HEX: return strtoull(tokens[p].str, NULL, 16);
+    case TK_REG: {
+      word_t ret = isa_reg_str2val(tokens[p].str, success);
+      if (!*success) {
+        printf("Unknown register '%s'\n", tokens[p].str);
+        return 0;
+      }
+      return ret;
+    }
+    default: assert(0);
+  }
+}
+
 word_t val(int p, int q, bool *success){
   if(p > q){
     *success = false;
     return 0;
   }
 
-  if( p==q ){
-    if(tokens[p].type == TK_NUMBER) return strtoull(tokens[p].str, NULL, 10);
-    if(tokens[p].type == TK_HEX) return strtoull(tokens[p].str, NULL, 16);
-    if(tokens[p].type == TK_REG){
-      word_t ret = isa_reg_str2val(tokens[p].str, success);
-      if(!*success){
-        printf("Unknown register '%s'\n", tokens[p].str);
-        return 0;
-      }
-      return ret;
-    }
-  }
+  if(p == q) return address_value_token(p, success);
 
   // // 不够完善的负号处理方案
   // if(tokens[p].type == TK_MINUS) return -val(p + 1, q, success);
@@ -238,7 +259,7 @@ word_t val(int p, int q, bool *success){
         return 0;
       }
       word_t addr = val(p + 1, q, success);
-      if( addr < 0x80000000 || addr > 0x87ffffff ){
+      if( addr < CONFIG_MBASE || addr > 0x87ffffff ){
         printf("Invalid address 0x%x\n", addr);
         *success = false;
         return 0;
@@ -247,7 +268,7 @@ word_t val(int p, int q, bool *success){
     }
     if(tokens[p+1].type == TK_LPAREN && check_parentness(p + 1, q)){
       word_t addr = val(p + 2, q - 1, success);
-      if( addr < 0x80000000 || addr > 0x87ffffff ){
+      if( addr < CONFIG_MBASE || addr > 0x87ffffff ){
         printf("Invalid address 0x%x\n", addr);
         *success = false;
         return 0;
@@ -341,27 +362,11 @@ word_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   // address dereference and negative number
   for(int i = 0; i < nr_token; i++){
-    if(
-       tokens[i].type == TK_MINUS &&
-       (
-        i == 0 || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS || 
-        tokens[i - 1].type == TK_MULTIPLY || tokens[i - 1].type == TK_DIVIDE || tokens[i - 1].type == TK_LPAREN || 
-        tokens[i - 1].type == TK_EQUAL || tokens[i - 1].type == TK_UEQUAL || tokens[i - 1].type == TK_AND
-       )
-      )
-    {
+    if( tokens[i].type == TK_MINUS && ( i == 0 || is_operator_or_lparen(tokens[i - 1].type) ) ){
       tokens[i].type = TK_NEGATIVE;
     }
 
-    if(
-       tokens[i].type == TK_MULTIPLY &&
-       (
-        i == 0 || tokens[i - 1].type == TK_PLUS || tokens[i - 1].type == TK_MINUS || tokens[i - 1].type == TK_NEGATIVE || // 解引用前可以有负号
-        tokens[i - 1].type == TK_MULTIPLY || tokens[i - 1].type == TK_DIVIDE || tokens[i - 1].type == TK_LPAREN || 
-        tokens[i - 1].type == TK_EQUAL || tokens[i - 1].type == TK_UEQUAL || tokens[i - 1].type == TK_AND
-       )
-      )
-    {
+    if( tokens[i].type == TK_MULTIPLY && ( i == 0 || tokens[i-1].type == TK_NEGATIVE || is_operator_or_lparen(tokens[i - 1].type) ) ){
       tokens[i].type = TK_DEREF;
     }
   }
