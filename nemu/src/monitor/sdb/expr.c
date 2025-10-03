@@ -362,6 +362,7 @@ word_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   // address dereference and negative number
+  // 目前的逻辑不支持双负号和双指针解引用(表达式会被判错)
   for(int i = 0; i < nr_token; i++){
     if( tokens[i].type == TK_MINUS && ( i == 0 || is_operator_or_lparen(tokens[i - 1].type) ) ){
       tokens[i].type = TK_NEGATIVE;
