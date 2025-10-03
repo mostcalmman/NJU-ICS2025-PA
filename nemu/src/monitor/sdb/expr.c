@@ -217,7 +217,10 @@ word_t address_value_token(int p, bool *success){
       }
       return ret;
     }
-    default: assert(0);
+    default: {
+      *success = false;
+      return 0;
+    }
   }
 }
 
