@@ -300,13 +300,11 @@ word_t val(int p, int q, bool *success){
     if(tokens[i].type == TK_AND){
       op.position = i;
       op.type = tokens[i].type;
-      break; // &&
     }
 
     if((tokens[i].type == TK_EQUAL || tokens[i].type == TK_UEQUAL) && op.type != TK_AND){
       op.position = i;
       op.type = tokens[i].type;
-      break; // ==  !=
     }
 
     if( (tokens[i].type == TK_PLUS || tokens[i].type == TK_MINUS) && (op.type != TK_AND && op.type != TK_EQUAL && op.type != TK_UEQUAL) ){
