@@ -322,7 +322,7 @@ word_t val(int p, int q, bool *success){
       //   ++i; // skip negative sign
       // }
     }
-    if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && (op.type == TK_PLUS || op.type == TK_MINUS || op.type == -1) ){
+    if( (tokens[i].type == TK_MULTIPLY || tokens[i].type == TK_DIVIDE) && (op.type == TK_MULTIPLY || op.type == TK_DIVIDE || op.type == -1) ){
       op.position = i;
       op.type = tokens[i].type;
     }
