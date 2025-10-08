@@ -18,6 +18,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <stdio.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
@@ -45,6 +46,19 @@ int strToUint64(char *str, uint64_t *dest){
   
   return 0;
 };
+
+void display_all_watchpoints() {
+  WP *p = watchpoint_head;
+  if(p == NULL){
+    printf("No watchpoint.\n");
+    return;
+  }
+  printf("Num\tWhat\tLast value\n");
+  while(p != NULL){
+    printf("%d\t%s\t0x%x\n", p->NO, p->expr, p->last_value);
+    p = p->next;
+  }
+}
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
@@ -93,11 +107,7 @@ static int cmd_si(char *args){
     printf("Invalid input: Number too large\n");
     return 0;
   }
-  if(ret == -3){
-    printf("Invalid input: N should be a positive number\n");
-    return 0;
-  }
-  if(n == 0){
+  if(ret == -3 || n == 0){
     printf("Invalid input: N should be a positive number\n");
     return 0;
   }
@@ -116,7 +126,7 @@ static int cmd_info(char *args){
     isa_reg_display();
   }
   else if(strcmp(args, "w") == 0){
-    printf("TODO: List all watchpoints here.\n");
+    display_all_watchpoints();
   }
   else{
     printf("Invalid input: Unknown argument '%s'\n", args);
@@ -177,12 +187,61 @@ static int cmd_p(char *args){
 }
 
 static int cmd_w(char *args){
+  if(args == NULL){
+    printf("Invalid input: Missing argument\n");
+    return 0;
+  }
+  // check expression legality
+  bool success = true;
+  word_t val = expr(args, &success);
+  if(!success){
+    printf("The expression is illegal.\n");
+    return 0;
+  }
 
+  watchpoint_head = new_wp();
+  if(watchpoint_head == NULL) return 0; // 错误信息会在new_wp中打印
+  strncpy(watchpoint_head->expr, args, 1023);
+  watchpoint_head->expr[1023] = '\0'; // 确保字符串以'\0'结尾
+  watchpoint_head->last_value = val;
+  printf("New watchpoint %d: %s, original value = 0x%x\n", watchpoint_head->NO, watchpoint_head->expr, watchpoint_head->last_value);
   return 0;
 }
 
 static int cmd_d(char *args){
+  if(args == NULL){
+    printf("Invalid input: Missing argument\n");
+    return 0;
+  }
 
+  uint64_t n;
+  int ret = strToUint64(args, &n);
+
+  if(ret == -1){
+    printf("Invalid input: Not a number\n");
+    return 0;
+  }
+  if(ret == -2){
+    printf("Invalid input: Number too large\n");
+    return 0;
+  }
+  if(ret == -3 || n == 0){
+    printf("Invalid input: N should be a positive number\n");
+    return 0;
+  }
+  if(n >= NR_WP){
+    printf("Invalid input: N should be less than %d\n", NR_WP);
+    return 0;
+  }
+
+  WP *p = watchpoint_head;
+  while(p != NULL && p->NO != n) p = p->next;
+  if(p == NULL){
+    printf("No watchpoint %lu\n", n);
+    return 0;
+  }
+  free_wp(p);
+  printf("Watchpoint %lu deleted\n", n);
   return 0;
 }
 
@@ -250,6 +309,7 @@ void sdb_mainloop() {
     cmd_c(NULL);
     return;
   }
+  
 
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);

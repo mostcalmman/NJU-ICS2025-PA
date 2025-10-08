@@ -111,8 +111,8 @@ typedef struct token {
   char str[32];
 } Token;
 
-// MARK: 暂时调大tokens
-static Token tokens[65536] __attribute__((used)) = {};
+// MARK: tokens上限
+static Token tokens[1024] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -140,7 +140,7 @@ static bool make_token(char *e) {
          * of tokens, some extra actions should be performed.
          */
 
-        assert(nr_token < 65536);
+        assert(nr_token < 1024);
 
         switch (rules[i].token_type) {
           case TK_NOTYPE:
