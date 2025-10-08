@@ -41,3 +41,34 @@ void init_wp_pool() {
 
 /* TODO: Implement the functionality of watchpoint */
 
+WP* new_wp(){
+  if(free_ == NULL){
+    printf("No free watchpoint. Create failed.\n");
+    return NULL;
+  }
+
+  WP *new_wp = free_;
+  free_ = free_->next;
+
+  new_wp->next = head;
+  head = new_wp;
+
+  return new_wp;
+}
+
+void free_wp(WP *wp){
+  if(wp == NULL) return;
+
+  if(head == wp){
+    head = head->next;
+  }
+  else{
+    WP *p = head;
+    while(p != NULL && p->next != wp) p = p->next; // find the previous node
+    if(p != NULL) p->next = wp->next;
+  }
+
+  // reset free list
+  wp->next = free_;
+  free_ = wp;
+}

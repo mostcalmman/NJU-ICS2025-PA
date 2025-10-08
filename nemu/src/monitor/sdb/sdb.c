@@ -165,7 +165,14 @@ static int cmd_x(char *args){
 }
 
 static int cmd_p(char *args){
-
+  bool success = true;
+  word_t result = expr(args, &success);
+  if(success){
+    printf("Result is %u\n", result);
+  }
+  else{
+    printf("The expression is illegal.\n");
+  }
   return 0;
 }
 
@@ -182,18 +189,6 @@ static int cmd_d(char *args){
 static int cmd_test(char *args) {
   if(*args != '\0'){
     printf("%s\n", args);
-  }
-  return 0;
-}
-
-static int cmd_regexTest(char *args){
-  bool success = true;
-  word_t result = expr(args, &success);
-  if(success){
-    printf("Result is %u\n", result);
-  }
-  else{
-    printf("The expression is illegal.\n");
   }
   return 0;
 }
@@ -215,7 +210,7 @@ static struct {
   { "w", "Set a watchpoint for an expression EXPR", cmd_w },
   { "d", "Delete the watchpoint with the given number", cmd_d },
   { "test", "A test command for demonstration", cmd_test },
-  { "regexTest", "A test command for regex", cmd_regexTest },
+  { "p", "Get the value of the expression EXPR", cmd_p },
 
   /* TODO: Add more commands */
 
