@@ -18,7 +18,7 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 #include "../monitor/sdb/sdb.h"
-void paddr_write(paddr_t addr, int len, word_t data); // 测试用
+// void paddr_write(paddr_t addr, int len, word_t data); // 测试用
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -100,7 +100,7 @@ static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
-    paddr_write(0x80000000, 4, cpu.pc + 1); // 测试用
+    // paddr_write(0x80000000, 4, cpu.pc + 1); // 测试用
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
     if (nemu_state.state != NEMU_RUNNING) break;
