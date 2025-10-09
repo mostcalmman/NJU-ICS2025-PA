@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <isa.h>
+#include <string.h>
 #include "local-include/reg.h"
 
 const char *regs[] = {
@@ -35,6 +36,9 @@ word_t isa_reg_str2val(const char *s, bool *success) {
     if(strcmp(s+1, regs[i]) == 0) {
       return cpu.gpr[i];
     }
+  }
+  if(strcmp(s+1, "pc") == 0) {
+    return cpu.pc;
   }
   *success = false;
   return 0;
