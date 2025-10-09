@@ -61,3 +61,6 @@ else
 # Include rules to build NEMU
 include $(NEMU_HOME)/scripts/native.mk
 endif
+
+count:
+	find . -name "*.c" -o -name "*.h" | xargs awk 'NF > 0 { non_empty++ } { total++ } END { printf "Total lines: %d\nNon-empty lines: %d\n", total, non_empty }'
