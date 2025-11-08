@@ -64,3 +64,10 @@ endif
 
 count:
 	find . -name "*.c" -o -name "*.h" | xargs awk 'NF > 0 { non_empty++ } { total++ } END { printf "Total lines: %d\nNon-empty lines: %d\n", total, non_empty }'
+
+OUT := $(FILE:.c=.i)
+.PHONY: expand
+expand:
+	@echo "------ Expanding $(FILE) to $(OUT) ------"
+	$(CC) $(CFLAGS) -E -P $(FILE) -o $(OUT)
+	@echo "------ Done. See $(OUT) for results. ------"
