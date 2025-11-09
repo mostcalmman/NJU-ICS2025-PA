@@ -15,7 +15,7 @@
 
 #include <isa.h>
 #include <string.h>
-#include "local-include/reg.h"
+// #include "local-include/reg.h"
 
 const char *regs[] = {
   // 这里改过, 第一个原本是$0
