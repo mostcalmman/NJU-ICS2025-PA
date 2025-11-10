@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
   am_init_monitor();
 #else
   init_monitor(argc, argv);
+  // am_init_monitor();
 #endif
 
   // // Test expr
