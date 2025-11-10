@@ -64,6 +64,7 @@ endif
 
 count:
 	find . -name "*.c" -o -name "*.h" | xargs awk 'NF > 0 { non_empty++ } { total++ } END { printf "Total lines: %d\nNon-empty lines: %d\n", total, non_empty }'
+.PHONY: count
 
 OUT := $(FILE:.c=.i)
 .PHONY: expand
