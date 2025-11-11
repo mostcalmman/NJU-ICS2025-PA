@@ -11,15 +11,21 @@ void writeIringbuf(Decode *s){
 #ifdef CONFIG_IRINGBUF
   cpu.iringbuf_index = cpu.iringbuf_index % 20;
   cpu.iringbuf[cpu.iringbuf_index] = s->isa.inst;
+  cpu.iringbuf_pc[cpu.iringbuf_index] = s->pc;
   cpu.iringbuf_index++;
 #endif
 }
 
 void printIringbuf(){
-    for(int i = 0; i < 20; i++){
 #ifdef CONFIG_IRINGBUF
-      int index = (cpu.iringbuf_index + i) % 20;
-      printf("0x%08x\n", cpu.iringbuf[index]);
-#endif
+    printf("\t======= IRINGBUF =======\n");
+    for(int i = 0; i < 20; i++){
+      if(i == (cpu.iringbuf_index + i) % 20) {
+        printf("->");
+      } else {
+        printf("\t");
+      }
+      printf("0x%08x: %08x\n", cpu.iringbuf_pc[i], cpu.iringbuf[i]);
     }
+#endif
 }

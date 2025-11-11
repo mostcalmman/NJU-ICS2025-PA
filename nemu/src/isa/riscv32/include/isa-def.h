@@ -23,6 +23,7 @@ typedef struct {
   vaddr_t pc;
 #ifdef CONFIG_IRINGBUF
   word_t iringbuf[20]; // 缓存20条指令
+  word_t iringbuf_pc[20];
   unsigned short iringbuf_index;
 #endif
 } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
