@@ -18,12 +18,12 @@ void writeIringbuf(Decode *s){
 
 void printIringbuf(){
 #ifdef CONFIG_IRINGBUF
-    printf("  ======= IRINGBUF =======\n");
+    printf("   ======= IRINGBUF =======\n");
     for(int i = 0; i < 20; i++){
       if(i == cpu.iringbuf_index % 20) {
-        printf("->");
+        printf("-->");
       } else {
-        printf("  ");
+        printf("   ");
       }
       printf("%08x: %08x\n", cpu.iringbuf_pc[i], cpu.iringbuf[i]);
     }
