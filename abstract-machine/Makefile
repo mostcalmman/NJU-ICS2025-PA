@@ -1,5 +1,5 @@
 # Makefile for AbstractMachine Kernels and Libraries
-# NAME = add
+# NAME = dummy
 # SRCS = /home/liushengrui/ics2025/am-kernels/tests/cpu-tests/tests/add.c
 # ARCH = riscv32-nemu
 
