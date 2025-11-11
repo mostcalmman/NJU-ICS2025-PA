@@ -16,6 +16,7 @@
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
+#include <cpu/iringbuf.h>
 #include <locale.h>
 #include "../monitor/sdb/sdb.h"
 // void paddr_write(paddr_t addr, int len, word_t data); // 测试用
@@ -27,7 +28,12 @@
  */
 #define MAX_INST_TO_PRINT 10
 
-CPU_state cpu = {};
+CPU_state cpu = {
+#ifdef CONFIG_IRINGBUF
+  .iringbuf = {0},
+  .iringbuf_index = 0,
+#endif
+};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
@@ -70,8 +76,11 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
+  
+// ITRACE
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
+  // 目标, 大小, 内容 ...
   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
   int ilen = s->snpc - s->pc;
   int i;
@@ -94,6 +103,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
 #endif
+
+// IRINGBUF
+#ifdef CONFIG_IRINGBUF
+  writeIringbuf(s);
+#endif
+
 }
 
 static void execute(uint64_t n) {

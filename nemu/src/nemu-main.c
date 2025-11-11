@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include <common.h>
+#include <cpu/iringbuf.h>
 // #include <stdio.h>
 
 void init_monitor(int, char *[]);
@@ -67,5 +68,9 @@ int main(int argc, char *argv[]) {
 
   engine_start();
 
-  return is_exit_status_bad();
+  bool bad = is_exit_status_bad();
+  if(bad){
+    printIringbuf();
+  }
+  return bad;
 }

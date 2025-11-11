@@ -21,6 +21,10 @@
 typedef struct {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   vaddr_t pc;
+#ifdef CONFIG_IRINGBUF
+  word_t iringbuf[20]; // 缓存20条指令
+  unsigned short iringbuf_index;
+#endif
 } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 
 // decode

@@ -26,6 +26,10 @@ typedef struct Decode {
   IFDEF(CONFIG_ITRACE, char logbuf[128]);
 } Decode;
 
+// typedef struct {
+//   uint32_t inst;
+// } MUXDEF(cONFIG_RV64, riscv64_ISADecodeInfo, riscv32_ISADecodeInfo);
+
 // --- pattern matching mechanism ---
 __attribute__((always_inline))
 static inline void pattern_decode(const char *str, int len,
