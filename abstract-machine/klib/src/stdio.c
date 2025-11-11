@@ -34,24 +34,23 @@ int sprintf(char *out, const char *fmt, ...) {
       }
       case 'd': {
         d = va_arg(ap, int);
-        char buf[32];
+        char buf[15];
         int i = 0;
-        if(d == 0){
-          buf[i++] = '0';
-        } else {
-          bool negative = false;
-          if(d < 0){
-            negative = true;
-            d = -d;
-          }
-          while(d > 0){
-            buf[i++] = (d % 10) + '0';
-            d /= 10;
-          }
-          if(negative){
-            buf[i++] = '-';
-          }
+        if(d == 0){ buf[i++] = '0'; break; }
+
+        bool negative = false;
+        if(d < 0){
+          negative = true;
+          d = -d;
         }
+        while(d > 0){
+          buf[i++] = (d % 10) + '0';
+          d /= 10;
+        }
+        if(negative){
+          buf[i++] = '-';
+        }
+        
         // Reverse the string
         for(int j = i - 1; j >= 0; j--){
           *out++ = buf[j];
