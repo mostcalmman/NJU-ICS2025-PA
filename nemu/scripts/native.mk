@@ -23,9 +23,10 @@ compile_git:
 $(BINARY):: compile_git
 
 # Some convenient rules
+# 此处用来加默认的NEMU运行参数，比如-difftest等
 
 override ARGS ?= --log=$(BUILD_DIR)/nemu-log.txt
-override ARGS += $(ARGS_DIFF) -b
+override ARGS += $(ARGS_DIFF)
 
 # Command to execute NEMU
 IMG ?=
