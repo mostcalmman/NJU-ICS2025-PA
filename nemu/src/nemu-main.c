@@ -26,7 +26,7 @@ int is_exit_status_bad();
 int main(int argc, char *argv[]) {
   /* Initialize the monitor. */
   for(int i = 0; i < argc; i++){
-    Log("argv[%d]: %s\n", i, argv[i]);
+    Log("argv[%d]: %s", i, argv[i]);
   }
 #ifdef CONFIG_TARGET_AM
   am_init_monitor();
