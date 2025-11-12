@@ -159,6 +159,10 @@ config MTRACE
   bool "Enable memory trace"
   default "true"
 
+config NEMU_ARGTRACE
+  bool "Enable NEMU argument trace"
+  default "true"
+
 config WATCHPOINT
   depends on TARGET_NATIVE_ELF
   bool "Enable watchpoint"

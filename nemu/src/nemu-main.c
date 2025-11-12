@@ -25,9 +25,11 @@ int is_exit_status_bad();
 
 int main(int argc, char *argv[]) {
   /* Initialize the monitor. */
+#ifdef CONFIG_NEMU_ARGTRACE
   for(int i = 0; i < argc; i++){
     Log("argv[%d]: %s", i, argv[i]);
   }
+#endif
 #ifdef CONFIG_TARGET_AM
   am_init_monitor();
 #else
