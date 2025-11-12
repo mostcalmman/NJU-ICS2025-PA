@@ -30,7 +30,7 @@ void printIringbuf(){
   }
   printf("====== TEST ======\n");
   char disasm_buf[128];
-  disassemble(disasm_buf, 8, cpu.iringbuf_pc[cpu.iringbuf_index % 20 - 2], (uint8_t *)&cpu.iringbuf[cpu.iringbuf_index % 20 - 2], 4);
+  disassemble(disasm_buf, 128, cpu.iringbuf_pc[cpu.iringbuf_index % 20 - 2], (uint8_t *)&cpu.iringbuf[cpu.iringbuf_index % 20 - 2], 4);
   printf("%s\n", disasm_buf);
 #endif
 }
