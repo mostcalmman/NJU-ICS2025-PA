@@ -155,6 +155,10 @@ config IRINGBUF
   bool "Enable instruction ring buffer"
   default "true"
 
+config MTRACE
+  bool "Enable memory trace"
+  default "true"
+
 config WATCHPOINT
   depends on TARGET_NATIVE_ELF
   bool "Enable watchpoint"
