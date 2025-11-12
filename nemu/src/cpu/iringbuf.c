@@ -22,7 +22,7 @@ void printIringbuf(){
   char disasm_buf[64];
   printf("======= IRINGBUF =======\n");
   for(int i = 0; i < 20; i++){
-    disassemble(disasm_buf, 64, cpu.iringbuf_pc[cpu.iringbuf_index % 20 - 1], (uint8_t *)&cpu.iringbuf[cpu.iringbuf_index % 20 - 1], 4);
+    disassemble(disasm_buf, 64, cpu.iringbuf_pc[i], (uint8_t *)&cpu.iringbuf[i], 4);
     if(i == cpu.iringbuf_index % 20 - 1) {
       printf("-->");
     } else {
