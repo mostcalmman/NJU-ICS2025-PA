@@ -31,6 +31,6 @@ void printIringbuf(){
            (cpu.iringbuf[i] >> 24) & 0xFF, (cpu.iringbuf[i] >> 16) & 0xFF, (cpu.iringbuf[i] >> 8) & 0xFF, cpu.iringbuf[i] & 0xFF,
            disasm_buf);
   }
-  printf("=========== END ===========\n");
+  printf("=========== IRINGEND ===========\n");
 #endif
 }
