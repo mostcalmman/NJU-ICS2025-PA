@@ -1,9 +1,6 @@
 #include <cpu/cpu.h>
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
-#include <locale.h>
-#include <string.h>
-#include "../monitor/sdb/sdb.h"
 
 extern CPU_state cpu;
 
