@@ -76,7 +76,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
-  
+  // 由于ITRACE在实际执行后, 所以Log中记录的内存读写对应的是下一条指令
 // ITRACE
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
