@@ -25,7 +25,11 @@ void printIringbuf(){
     } else {
       printf("   ");
     }
-    printf("%08x: %08x  %s\n", cpu.iringbuf_pc[i], cpu.iringbuf[i], disasm_buf);
+    // printf("%08x: %08x  %s\n", cpu.iringbuf_pc[i], cpu.iringbuf[i], disasm_buf);
+    printf("%08x: %02X %02X %02X %02X  %s\n",
+           cpu.iringbuf_pc[i],
+           (cpu.iringbuf[i] >> 24) & 0xFF, (cpu.iringbuf[i] >> 16) & 0xFF, (cpu.iringbuf[i] >> 8) & 0xFF, cpu.iringbuf[i] & 0xFF,
+           disasm_buf);
   }
 #endif
 }
