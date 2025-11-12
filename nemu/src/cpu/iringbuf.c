@@ -20,7 +20,7 @@ void printIringbuf(){
 #ifdef CONFIG_IRINGBUF
     printf("======= IRINGBUF =======\n");
     for(int i = 0; i < 20; i++){
-      if(i == cpu.iringbuf_index % 20) {
+      if(i == cpu.iringbuf_index % 20 - 1) {
         printf("-->");
       } else {
         printf("   ");
