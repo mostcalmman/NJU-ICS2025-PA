@@ -17,7 +17,7 @@ void printIringbuf(){
 #ifdef CONFIG_IRINGBUF
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   char disasm_buf[64];
-  printf("======= IRINGBUF =======\n");
+  printf("=========== IRINGBUF ===========\n");
   for(int i = 0; i < 20; i++){
     disassemble(disasm_buf, 64, cpu.iringbuf_pc[i], (uint8_t *)&cpu.iringbuf[i], 4);
     if(i == cpu.iringbuf_index % 20 - 1) {
@@ -26,10 +26,11 @@ void printIringbuf(){
       printf("   ");
     }
     // printf("%08x: %08x  %s\n", cpu.iringbuf_pc[i], cpu.iringbuf[i], disasm_buf);
-    printf("%08x: %02X %02X %02X %02X  %s\n",
+    printf("0x%08x: %02X %02X %02X %02X  %s\n",
            cpu.iringbuf_pc[i],
            (cpu.iringbuf[i] >> 24) & 0xFF, (cpu.iringbuf[i] >> 16) & 0xFF, (cpu.iringbuf[i] >> 8) & 0xFF, cpu.iringbuf[i] & 0xFF,
            disasm_buf);
   }
+  printf("=========== END ===========\n");
 #endif
 }
