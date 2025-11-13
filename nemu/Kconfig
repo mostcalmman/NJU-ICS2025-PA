@@ -160,7 +160,7 @@ config MTRACE
   default "true"
 
 config FTRACE
-  depends on IRINGBUF
+  depends on ITRACE
   bool "Enable function trace"
   default "true"
 
