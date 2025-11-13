@@ -47,6 +47,29 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
+#ifdef CONFIG_FTRACE
+  // 检查函数调用和返回
+  static vaddr_t last_dnpc = 0;
+  // 调用指令: jal, jalr
+  uint32_t inst = _this->isa.inst;
+  bool is_call = false, is_ret = false;
+  if((BITS(inst, 6, 0) == 0b1101111) || // jal
+     (BITS(inst, 6, 0) == 0b1100111 && BITS(inst, 14, 12) == 0b000)) { // jalr rd=ra
+    is_call = true;
+  }
+  else if(BITS(inst, 6, 0) == 0b1100111 && BITS(inst, 14, 12) == 0b000 && BITS(inst, 11,7) == 1) { // jalr rd=x1 (ra)
+    is_ret = true;
+  }
+
+  if(is_call) {
+    ftrace_push(_this->pc, dnpc);
+  }
+  else if(is_ret) {
+    ftrace_pop(_this->pc);
+  }
+  last_dnpc = dnpc;
+#endif
+
 #ifdef CONFIG_WATCHPOINT
   WP *p = watchpoint_head;
   bool success = true;
