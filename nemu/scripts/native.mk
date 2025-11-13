@@ -25,7 +25,7 @@ $(BINARY):: compile_git
 # Some convenient rules
 # 此处用来加默认的NEMU运行参数，比如-difftest等
 
-override ARGS ?= --log=$(BUILD_DIR)/nemu-log.txt -F $(BUILD_DIR)/ftrace-log.txt
+override ARGS ?= --log=$(BUILD_DIR)/nemu-log.txt -F $(BUILD_DIR)/ftrace-log.txt # 这里加上-ftrace-log.txt参数没啥必要, 但先这样吧
 override ARGS += $(ARGS_DIFF)
 
 # Command to execute NEMU
