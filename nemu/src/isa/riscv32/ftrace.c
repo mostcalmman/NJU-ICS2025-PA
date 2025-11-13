@@ -120,6 +120,8 @@ bool parse_elf(const char *elf_file) {
     free(func_map);
     fclose(fp);
     Log("ELF file parsed successfully, %d functions found", func_count);
+    void print_function_map();
+    print_function_map();
     return true;
 }
 
@@ -130,6 +132,7 @@ bool init_ftrace(const char *elf_file) {
     }
     Log("Function trace enabled using ELF file: %s", elf_file);
     return parse_elf(elf_file);
+    
 }
 
 // 在function_map中查找对应addr的函数名
