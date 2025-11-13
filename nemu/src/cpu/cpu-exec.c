@@ -42,7 +42,7 @@ CPU_state cpu = {
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
-static int g_ftrace_tab_num = 0;
+// static int g_ftrace_tab_num = 0;
 
 void device_update();
 
@@ -54,26 +54,27 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 #ifdef CONFIG_FTRACE
-  // _this->logbuf[24]开始是反汇编助记符
-  char ftracebuf[128];
-  char *ptr = ftracebuf;
-  ftracebuf[0] = '\0'; // 清空
-  if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
-    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
-    for(int i = 0; i < g_ftrace_tab_num; i++) {
-        ptr += sprintf(ptr, "  ");
-    }
-    sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc) == NULL  ? "???" : get_function_name(dnpc), dnpc);
-    g_ftrace_tab_num++;
-  }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
-    g_ftrace_tab_num = g_ftrace_tab_num > 0 ? g_ftrace_tab_num - 1 : 0; // 防止负数
-    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
-    for(int i = 0; i < g_ftrace_tab_num; i++) {
-        ptr += sprintf(ptr, "  ");
-    }
-    sprintf(ptr, "ret  [%s]\n", find_function_containing(_this->pc) == NULL ? "???" : find_function_containing(_this->pc));
-  }
-  if (ftracebuf[0] != '\0') { ftrace_log_write(ftracebuf); }
+  // // _this->logbuf[24]开始是反汇编助记符
+  // char ftracebuf[128];
+  // char *ptr = ftracebuf;
+  // ftracebuf[0] = '\0'; // 清空
+  // if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
+  //   ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
+  //   for(int i = 0; i < g_ftrace_tab_num; i++) {
+  //       ptr += sprintf(ptr, "  ");
+  //   }
+  //   sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc) == NULL  ? "???" : get_function_name(dnpc), dnpc);
+  //   g_ftrace_tab_num++;
+  // }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
+  //   g_ftrace_tab_num = g_ftrace_tab_num > 0 ? g_ftrace_tab_num - 1 : 0; // 防止负数
+  //   ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
+  //   for(int i = 0; i < g_ftrace_tab_num; i++) {
+  //       ptr += sprintf(ptr, "  ");
+  //   }
+  //   sprintf(ptr, "ret  [%s]\n", find_function_containing(_this->pc) == NULL ? "???" : find_function_containing(_this->pc));
+  // }
+  // if (ftracebuf[0] != '\0') { ftrace_log_write(ftracebuf); }
+  ftrace_trace(_this, dnpc);
 #endif
 
 #ifdef CONFIG_WATCHPOINT

@@ -10,6 +10,7 @@
 static int func_count;
 static FunctionMap *function_map;
 static FILE *ftrace_log;
+static int g_ftrace_tab_num = 0;
 
 // false表示解析失败, true表示成功
 bool parse_elf(const char *elf_file) {
@@ -179,4 +180,27 @@ void ftrace_log_write(const char *buf) {
     if(ftrace_log) {
         fputs(buf, ftrace_log);
     }
+}
+
+void ftrace_trace(Decode *_this, vaddr_t dnpc){
+    // _this->logbuf[24]开始是反汇编助记符
+  char ftracebuf[128];
+  char *ptr = ftracebuf;
+  ftracebuf[0] = '\0'; // 清空
+  if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
+    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
+    for(int i = 0; i < g_ftrace_tab_num; i++) {
+        ptr += sprintf(ptr, "  ");
+    }
+    sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc) == NULL  ? "???" : get_function_name(dnpc), dnpc);
+    g_ftrace_tab_num++;
+  }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
+    g_ftrace_tab_num = g_ftrace_tab_num > 0 ? g_ftrace_tab_num - 1 : 0; // 防止负数
+    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
+    for(int i = 0; i < g_ftrace_tab_num; i++) {
+        ptr += sprintf(ptr, "  ");
+    }
+    sprintf(ptr, "ret  [%s]\n", find_function_containing(_this->pc) == NULL ? "???" : find_function_containing(_this->pc));
+  }
+  if (ftracebuf[0] != '\0') { ftrace_log_write(ftracebuf); }
 }
