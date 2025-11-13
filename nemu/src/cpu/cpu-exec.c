@@ -75,7 +75,10 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     }
     sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
-  puts(ftracebuf);
+  // puts(ftracebuf);
+  FILE *fp = fopen("/home/liushengrui/ics2025/am-kernels/tests/cpu-tests/build/ftrace.txt", "a");
+  fputs(ftracebuf, fp);
+  fclose(fp);
 #endif
 
 #ifdef CONFIG_WATCHPOINT
