@@ -160,6 +160,6 @@ void fstackPush(vaddr_t addr, FuncStack *fstack) {
 }
 
 vaddr_t fstackPop(FuncStack *fstack) {
-    assert(fstack->func_number > 0);
+    assert(fstack->func_number >= 0);
     return fstack->func_addr[--fstack->func_number];
 }
