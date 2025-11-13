@@ -59,19 +59,15 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   char *ptr = ftracebuf;
   ftracebuf[0] = '\0'; // 清空
   if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
-    // memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
-    // ptr+=12;
-    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制 "0x8000000c: "
+    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
     for(int i = 0; i < g_ftrace_tab_num; i++) {
         ptr += sprintf(ptr, "  ");
     }
     sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc) == NULL  ? "???" : get_function_name(dnpc), dnpc);
     g_ftrace_tab_num++;
   }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
-    g_ftrace_tab_num--; // TODO
-    // memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
-    // ptr+=12;
-    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制 "0x8000000c: "
+    g_ftrace_tab_num = g_ftrace_tab_num > 0 ? g_ftrace_tab_num - 1 : 0; // 防止负数
+    ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
     for(int i = 0; i < g_ftrace_tab_num; i++) {
         ptr += sprintf(ptr, "  ");
     }
