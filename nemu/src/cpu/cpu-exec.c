@@ -74,7 +74,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     }
     sprintf(ptr, "return [%s@" FMT_WORD "]\n", get_function_name(_this->pc), _this->pc);
   }
-  puts(ftracebuf);
+  // puts(ftracebuf);
 #endif
 
 #ifdef CONFIG_WATCHPOINT

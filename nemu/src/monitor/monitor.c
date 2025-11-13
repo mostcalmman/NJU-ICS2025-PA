@@ -24,6 +24,7 @@ void init_device();
 void init_sdb();
 void init_disasm();
 bool init_ftrace(const char *elf_file);
+void print_function_map();
 
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
@@ -137,6 +138,9 @@ void init_monitor(int argc, char *argv[]) {
 
   // 解析elf文件, 用于ftrace
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file));
+
+  // 测试
+  IFDEF(CONFIG_FTRACE, print_function_map());
 
   /* Display welcome message. */
   welcome();

@@ -142,6 +142,12 @@ const char* get_function_name(vaddr_t addr) {
     return NULL; // 未找到
 }
 
+void print_function_map() {
+    for(int i = 0; i < func_count; i++) {
+        printf("Function: %s, Address: 0x%08x\n", function_map[i].name, function_map[i].addr);
+    }
+}
+
 void free_function_map() {
     if(function_map) {
         free(function_map);
