@@ -95,7 +95,7 @@ bool parse_elf(const char *elf_file) {
         return false;
     }
 
-    // 遍历符号表, 提取函数符号
+    // 遍历符号表, 提取函数符号和大小
     int num_symbols = symtab_shdr->sh_size / sizeof(Elf32_Sym);
     FunctionMap *func_map = malloc(num_symbols * sizeof(FunctionMap));
     func_count = 0;
@@ -103,6 +103,7 @@ bool parse_elf(const char *elf_file) {
         if(ELF32_ST_TYPE(symtab_data[i].st_info) == STT_FUNC) {
             strcpy(func_map[func_count].name, strtab_data + symtab_data[i].st_name); // 根据偏置找名字
             func_map[func_count].addr = symtab_data[i].st_value;
+            func_map[func_count].size = symtab_data[i].st_size;
             func_count++;
         }
     }
@@ -145,6 +146,17 @@ const char* get_function_name(vaddr_t addr) {
     return NULL; // 未找到
 }
 
+// 根据地址查找它属于哪个函数
+const char* find_function_containing(vaddr_t addr) {
+    for(int i = 0; i < func_count; i++) {
+        // 检查地址是否在 [func.addr, func.addr + func.size) 范围内
+        if(addr >= function_map[i].addr && addr < (function_map[i].addr + function_map[i].size)) {
+            return function_map[i].name;
+        }
+    }
+    return NULL; // 未找到
+}
+
 void print_function_map() {
     printf("Function Map, Count: %d\n", func_count);
     for(int i = 0; i < func_count; i++) {
@@ -167,14 +179,4 @@ void ftrace_log_write(const char *buf) {
     if(ftrace_log) {
         fputs(buf, ftrace_log);
     }
-}
-
-void fstackPush(vaddr_t addr, FuncStack *fstack) {
-    assert(fstack->func_number < 256);
-    fstack->func_addr[fstack->func_number++] = addr;
-}
-
-vaddr_t fstackPop(FuncStack *fstack) {
-    assert(fstack->func_number > 0);
-    return fstack->func_addr[--fstack->func_number];
 }
