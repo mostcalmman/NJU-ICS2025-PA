@@ -75,7 +75,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     }
     sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
-  puts(ftracebuf);
+  // puts(ftracebuf);
 #endif
 
 #ifdef CONFIG_WATCHPOINT

@@ -139,7 +139,7 @@ void init_monitor(int argc, char *argv[]) {
   // 解析elf文件, 用于ftrace
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file));
 
-  // IFDEF(CONFIG_FTRACE, print_function_map());
+  IFDEF(CONFIG_FTRACE, print_function_map());
 
   /* Display welcome message. */
   welcome();
