@@ -9,6 +9,7 @@
 
 static int func_count;
 static FunctionMap *function_map;
+static FILE *ftrace_log;
 
 // false表示解析失败, true表示成功
 bool parse_elf(const char *elf_file) {
@@ -120,14 +121,18 @@ bool parse_elf(const char *elf_file) {
     return true;
 }
 
-bool init_ftrace(const char *elf_file) {
+bool init_ftrace(const char *elf_file, const char *log_file) {
     if(elf_file == NULL) {
         Log("FTRACE enabled but no ELF file provided! Function trace will not be available.");
         return false;
     }
-    Log("Function trace enabled using ELF file: %s", elf_file);
+    ftrace_log = fopen(log_file, "w");
+    if(!ftrace_log) {
+        Log("Failed to open ftrace log file: %s, Function trace will not be available.", log_file);
+        return false;
+    }
+    Log("Function trace enabled using ELF file: %s, log file: %s", elf_file, log_file);
     return parse_elf(elf_file);
-    
 }
 
 // 在function_map中查找对应addr的函数名
@@ -147,10 +152,20 @@ void print_function_map() {
     }
 }
 
-void free_function_map() {
+void ftrace_clean() {
     if(function_map) {
         free(function_map);
         function_map = NULL;
+    }
+    if(ftrace_log) {
+        fclose(ftrace_log);
+        ftrace_log = NULL;
+    }
+}
+
+void ftrace_log_write(const char *buf) {
+    if(ftrace_log) {
+        fputs(buf, ftrace_log);
     }
 }
 

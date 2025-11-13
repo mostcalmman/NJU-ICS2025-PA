@@ -22,7 +22,7 @@ void init_monitor(int, char *[]);
 void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
-void free_function_map();
+void ftrace_clean();
 // word_t expr(char *e, bool *success);
 
 int main(int argc, char *argv[]) {
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
   engine_start();
 
-  IFDEF(CONFIG_FTRACE, free_function_map());
+  IFDEF(CONFIG_FTRACE, ftrace_clean());
 
   bool bad = is_exit_status_bad();
 #ifdef CONFIG_IRINGBUF

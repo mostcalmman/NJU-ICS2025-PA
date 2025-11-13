@@ -15,7 +15,7 @@ LDFLAGS   += --gc-sections -e _start
 NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt
 NEMUFLAGS += -b
 NEMUFLAGS += -f $(IMAGE).elf
-# NEMUFLAGS += -f /home/liushengrui/ics2025/am-kernels/tests/cpu-tests/build/if-else-riscv32-nemu.elf # 最粗暴的测试
+NEMUFLAGS += -F $(shell dirname $(IMAGE).elf)/ftrace-log.txt
 
 MAINARGS_MAX_LEN = 64
 MAINARGS_PLACEHOLDER = the_insert-arg_rule_in_Makefile_will_insert_mainargs_here

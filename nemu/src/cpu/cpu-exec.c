@@ -78,9 +78,9 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
   // puts(ftracebuf);
-  FILE *fp = fopen("/home/liushengrui/ics2025/am-kernels/tests/cpu-tests/build/ftrace.txt", "a");
-  fputs(ftracebuf, fp);
-  fclose(fp);
+  // extern FILE *ftrace_log;
+  // fputs(ftracebuf, ftrace_log);
+  ftrace_log_write(ftracebuf);
 #endif
 
 #ifdef CONFIG_WATCHPOINT
@@ -112,7 +112,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   cpu.pc = s->dnpc;
-  // 由于ITRACE在实际执行后, 所以Log中记录的内存读写对应的是下一条指令
+  // 由于ITRACE在实际执行后, 所以Log中记录的mtrace对应的是下一条指令
 // ITRACE
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
