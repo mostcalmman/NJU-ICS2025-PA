@@ -7,7 +7,7 @@ typedef struct {
 
 typedef struct {
     int func_number;
-    vaddr_t func_addr[CONFIG_FTRACE];
+    vaddr_t func_addr[256];
 } FuncStack;
 
 bool parse_elf(const char *elf_file);
