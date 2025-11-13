@@ -71,7 +71,8 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
     ptr+=12;
     for(int i = 0; i < fstack.func_number; i++){
-      *ptr++ = '\t';
+      *ptr++ = '0';
+      *ptr++ = '0';
     }
     sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
