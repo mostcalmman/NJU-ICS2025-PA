@@ -159,6 +159,11 @@ config MTRACE
   bool "Enable memory trace"
   default "true"
 
+config FTRACE
+  depends on IRINGBUF
+  bool "Enable function trace"
+  default "true"
+
 config NEMU_ARGTRACE
   bool "Enable NEMU argument trace"
   default "true"

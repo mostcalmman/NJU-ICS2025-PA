@@ -70,9 +70,13 @@ int main(int argc, char *argv[]) {
 
   engine_start();
 
+  
+
   bool bad = is_exit_status_bad();
+#ifdef CONFIG_IRINGBUF
   if(bad){
     printIringbuf();
   }
+#endif
   return bad;
 }
