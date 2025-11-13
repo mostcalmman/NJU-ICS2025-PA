@@ -11,7 +11,7 @@ typedef struct {
 } FunctionMap;
 
 static int func_count;
-static FunctionMap *function_map = NULL;
+static FunctionMap *function_map;
 
 // false表示解析失败, true表示成功
 bool parse_elf(const char *elf_file) {
