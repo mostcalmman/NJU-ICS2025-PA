@@ -140,7 +140,7 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file));
 
   // 测试
-  // IFDEF(CONFIG_FTRACE, print_function_map());
+  IFDEF(CONFIG_FTRACE, print_function_map());
 
   /* Display welcome message. */
   welcome();

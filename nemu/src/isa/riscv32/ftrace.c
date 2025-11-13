@@ -148,7 +148,7 @@ const char* get_function_name(vaddr_t addr) {
 }
 
 void print_function_map() {
-    printf("Function Map, Count: %d\n\n\n\n\n", func_count);
+    printf("Function Map, Count: %d\n", func_count);
     for(int i = 0; i < func_count; i++) {
         printf("Function: %s, Address: 0x%08x\n", function_map[i].name, function_map[i].addr);
     }
