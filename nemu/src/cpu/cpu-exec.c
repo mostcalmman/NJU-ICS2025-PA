@@ -42,6 +42,7 @@ CPU_state cpu = {
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
+FuncStack fstack = {.func_number=0};
 
 void device_update();
 
@@ -57,13 +58,12 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   const char* get_function_name(vaddr_t addr);
   char ftracebuf[128];
   char *ptr = ftracebuf;
-  FuncStack fstack = {.func_number=0};
   if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
     memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
     ptr+=12;
     for(int i = 0; i < fstack.func_number; i++){
-      *ptr++ = '0';
-      *ptr++ = '0';
+      *ptr++ = ' ';
+      *ptr++ = ' ';
     }
     sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc), dnpc);
     fstackPush(dnpc, &fstack);
@@ -72,8 +72,8 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
     memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
     ptr+=12;
     for(int i = 0; i < fstack.func_number; i++){
-      *ptr++ = '0';
-      *ptr++ = '0';
+      *ptr++ = ' ';
+      *ptr++ = ' ';
     }
     sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
