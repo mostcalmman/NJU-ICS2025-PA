@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <elf.h>
+#include <string.h>
 
 typedef struct {
-    const char *name;
+    char name[32];
     vaddr_t addr;
 } FunctionMap;
 
@@ -103,7 +104,7 @@ bool parse_elf(const char *elf_file) {
     func_count = 0;
     for(int i = 0; i < num_symbols; i++) {
         if(ELF32_ST_TYPE(symtab_data[i].st_info) == STT_FUNC) {
-            func_map[func_count].name = strtab_data + symtab_data[i].st_name; // 根据偏置找名字
+            strcpy(func_map[func_count].name, strtab_data + symtab_data[i].st_name); // 根据偏置找名字
             func_map[func_count].addr = symtab_data[i].st_value;
             func_count++;
         }
