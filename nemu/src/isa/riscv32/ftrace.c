@@ -155,8 +155,8 @@ void print_function_map() {
 }
 
 void free_function_map() {
-    if(function_map) {
-        free(function_map);
-        function_map = NULL;
-    }
+    // if(function_map) {
+    //     free(function_map);
+    //     function_map = NULL;
+    // }
 }
