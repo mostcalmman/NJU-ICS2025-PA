@@ -155,11 +155,11 @@ void free_function_map() {
 }
 
 void fstackPush(vaddr_t addr, FuncStack *fstack) {
-    assert(fstack->func_number < CONFIG_FTRACE);
+    assert(fstack->func_number < 256);
     fstack->func_addr[fstack->func_number++] = addr;
 }
 
 vaddr_t fstackPop(FuncStack *fstack) {
-    assert(fstack->func_number >= 0);
+    assert(fstack->func_number > 0);
     return fstack->func_addr[--fstack->func_number];
 }
