@@ -10,7 +10,7 @@ typedef struct {
     vaddr_t addr;
 } FunctionMap;
 
-int func_count;
+static int func_count;
 FunctionMap *function_map = NULL;
 
 // false表示解析失败, true表示成功
