@@ -120,7 +120,7 @@ bool parse_elf(const char *elf_file) {
     free(func_map);
     fclose(fp);
     Log("ELF file parsed successfully, %d functions found", func_count);
-    printf("Function Map, Count: %d\n\n\n\n\n", func_count);
+    printf("Function Map, Count: %d\n", func_count);
     for(int i = 0; i < func_count; i++) {
         printf("Function: %s, Address: 0x%08x\n", function_map[i].name, function_map[i].addr);
     }
