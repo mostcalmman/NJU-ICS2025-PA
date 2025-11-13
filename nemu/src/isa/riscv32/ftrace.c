@@ -1,5 +1,6 @@
 #include "common.h"
 #include "debug.h"
+#include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <elf.h>
@@ -8,6 +9,9 @@ typedef struct {
     const char *name;
     vaddr_t addr;
 } FunctionMap;
+
+int func_count;
+FunctionMap *function_map = NULL;
 
 // false表示解析失败, true表示成功
 bool parse_elf(const char *elf_file) {
@@ -106,7 +110,7 @@ bool parse_elf(const char *elf_file) {
     }
 
     // 节省空间
-    FunctionMap *function_map = malloc(func_count * sizeof(FunctionMap));
+    function_map = malloc(func_count * sizeof(FunctionMap));
     memcpy(function_map, func_map, func_count * sizeof(FunctionMap));
 
     free(shdr_table);
@@ -128,3 +132,19 @@ bool init_ftrace(const char *elf_file) {
     return parse_elf(elf_file);
 }
 
+// 在function_map中查找对应addr的函数名
+const char* get_function_name(vaddr_t addr) {
+    for(int i = 0; i < func_count; i++) {
+        if(function_map[i].addr == addr) {
+            return function_map[i].name;
+        }
+    }
+    return NULL; // 未找到
+}
+
+void free_function_map() {
+    if(function_map) {
+        free(function_map);
+        function_map = NULL;
+    }
+}

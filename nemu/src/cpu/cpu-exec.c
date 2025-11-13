@@ -18,7 +18,10 @@
 #include <cpu/difftest.h>
 #include <cpu/iringbuf.h>
 #include <locale.h>
+#include <stdio.h>
+#include <string.h>
 #include "../monitor/sdb/sdb.h"
+#include "macro.h"
 // void paddr_write(paddr_t addr, int len, word_t data); // 测试用
 
 /* The assembly code of instructions executed is only output to the screen
@@ -48,26 +51,30 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 #ifdef CONFIG_FTRACE
-  // // 检查函数调用和返回
-  // static vaddr_t last_dnpc = 0;
-  // // 调用指令: jal, jalr
-  // uint32_t inst = _this->isa.inst;
-  // bool is_call = false, is_ret = false;
-  // if((BITS(inst, 6, 0) == 0b1101111) || // jal
-  //    (BITS(inst, 6, 0) == 0b1100111 && BITS(inst, 14, 12) == 0b000)) { // jalr rd=ra
-  //   is_call = true;
-  // }
-  // else if(BITS(inst, 6, 0) == 0b1100111 && BITS(inst, 14, 12) == 0b000 && BITS(inst, 11,7) == 1) { // jalr rd=x1 (ra)
-  //   is_ret = true;
-  // }
-
-  // if(is_call) {
-  //   ftrace_push(_this->pc, dnpc);
-  // }
-  // else if(is_ret) {
-  //   ftrace_pop(_this->pc);
-  // }
-  // last_dnpc = dnpc;
+  // dnpc是下一条指令的地址
+  // _this->logbuf[24]开始是反汇编助记符
+  const char* get_function_name(vaddr_t addr);
+  char ftracebuf[128];
+  char *ptr = ftracebuf;
+  int tab_num = 0; // 当作简化的栈
+  if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
+    memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
+    ptr+=12;
+    for(int i = 0; i < tab_num; i++){
+      *ptr++ = '\t';
+    }
+    sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc), dnpc);
+    tab_num++;
+  }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
+    tab_num--;
+    memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
+    ptr+=12;
+    for(int i = 0; i < tab_num; i++){
+      *ptr++ = '\t';
+    }
+    sprintf(ptr, "return [%s@" FMT_WORD "]\n", get_function_name(_this->pc), _this->pc);
+  }
+  puts(ftracebuf);
 #endif
 
 #ifdef CONFIG_WATCHPOINT
@@ -127,10 +134,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
 #endif
 
-// IRINGBUF
-#ifdef CONFIG_IRINGBUF
-  writeIringbuf(s);
-#endif
+  // IRINGBUF
+  IFDEF(CONFIG_IRINGBUF, writeIringbuf(s));
 
 }
 

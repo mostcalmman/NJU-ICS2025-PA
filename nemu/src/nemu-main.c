@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "macro.h"
 #include <common.h>
 #include <cpu/iringbuf.h>
 // #include <stdio.h>
@@ -21,6 +22,7 @@ void init_monitor(int, char *[]);
 void am_init_monitor();
 void engine_start();
 int is_exit_status_bad();
+void free_function_map();
 // word_t expr(char *e, bool *success);
 
 int main(int argc, char *argv[]) {
@@ -70,13 +72,11 @@ int main(int argc, char *argv[]) {
 
   engine_start();
 
-  
+  IFDEF(CONFIG_FTRACE, free_function_map());
 
   bool bad = is_exit_status_bad();
 #ifdef CONFIG_IRINGBUF
-  if(bad){
-    printIringbuf();
-  }
+  if(bad) printIringbuf();
 #endif
   return bad;
 }
