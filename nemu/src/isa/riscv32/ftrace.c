@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <elf.h>
 #include <string.h>
-
 #include "ftrace.h"
 
 static int func_count;
