@@ -100,7 +100,7 @@ bool parse_elf(const char *elf_file) {
     // 遍历符号表, 提取函数符号
     int num_symbols = symtab_shdr->sh_size / sizeof(Elf32_Sym);
     FunctionMap *func_map = malloc(num_symbols * sizeof(FunctionMap));
-    int func_count = 0;
+    // int func_count = 0;
     for(int i = 0; i < num_symbols; i++) {
         if(ELF32_ST_TYPE(symtab_data[i].st_info) == STT_FUNC) {
             func_map[func_count].name = strtab_data + symtab_data[i].st_name; // 根据偏置找名字
