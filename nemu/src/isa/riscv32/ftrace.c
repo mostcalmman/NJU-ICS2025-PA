@@ -1,15 +1,11 @@
 #include "common.h"
 #include "debug.h"
 #include <locale.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <elf.h>
 #include <string.h>
 
-typedef struct {
-    char name[32];
-    vaddr_t addr;
-} FunctionMap;
+#include "ftrace.h"
 
 static int func_count;
 static FunctionMap *function_map;
@@ -156,4 +152,14 @@ void free_function_map() {
         free(function_map);
         function_map = NULL;
     }
+}
+
+void fstackPush(vaddr_t addr, FuncStack *fstack) {
+    assert(fstack->func_number < CONFIG_FTRACE);
+    fstack->func_addr[fstack->func_number++] = addr;
+}
+
+vaddr_t fstackPop(FuncStack *fstack) {
+    assert(fstack->func_number > 0);
+    return fstack->func_addr[--fstack->func_number];
 }

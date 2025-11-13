@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "../monitor/sdb/sdb.h"
+#include "common.h"
 #include "macro.h"
+#include <ftrace.h>
 // void paddr_write(paddr_t addr, int len, word_t data); // 测试用
 
 /* The assembly code of instructions executed is only output to the screen
@@ -51,28 +53,27 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 #ifdef CONFIG_FTRACE
-  // dnpc是下一条指令的地址
   // _this->logbuf[24]开始是反汇编助记符
   const char* get_function_name(vaddr_t addr);
   char ftracebuf[128];
   char *ptr = ftracebuf;
-  int tab_num = 0; // 当作简化的栈
+  FuncStack fstack = {.func_number=0};
   if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
     memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
     ptr+=12;
-    for(int i = 0; i < tab_num; i++){
+    for(int i = 0; i < fstack.func_number; i++){
       *ptr++ = '\t';
     }
     sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc), dnpc);
-    tab_num++;
+    fstackPush(dnpc, &fstack);
   }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
-    tab_num--;
+    vaddr_t addr = fstackPop(&fstack);
     memcpy(ptr, _this->logbuf, 12); // 复制 "0x8000000c: "
     ptr+=12;
-    for(int i = 0; i < tab_num; i++){
+    for(int i = 0; i < fstack.func_number; i++){
       *ptr++ = '\t';
     }
-    sprintf(ptr, "return [%s@" FMT_WORD "]\n", get_function_name(_this->pc), _this->pc);
+    sprintf(ptr, "ret  [%s]\n", get_function_name(addr));
   }
   puts(ftracebuf);
 #endif
