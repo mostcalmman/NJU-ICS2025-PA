@@ -26,7 +26,7 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-  printf("register\tdec\thex\n");
+  printf("reg\tdec\thex\n");
   for (int i = 0; i < 32; i++) {
     printf("%s\t%d\t0x%x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
   }
