@@ -1,6 +1,8 @@
 #include <klib.h>
 #include <klib-macros.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <x86_64-linux-gnu/sys/types.h>
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
@@ -63,8 +65,20 @@ int strncmp(const char *s1, const char *s2, size_t n) {
 }
 
 void *memset(void *s, int c, size_t n) {
-  for(size_t i = 0; i < n; i++) {
-    ((char *)s)[i] = (char)c;
+  // for(size_t i = 0; i < n; i++) {
+  //   ((char *)s)[i] = (char)c;
+  // }
+  // return s;
+  uint32_t *s32 = (uint32_t *)s;
+  size_t word_n = n / 4;
+  uint32_t c32 = (uint32_t)c | ((uint32_t)c << 8) | ((uint32_t)c << 16) | ((uint32_t)c << 24);
+  for(size_t i = 0; i < word_n; i++) {
+    s32[i] = c32;
+  }
+  size_t byte_n = n % 4;
+  uint8_t *s8 = (uint8_t *)(s32 + word_n);
+  for(size_t i = 0; i < byte_n; i++) {
+    s8[i] = (uint8_t)c;
   }
   return s;
 }
@@ -88,8 +102,22 @@ void *memmove(void *dst, const void *src, size_t n) {
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
-  for(size_t i = 0; i < n; i++) {
-    ((char *)out)[i] = ((char *)in)[i];
+  // for(size_t i = 0; i < n; i++) {
+  //   ((char *)out)[i] = ((char *)in)[i];
+  // }
+  // return out;
+  uint32_t *d32 = (uint32_t *)out;
+  const uint32_t *s32 = (const uint32_t *)in;
+  size_t word_n = n / 4;
+  for(size_t i = 0; i < word_n; i++) {
+    d32[i] = s32[i];
+  }
+  size_t byte_n = n % 4;
+  uint8_t *d8 = (uint8_t *)(d32 + word_n);
+  const uint8_t *s8 = (const uint8_t *)(s32 + word_n);
+
+  for(size_t i = 0; i < byte_n; i++) {
+    d8[i] = s8[i];
   }
   return out;
 }
