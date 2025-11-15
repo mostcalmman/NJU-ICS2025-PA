@@ -30,6 +30,7 @@ void isa_reg_display() {
   for (int i = 0; i < 32; i++) {
     printf("%-5s %13d %12x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
   }
+  printf("    Register State Table End\n");
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
