@@ -18,7 +18,7 @@
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   if(ref_r->pc != pc) {
-    printf("Difftest Error: pc not match, ref = 0x%x, dut = 0x%x\n", 
+    printf("Difftest Error: dnpc not match, ref = 0x%x, dut = 0x%x\nThis means the instruction before dnpc is not executed correctly.\n", 
            ref_r->pc, pc);
     return false;
   }
