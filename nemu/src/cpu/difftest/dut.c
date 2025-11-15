@@ -99,6 +99,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc) {
   }
 }
 
+// 让ref执行相同的指令然后读取其寄存器进行对比
 void difftest_step(vaddr_t pc, vaddr_t npc) {
   CPU_state ref_r;
 
