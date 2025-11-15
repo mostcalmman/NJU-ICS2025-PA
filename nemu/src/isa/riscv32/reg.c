@@ -26,11 +26,11 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-  printf("      Register State Table      \nreg             dec\t     hex\n");
+  printf("------Register State Table------\nreg             dec\t     hex\n");
   for (int i = 0; i < 32; i++) {
     printf("%-5s %13d %12x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
   }
-  printf("    Register State Table End\n");
+  printf("----Register State Table End----\n");
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
