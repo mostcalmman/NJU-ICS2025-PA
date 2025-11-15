@@ -28,7 +28,7 @@ const char *regs[] = {
 void isa_reg_display() {
   printf("------Register State Table------\nreg             dec\t     hex\n");
   printf("%-5s %13d %12x\n", "pc", cpu.pc, cpu.pc);
-  printf("%-5s %13d %12x\n", "$0", cpu.pc, cpu.pc);
+  printf("%-5s %13d %12x\n", "$0", cpu.gpr[0], cpu.gpr[0]);
   for (int i = 1; i < 32; i++) {
     printf("%-5s %13d %12x\n", regs[i], cpu.gpr[i], cpu.gpr[i]);
   }
