@@ -34,7 +34,7 @@ bool parse_elf(const char *elf_file) {
 
     // 读取Section Header Table
     fseek(fp, ehdr.e_shoff, SEEK_SET);
-    int shdr_table_size = ehdr.e_shnum * ehdr.e_shentsize; // 暂不考虑e_shnum>=SHN_LORESERVE的情况
+    int shdr_table_size = ehdr.e_shnum * ehdr.e_shentsize; // 暂不考虑 e_shnum >= SHN_LORESERVE 的情况
     Elf32_Shdr *shdr_table = malloc(shdr_table_size);
     if(fread(shdr_table, 1, shdr_table_size, fp) != shdr_table_size) {
         Log("Failed to read Section Header Table");
