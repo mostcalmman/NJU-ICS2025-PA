@@ -62,9 +62,33 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
       continue;
     }
     ++fmt;
+    
+    // 解析格式控制符
+    char pad_char = ' ';
+    int width = 0;
+
+    // 检查填充字符, 如 %08d 中的 0
+    if (*fmt == '0') {
+      pad_char = '0';
+      ++fmt;
+    }
+
+    // 解析宽度, 如 %08d 中的 8
+    while (*fmt >= '0' && *fmt <= '9') {
+      width = width * 10 + (*fmt - '0');
+      ++fmt;
+    }
+
     switch(*fmt++){
       case 's': {
         s = va_arg(ap, char*);
+        int len = strlen(s);
+        // 处理左侧填充
+        while (width > len) {
+            if (out && count < n - 1) out[count] = ' ';
+            ++count;
+            width--;
+        }
         while(*s){
           if(out && count < n - 1){
             out[count] = *s;
@@ -94,6 +118,28 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
             buf[i++] = '-';
           }
         }
+
+        // 计算实际数字长度
+        int len = i;
+        // %04d, -1 -> -001 (填充在符号后)
+        // %4d, -1 ->   -1 (填充在符号前，空格填充)
+        
+        // 如果是0填充且有负号，先输出负号，再填充0
+        bool handle_sign_first = (pad_char == '0' && buf[i-1] == '-');
+        if (handle_sign_first) {
+            if(out && count < n - 1) out[count] = '-';
+            ++count;
+            len--; // 符号已经输出了，剩余长度减1
+            i--;   // buf中最后一个字符是'-'，不需要再输出了
+        }
+
+        // 填充
+        while (width > len) {
+            if (out && count < n - 1) out[count] = pad_char;
+            ++count;
+            width--;
+        }
+
         // Reverse the string
         for(int j = i - 1; j >= 0; j--){
           char ch = buf[j];
@@ -121,6 +167,7 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
       }
       default: 
         putch(*(fmt - 1));
+        putch('\n');
         assert(0);
     }
   }
