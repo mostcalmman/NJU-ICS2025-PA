@@ -1,5 +1,3 @@
-#ifdef CONFIG_FTRACE
-
 #include "common.h"
 #include "debug.h"
 #include <locale.h>
@@ -12,6 +10,7 @@ static int func_count;
 static FunctionMap *function_map;
 static FILE *ftrace_log;
 static int g_ftrace_tab_num = 0;
+#ifdef CONFIG_FTRACE
 
 // false表示解析失败, true表示成功
 bool parse_elf(const char *elf_file) {
