@@ -1,6 +1,11 @@
 # Makefile for AbstractMachine Kernels and Libraries
+
 # NAME = dummy
 # SRCS = /home/liushengrui/ics2025/am-kernels/tests/cpu-tests/tests/add.c
+# ARCH = riscv32-nemu
+
+# NAME = amtest
+# SRCS = /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/main.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/video.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/devscan.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/mp.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/hello.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/vm.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/intr.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/audio.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/rtc.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/keyboard.c /home/liushengrui/ics2025/am-kernels/tests/am-tests/src/tests/audio/audio-data.S
 # ARCH = riscv32-nemu
 
 ### *Get a more readable version of this Makefile* by `make html` (requires python-markdown)
