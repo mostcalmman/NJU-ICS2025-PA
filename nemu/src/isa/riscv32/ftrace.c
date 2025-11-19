@@ -1,3 +1,5 @@
+#ifdef CONFIG_FTRACE
+
 #include "common.h"
 #include "debug.h"
 #include <locale.h>
@@ -203,3 +205,5 @@ void ftrace_trace(Decode *_this, vaddr_t dnpc){
   }
   if (ftracebuf[0] != '\0') { ftrace_log_write(ftracebuf); }
 }
+
+#endif
