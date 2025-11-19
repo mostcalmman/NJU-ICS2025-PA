@@ -104,7 +104,16 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         }
         break;
       }
-      default: assert(0);
+      case 'c': {
+        char ch = (char)va_arg(ap, int);
+        if(out && count < n - 1){
+          out[count] = ch;
+        }
+        ++count;
+        break;
+      }
+      default: 
+        assert(0);
     }
   }
   if(out && n > 0){

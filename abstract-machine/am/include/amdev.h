@@ -3,6 +3,8 @@
 
 // **MAY SUBJECT TO CHANGE IN THE FUTURE**
 
+#include <stdbool.h>
+#include <stdint.h>
 #define AM_DEVREG(id, reg, perm, ...) \
   enum { AM_##reg = (id) }; \
   typedef struct { __VA_ARGS__; } AM_##reg##_T;

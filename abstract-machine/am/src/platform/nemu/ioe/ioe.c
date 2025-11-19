@@ -1,9 +1,11 @@
 #include <am.h>
 #include <klib-macros.h>
 
+// 这三个初始化都被抽象成ioe_init了, 不需要被ioe_read, ioe_write调用
 void __am_timer_init();
 void __am_gpu_init();
 void __am_audio_init();
+
 void __am_input_keybrd(AM_INPUT_KEYBRD_T *);
 void __am_timer_rtc(AM_TIMER_RTC_T *);
 void __am_timer_uptime(AM_TIMER_UPTIME_T *);
