@@ -29,17 +29,44 @@ int atoi(const char* nptr) {
   return x;
 }
 
+#define ALIGN_MASK 7
+static void *addr = NULL;
+
 void *malloc(size_t size) {
-  // On native, malloc() will be called during initializaion of C runtime.
-  // Therefore do not call panic() here, else it will yield a dead recursion:
-  //   panic() -> putchar() -> (glibc) -> malloc() -> panic()
-#if !(defined(__ISA_NATIVE__) && defined(__NATIVE_USE_KLIB__))
-  panic("Not implemented");
-#endif
-  return NULL;
+//   // On native, malloc() will be called during initializaion of C runtime.
+//   // Therefore do not call panic() here, else it will yield a dead recursion:
+//   //   panic() -> putchar() -> (glibc) -> malloc() -> panic()
+// #if !(defined(__ISA_NATIVE__) && defined(__NATIVE_USE_KLIB__))
+//   panic("Not implemented");
+// #endif
+
+
+  if (size == 0) { return NULL; }
+
+  if (addr == NULL) { addr = heap.start; }
+
+  uintptr_t current_addr_int = (uintptr_t)addr;
+  uintptr_t aligned_addr_int = (current_addr_int + ALIGN_MASK) & ~ALIGN_MASK; // 8字节对齐
+  void *current_addr = (void *)aligned_addr_int;
+
+  if(size > PTRDIFF_MAX){
+      printf("Error: malloc size too large! (Request size: %u)\n", size);
+      return NULL;
+  }
+
+  void *next_addr = (void *)((char *)current_addr + size);
+
+  if (next_addr > heap.end) {
+      printf("Error: malloc out of memory! (Request size: %u)\n", size);
+      return NULL;
+  }
+
+  addr = next_addr;
+  return current_addr;
 }
 
 void free(void *ptr) {
+  // 简化情况, 直接留空
 }
 
 #endif
