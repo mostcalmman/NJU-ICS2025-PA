@@ -133,10 +133,18 @@ static int decode_exec(Decode *s) {
   /* ------------------------- RV32M 乘法扩展 ------------------------- */
   INSTPAT("0000001 ????? ????? 000 ????? 0110011", mul    , R, R(rd) = src1 * src2);
   // 先把word_t(32位无符号转化为32位有符号, 转64的时候才会进行符号扩展)
-  INSTPAT("0000001 ????? ????? 001 ????? 0110011", mulh   , R, int64_t tmp = (int64_t)(int32_t)src1 * (int64_t)(int32_t)src2; R(rd) = BITS(tmp, 63, 32));
-  // 这俩估计不对, 需要用再改
-  // INSTPAT("0000001 ????? ????? 010 ????? 0110011", mulsu  , R, R(rd) = ((int64_t)(uint32_t)src1 * (int64_t)(uint32_t)src2) >> 32);
-  // INSTPAT("0000001 ????? ????? 011 ????? 0110011", mulu   , R, R(rd) = ((uint64_t)src1 * (uint64_t)src2) >> 32);
+  INSTPAT("0000001 ????? ????? 001 ????? 0110011", mulh   , R, // signed * signed
+    int64_t tmp = (int64_t)(int32_t)src1 * (int64_t)(int32_t)src2; 
+    R(rd) = BITS(tmp, 63, 32)
+  );
+  INSTPAT("0000001 ????? ????? 010 ????? 0110011", mulsu  , R, // signed * unsigned
+    int64_t tmp = (int64_t)(int32_t)src1 * (uint64_t)src2;
+    R(rd) = BITS(tmp, 63, 32)
+  );
+  INSTPAT("0000001 ????? ????? 011 ????? 0110011", mulhu  , R, // aka mulu, unsigned * unsigned
+    uint64_t tmp = ((uint64_t)src1 * (uint64_t)src2);
+    R(rd) = BITS(tmp, 63, 32)
+  );
   INSTPAT("0000001 ????? ????? 100 ????? 0110011", div    , R, 
     if (src2 == 0) R(rd) = 0xFFFFFFFF;
     else if (src1 == 0x80000000 && src2 == 0xffffffff) R(rd) = src1;
