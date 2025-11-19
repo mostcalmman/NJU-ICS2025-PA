@@ -150,6 +150,38 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         }
         break;
       }
+      case 'x': {
+        unsigned int x = va_arg(ap, unsigned int);
+        char buf[32];
+        int i = 0;
+        if (x == 0) {
+          buf[i++] = '0';
+        } else {
+          while (x > 0) {
+            int digit = x % 16;
+            if (digit < 10) buf[i++] = digit + '0';
+            else buf[i++] = digit - 10 + 'a';
+            x /= 16;
+          }
+        }
+
+        int len = i;
+        // 填充
+        while (width > len) {
+            if (out && count < n - 1) out[count] = pad_char;
+            ++count;
+            width--;
+        }
+
+        // Reverse the string
+        for (int j = i - 1; j >= 0; j--) {
+          if (out && count < n - 1) {
+            out[count] = buf[j];
+          }
+          ++count;
+        }
+        break;
+      }
       case 'c': {
         char ch = (char)va_arg(ap, int);
         if(out && count < n - 1){
