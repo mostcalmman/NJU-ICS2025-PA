@@ -120,7 +120,7 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         break;
       }
       default: 
-        printf("Unsupported format specifier: %%%c\n", *(fmt - 1));
+        printf("Unsupported format specifier: %%%c\n", *(fmt));
         assert(0);
     }
   }
