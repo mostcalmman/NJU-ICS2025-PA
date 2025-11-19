@@ -112,7 +112,15 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
         ++count;
         break;
       }
+      case '%': {
+        if(out && count < n - 1){
+          out[count] = '%';
+        }
+        ++count;
+        break;
+      }
       default: 
+        printf("Unsupported format specifier: %%%c\n", *(fmt - 1));
         assert(0);
     }
   }
