@@ -45,6 +45,7 @@ AM_DEVREG(24, NET_RX,       WR, Area buf);
   _(LCTRL) _(APPLICATION) _(LALT) _(SPACE) _(RALT) _(RCTRL) \
   _(UP) _(DOWN) _(LEFT) _(RIGHT) _(INSERT) _(DELETE) _(HOME) _(END) _(PAGEUP) _(PAGEDOWN)
 
+// 就是把各种按键一次列出
 #define AM_KEY_NAMES(key) AM_KEY_##key,
 enum {
   AM_KEY_NONE = 0,
