@@ -165,7 +165,7 @@ config FTRACE
   default y
 
 config DTRACE # at src/memory/Kconfig
-  depends on DEVICE
+  depends on DEVICE && ITRACE
   bool "Enable device trace"
   default y
 

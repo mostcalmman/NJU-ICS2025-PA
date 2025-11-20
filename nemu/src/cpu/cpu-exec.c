@@ -45,6 +45,7 @@ static bool g_print_step = false;
 
 void device_update();
 
+// ITRACE打开只会在条件满足时在控制台打trace, CONFIG_ITRACE_COND打开才会写进log文件
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   // ITRACE
 #ifdef CONFIG_ITRACE_COND
