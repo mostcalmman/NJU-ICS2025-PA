@@ -64,6 +64,7 @@ static uint32_t key_dequeue() {
   return key;
 }
 
+// keymap是一个索引表, 把SDL的scancode映射到NEMU的am_scancode
 void send_key(uint8_t scancode, bool is_keydown) {
   if (nemu_state.state == NEMU_RUNNING && keymap[scancode] != NEMU_KEY_NONE) {
     uint32_t am_scancode = keymap[scancode] | (is_keydown ? KEYDOWN_MASK : 0);
