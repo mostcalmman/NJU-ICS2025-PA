@@ -164,6 +164,11 @@ config FTRACE
   bool "Enable function trace"
   default y
 
+config DTRACE # at src/memory/Kconfig
+  depends on DEVICE
+  bool "Enable device trace"
+  default y
+
 config NEMU_ARGTRACE
   bool "Enable NEMU argument trace"
   default "true"
