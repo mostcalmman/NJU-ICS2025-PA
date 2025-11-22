@@ -5,6 +5,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <am.h>
 #define AM_DEVREG(id, reg, perm, ...) \
   enum { AM_##reg = (id) }; \
   typedef struct { __VA_ARGS__; } AM_##reg##_T;
@@ -28,6 +29,7 @@ AM_DEVREG(14, AUDIO_CONFIG, RD, bool present; int bufsize);
 AM_DEVREG(15, AUDIO_CTRL,   WR, int freq, channels, samples);
 AM_DEVREG(16, AUDIO_STATUS, RD, int count);
 AM_DEVREG(17, AUDIO_PLAY,   WR, Area buf);
+
 AM_DEVREG(18, DISK_CONFIG,  RD, bool present; int blksz, blkcnt);
 AM_DEVREG(19, DISK_STATUS,  RD, bool ready);
 AM_DEVREG(20, DISK_BLKIO,   WR, bool write; void *buf; int blkno, blkcnt);
