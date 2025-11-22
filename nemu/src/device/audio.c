@@ -32,7 +32,7 @@ static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
 static uint32_t play_pos = 0;
 
-void audio_callback(void *userdata, Uint8 * stream, int len){
+static void audio_callback(void *userdata, Uint8 * stream, int len){
   uint32_t to_play = len;
   if(len > audio_base[reg_count]){
     to_play = audio_base[reg_count];
@@ -74,6 +74,12 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   }
 }
 
+static void audio_sbuf_handler(uint32_t offset, int len, bool is_write) {
+  if (is_write) {
+    audio_base[reg_count] += len;
+  }
+}
+
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
@@ -84,7 +90,7 @@ void init_audio() {
 #endif
 
   sbuf = (uint8_t *)new_space(CONFIG_SB_SIZE);
-  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, NULL);
+  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, audio_sbuf_handler);
   audio_base[reg_init] = 0;
   audio_base[reg_count] = 0;
   audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;

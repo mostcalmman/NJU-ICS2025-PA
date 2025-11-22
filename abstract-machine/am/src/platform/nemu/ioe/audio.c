@@ -46,15 +46,15 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     uint32_t space_to_end = sbuf_size - sbuf_pos;
     if (to_write <= space_to_end) {
       for (uint32_t i = 0; i < to_write; i ++) {
-        outl(AUDIO_SBUF_ADDR + sbuf_pos + i, data[i]);
+        outb(AUDIO_SBUF_ADDR + sbuf_pos + i, data[i]);
       }
       sbuf_pos = sbuf_pos + to_write;
     } else {
       for (uint32_t i = 0; i < space_to_end; i ++) {
-        outl(AUDIO_SBUF_ADDR + sbuf_pos + i, data[i]);
+        outb(AUDIO_SBUF_ADDR + sbuf_pos + i, data[i]);
       }
       for (uint32_t i = 0; i < to_write - space_to_end; i ++) {
-        outl(AUDIO_SBUF_ADDR + i, data[space_to_end + i]);
+        outb(AUDIO_SBUF_ADDR + i, data[space_to_end + i]);
       }
       sbuf_pos = (sbuf_pos + to_write) % sbuf_size;
     }
