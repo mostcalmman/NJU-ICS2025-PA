@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include <SDL2/SDL_audio.h>
 #include <common.h>
 #include <device/map.h>
 #include <SDL2/SDL.h>
@@ -76,7 +77,9 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
 
 static void audio_sbuf_handler(uint32_t offset, int len, bool is_write) {
   if (is_write) {
+    SDL_LockAudio();
     audio_base[reg_count] += len;
+    SDL_UnlockAudio();
   }
 }
 
