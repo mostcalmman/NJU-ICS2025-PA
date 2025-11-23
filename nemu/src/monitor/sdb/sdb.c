@@ -199,12 +199,12 @@ static int cmd_w(char *args){
     return 0;
   }
 
-  watchpoint_head = new_wp();
-  if(watchpoint_head == NULL) return 0; // 错误信息会在new_wp中打印
-  strncpy(watchpoint_head->expr, args, 1023);
-  watchpoint_head->expr[1023] = '\0'; // 确保字符串以'\0'结尾
-  watchpoint_head->last_value = val;
-  printf("New watchpoint %d: %s, original value = 0x%x\n", watchpoint_head->NO, watchpoint_head->expr, watchpoint_head->last_value);
+  WP *wp = new_wp();
+  if(wp == NULL) return 0; // 错误信息会在new_wp中打印
+  strncpy(wp->expr, args, 1023);
+  wp->expr[1023] = '\0'; // 确保字符串以'\0'结尾
+  wp->last_value = val;
+  printf("New watchpoint %d: %s, original value = 0x%x\n", wp->NO, wp->expr, wp->last_value);
   return 0;
 }
 

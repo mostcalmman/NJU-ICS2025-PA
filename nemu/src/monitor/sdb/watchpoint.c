@@ -16,7 +16,7 @@
 #include "sdb.h"
 
 static WP wp_pool[NR_WP] = {};
-static WP *head = NULL, *free_ = NULL;
+static WP *free_ = NULL;
 WP *watchpoint_head = NULL; // 疑问
 
 void init_wp_pool() {
@@ -26,7 +26,7 @@ void init_wp_pool() {
     wp_pool[i].next = (i == NR_WP - 1 ? NULL : &wp_pool[i + 1]);
   }
 
-  head = NULL;
+  watchpoint_head = NULL;
   free_ = wp_pool;
 }
 
@@ -41,8 +41,8 @@ WP* new_wp(){
   WP *new_wp = free_;
   free_ = free_->next;
 
-  new_wp->next = head;
-  head = new_wp;
+  new_wp->next = watchpoint_head;
+  watchpoint_head = new_wp;
 
   return new_wp;
 }
@@ -50,11 +50,11 @@ WP* new_wp(){
 void free_wp(WP *wp){
   if(wp == NULL) return;
 
-  if(head == wp){
-    head = head->next;
+  if(watchpoint_head == wp){
+    watchpoint_head = watchpoint_head->next;
   }
   else{
-    WP *p = head;
+    WP *p = watchpoint_head;
     while(p != NULL && p->next != wp) p = p->next; // find the previous node
     if(p != NULL) p->next = wp->next;
   }
