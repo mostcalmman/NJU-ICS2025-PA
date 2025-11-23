@@ -131,12 +131,12 @@ static void execute(uint64_t n) {
 #ifdef CONFIG_DEADLOOP_DETECT
     total_exec_count ++;
     if(total_exec_count > MAX_INSTR_LIMIT){
-      printf("Deadloop detected! Total instruction count exceeds %d\n", MAX_INSTR_LIMIT);
+      Log("NEMU: "ANSI_FG_RED"Deadloop detected!"ANSI_BG_RED" Total instruction count exceeds %d", MAX_INSTR_LIMIT);
       nemu_state.state = NEMU_ABORT;
     }
 
     if (s.dnpc == s.pc) {
-      printf("NEMU: Dead loop detected! Jmp in place at PC = " FMT_WORD "\n", s.pc);
+      Log("NEMU: "ANSI_FG_RED"Deadloop detected!"ANSI_BG_RED" Jmp in place at PC = " FMT_WORD, s.pc);
       nemu_state.state = NEMU_STOP;
     }
 #endif
