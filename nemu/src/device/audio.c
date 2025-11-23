@@ -37,16 +37,16 @@ static uint32_t count = 0;
 
 static void audio_callback(void *userdata, Uint8 * stream, int len){
   uint32_t to_play = len;
-  if(len > count){
-    to_play = count;
+  if(len > audio_base[reg_count]){
+    to_play = audio_base[reg_count];
     memset(stream + to_play, 0, len - to_play);
   }
   for(uint32_t i = 0; i < to_play; i ++){
     stream[i] = sbuf[(play_pos + i) % audio_base[reg_sbuf_size]];
   }
   play_pos = (play_pos + to_play) % audio_base[reg_sbuf_size];
-  count -= to_play;
-  audio_base[reg_count] = count;
+  audio_base[reg_count] -= to_play;
+  count = audio_base[reg_count];
 }
 
 static void init_SDL_audio_subsystem(){
