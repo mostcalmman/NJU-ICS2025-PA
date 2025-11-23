@@ -225,10 +225,10 @@ static int cmd_d(char *args){
     printf("Invalid input: Number too large\n");
     return 0;
   }
-  if(ret == -3 || n == 0){
-    printf("Invalid input: N should be a positive number\n");
-    return 0;
-  }
+  // if(ret == -3 || n == 0){
+  //   printf("Invalid input: N should be a positive number\n");
+  //   return 0;
+  // }
   if(n >= NR_WP){
     printf("Invalid input: N should be less than %d\n", NR_WP);
     return 0;
