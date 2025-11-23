@@ -180,6 +180,10 @@ config WATCHPOINT
   help
     Enable watchpoint support.
 
+config DEADLOOP_DETECT
+  bool "Enable deadloop detection"
+  default y
+
 config DIFFTEST
   depends on TARGET_NATIVE_ELF
   bool "Enable differential testing"

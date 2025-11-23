@@ -19,12 +19,16 @@
 #include <cpu/iringbuf.h>
 #include <locale.h>
 #include <stdio.h>
-#include <string.h>
 #include "../monitor/sdb/sdb.h"
 #include "common.h"
 #include "macro.h"
 #include <ftrace.h>
 // void paddr_write(paddr_t addr, int len, word_t data); // 测试用
+
+#ifdef CONFIG_DEADLOOP_DETECT
+extern uint64_t total_exec_count;
+#define MAX_INSTR_LIMIT 10000000
+#endif
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -123,6 +127,20 @@ static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
+
+#ifdef CONFIG_DEADLOOP_DETECT
+    total_exec_count ++;
+    if(total_exec_count > MAX_INSTR_LIMIT){
+      printf("Deadloop detected! Total instruction count exceeds %d\n", MAX_INSTR_LIMIT);
+      nemu_state.state = NEMU_ABORT;
+    }
+
+    if (s.dnpc == s.pc) {
+      printf("NEMU: Dead loop detected! Jmp in place at PC = " FMT_WORD "\n", s.pc);
+      nemu_state.state = NEMU_STOP;
+    }
+#endif
+
     // paddr_write(0x80000000, 4, cpu.pc + 1); // 测试用
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);

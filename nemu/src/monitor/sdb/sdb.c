@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "sdb.h"
 
+IFDEF(CONFIG_DEADLOOP_DETECT, uint64_t total_exec_count = 0);
 static int is_batch_mode = false;
 
 void init_regex();
@@ -301,6 +302,7 @@ void sdb_set_batch_mode() {
 }
 
 void sdb_mainloop() {
+  IFDEF(CONFIG_DEADLOOP_DETECT, total_exec_count = 0);
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
