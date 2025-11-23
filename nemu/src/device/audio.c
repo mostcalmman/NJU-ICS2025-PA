@@ -78,14 +78,6 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   }
 }
 
-// static void audio_sbuf_handler(uint32_t offset, int len, bool is_write) {
-//   if (is_write) {
-//     SDL_LockAudio();
-//     audio_base[reg_count] += len;
-//     SDL_UnlockAudio();
-//   }
-// }
-
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
   audio_base = (uint32_t *)new_space(space_size);
