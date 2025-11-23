@@ -17,6 +17,7 @@
 #include <common.h>
 #include <device/map.h>
 #include <SDL2/SDL.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 enum {
@@ -32,24 +33,27 @@ enum {
 static uint8_t *sbuf = NULL;
 static uint32_t *audio_base = NULL;
 static uint32_t play_pos = 0;
+static uint32_t count = 0;
 
 static void audio_callback(void *userdata, Uint8 * stream, int len){
   uint32_t to_play = len;
-  if(len > audio_base[reg_count]){
-    to_play = audio_base[reg_count];
+  if(len > count){
+    to_play = count;
     memset(stream + to_play, 0, len - to_play);
     for(uint32_t i = 0; i < to_play; i ++){
       stream[i] = sbuf[(play_pos + i) % audio_base[reg_sbuf_size]];
     }
     play_pos = (play_pos + to_play) % audio_base[reg_sbuf_size];
     audio_base[reg_count] = 0;
+    count = 0;
     return;
   }
   for(uint32_t i = 0; i < to_play; i ++){
     stream[i] = sbuf[(play_pos + i) % audio_base[reg_sbuf_size]];
   }
   play_pos = (play_pos + to_play) % audio_base[reg_sbuf_size];
-  audio_base[reg_count] -= to_play;
+  count -= to_play;
+  audio_base[reg_count] = count;
 }
 
 static void init_SDL_audio_subsystem(){
@@ -73,15 +77,21 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
   if(reg_id == reg_init && audio_base[reg_init] == 1){
     init_SDL_audio_subsystem();
   }
-}
-
-static void audio_sbuf_handler(uint32_t offset, int len, bool is_write) {
-  if (is_write) {
+  if(reg_id == reg_count){
     SDL_LockAudio();
-    audio_base[reg_count] += len;
+    count += audio_base[reg_count];
+    audio_base[reg_count] = count;
     SDL_UnlockAudio();
   }
 }
+
+// static void audio_sbuf_handler(uint32_t offset, int len, bool is_write) {
+//   if (is_write) {
+//     SDL_LockAudio();
+//     audio_base[reg_count] += len;
+//     SDL_UnlockAudio();
+//   }
+// }
 
 void init_audio() {
   uint32_t space_size = sizeof(uint32_t) * nr_reg;
@@ -93,8 +103,9 @@ void init_audio() {
 #endif
 
   sbuf = (uint8_t *)new_space(CONFIG_SB_SIZE);
-  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, audio_sbuf_handler);
+  add_mmio_map("audio-sbuf", CONFIG_SB_ADDR, sbuf, CONFIG_SB_SIZE, NULL);
   audio_base[reg_init] = 0;
   audio_base[reg_count] = 0;
   audio_base[reg_sbuf_size] = CONFIG_SB_SIZE;
+  count = 0;
 }

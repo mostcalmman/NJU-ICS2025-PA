@@ -60,5 +60,6 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     }
     data += to_write;
     len -= to_write;
+    outl(AUDIO_COUNT_ADDR, to_write);
   }
 }
