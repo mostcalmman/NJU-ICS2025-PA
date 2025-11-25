@@ -129,11 +129,11 @@ static void execute(uint64_t n) {
     exec_once(&s, cpu.pc);
 
 #ifdef CONFIG_DEADLOOP_DETECT
-    total_exec_count ++;
-    if(total_exec_count > MAX_INSTR_LIMIT){
-      Log("NEMU: "ANSI_FG_RED"Deadloop detected!"ANSI_NONE" Total instruction count exceeds %d", MAX_INSTR_LIMIT);
-      nemu_state.state = NEMU_ABORT;
-    }
+    // total_exec_count ++;
+    // if(total_exec_count > MAX_INSTR_LIMIT){
+    //   Log("NEMU: "ANSI_FG_RED"Deadloop detected!"ANSI_NONE" Total instruction count exceeds %d", MAX_INSTR_LIMIT);
+    //   nemu_state.state = NEMU_ABORT;
+    // }
 
     if (s.dnpc == s.pc) {
       Log("NEMU: "ANSI_FG_RED"Deadloop detected!"ANSI_NONE" Jmp in place at PC = " FMT_WORD, s.pc);
