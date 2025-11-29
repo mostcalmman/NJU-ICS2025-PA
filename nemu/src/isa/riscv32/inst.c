@@ -172,8 +172,8 @@ static int decode_exec(Decode *s) {
   INSTPAT("????????????????????    ????? 0010111", auipc  , U, R(rd) = s->pc + imm);
 
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
-  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(5), s->pc));
-  INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(17))); // 把控制权转给Debugger, R(10) is $a0
+  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
+  INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
   // 这两个的详细行为参考指令集规范第二册
   INSTPAT("????????????  ????? 010 ????? 1110011", csrrs  , I, 
     word_t *csr = isa_csr_str2ptr(imm & 0xfff);
