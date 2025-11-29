@@ -42,7 +42,7 @@ CPU_state cpu = {
   .iringbuf = {0},
   .iringbuf_index = 0,
 #endif
-  // .mstatus = 0x1800,
+  .mstatus = 0x1800,
 };
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
