@@ -1,6 +1,7 @@
 #ifndef ARCH_H__
 #define ARCH_H__
 
+#include <stdint.h>
 #ifdef __riscv_e
 #define NR_REGS 16
 #else

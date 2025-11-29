@@ -169,8 +169,9 @@ static int decode_exec(Decode *s) {
   INSTPAT("????????????????????    ????? 0010111", auipc  , U, R(rd) = s->pc + imm);
 
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
-  // INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, ); // 把控制权转给OS
+  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
+  INSTPAT("????????????  ????? xxx ????? 1110011", , I, );
 
   // 无效指令, 这个必须在最后
   INSTPAT("??????? ????? ????? ??? ????? ???????", inv    , N, INV(s->pc));
@@ -183,6 +184,6 @@ static int decode_exec(Decode *s) {
 
 // inst的类型是uint32_t
 int isa_exec_once(Decode *s) {
-  s->isa.inst = inst_fetch(&s->snpc, 4);
+  s->isa.inst = inst_fetch(&s->snpc, 4); // snpc在这里会完成自加
   return decode_exec(s);
 }

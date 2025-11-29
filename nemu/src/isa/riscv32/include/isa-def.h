@@ -21,6 +21,10 @@
 typedef struct {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   vaddr_t pc;
+  vaddr_t mepc;
+  word_t mstatus;
+  word_t mcause;
+  word_t mtvec;
 #ifdef CONFIG_IRINGBUF
   word_t iringbuf[20]; // 缓存20条指令
   word_t iringbuf_pc[20];
