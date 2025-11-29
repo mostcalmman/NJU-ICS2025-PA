@@ -55,29 +55,6 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
   }
 }
 
-
-
-
-static vaddr_t *csr_register(word_t imm) {
-  switch (imm)
-  {
-  case 0x341: return &(cpu.mepc);
-  case 0x342: return &(cpu.mcause);
-  case 0x300: return &(cpu.mstatus);
-  case 0x305: return &(cpu.mtvec);
-  default: panic("Unknown csr");
-  }
-}
- 
-#define ECALL(dnpc) { bool success; dnpc = (isa_raise_intr(isa_reg_str2val("a7", &success), s->pc)); }
-#define CSR(i) *csr_register(i)
- 
-
-
-
-
-
-
 static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
 
@@ -194,27 +171,22 @@ static int decode_exec(Decode *s) {
   INSTPAT("????????????????????    ????? 0110111", lui    , U, R(rd) = imm); // <<12 在decode_operand里完成
   INSTPAT("????????????????????    ????? 0010111", auipc  , U, R(rd) = s->pc + imm);
 
-
-  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I, R(rd) = CSR(imm); CSR(imm) = src1);
-  INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I, R(rd) = CSR(imm); CSR(imm) |= src1);
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, ECALL(s->dnpc));
-
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
-  // INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
+  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
   // 这两个的详细行为参考指令集规范第二册
-  // INSTPAT("????????????  ????? 010 ????? 1110011", csrrs  , I, 
-  //   word_t *csr = isa_csr_str2ptr(imm & 0xfff);
-  //   word_t t = *csr;
-  //   if (src1 != 0) *csr = t | src1;
-  //   R(rd) = t;
-  // );
-  // INSTPAT("????????????  ????? 001 ????? 1110011", csrrw  , I, 
-  //   word_t *csr = isa_csr_str2ptr(imm & 0xfff);
-  //   word_t t = (rd != 0) ? *csr : 0;
-  //   *csr = src1;
-  //   R(rd) = t;
-  // );
+  INSTPAT("????????????  ????? 010 ????? 1110011", csrrs  , I, 
+    word_t *csr = isa_csr_str2ptr(imm & 0xfff);
+    word_t t = *csr;
+    if (src1 != 0) *csr = t | src1;
+    R(rd) = t;
+  );
+  INSTPAT("????????????  ????? 001 ????? 1110011", csrrw  , I, 
+    word_t *csr = isa_csr_str2ptr(imm & 0xfff);
+    word_t t = (rd != 0) ? *csr : 0;
+    *csr = src1;
+    R(rd) = t;
+  );
 
   // 无效指令, 这个必须在最后
   INSTPAT("??????? ????? ????? ??? ????? ???????", inv    , N, INV(s->pc));
