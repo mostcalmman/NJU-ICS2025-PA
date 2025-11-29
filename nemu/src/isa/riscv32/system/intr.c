@@ -26,9 +26,9 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
 #ifdef CONFIG_ETRACE
   Log("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
-// #ifdef CONFIG_ITRACE_COND
+#ifdef CONFIG_ITRACE_COND
   log_write("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
-// #endif
+#endif
 #endif
 
   return cpu.mtvec;
