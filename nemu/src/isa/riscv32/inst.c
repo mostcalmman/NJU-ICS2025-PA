@@ -167,10 +167,11 @@ static int decode_exec(Decode *s) {
     else R(rd) = src1 % src2
 );
 
-  /* ------------------------- 其他 ------------------------- */
+  /* ------------------------- 其他整数运算 ------------------------- */
   INSTPAT("????????????????????    ????? 0110111", lui    , U, R(rd) = imm); // <<12 在decode_operand里完成
   INSTPAT("????????????????????    ????? 0010111", auipc  , U, R(rd) = s->pc + imm);
 
+  /* ------------------------- 系统调用 ------------------------- */
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
   INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
@@ -186,6 +187,11 @@ static int decode_exec(Decode *s) {
     word_t t = (rd != 0) ? *csr : 0;
     *csr = src1;
     R(rd) = t;
+  );
+  INSTPAT("001100000010  00000 000 00000 1110011", mret   , N, 
+    s->dnpc = cpu.mepc;
+    cpu.mstatus = cpu.mstatus | ((cpu.mstatus & 0x80) >> 4); // MIE 设为 MPIE
+    cpu.mstatus = cpu.mstatus | (~0x80); // MPIE 设为 1
   );
 
   // 无效指令, 这个必须在最后
