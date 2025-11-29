@@ -13,11 +13,14 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "common.h"
 #include "local-include/reg.h"
 #include <cpu/cpu.h>
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
 #include <stdint.h>
+
+word_t* isa_csr_str2ptr(word_t csr);
 
 #define R(i) gpr(i)
 #define Mr vaddr_read
@@ -171,7 +174,19 @@ static int decode_exec(Decode *s) {
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
   INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
-  // INSTPAT("????????????  ????? xxx ????? 1110011", , I, );
+  // 这两个的详细行为参考指令集规范第二册
+  INSTPAT("????????????  ????? 001 ????? 1110011", csrrs  , I, 
+    word_t *csr = isa_csr_str2ptr(imm);
+    word_t t = *csr;
+    *csr = t | src1;
+    R(rd) = t;
+  );
+  INSTPAT("????????????  ????? 010 ????? 1110011", csrrw  , I, 
+    word_t *csr = isa_csr_str2ptr(imm);
+    word_t t = *csr;
+    *csr = src1;
+    R(rd) = t;
+  );
 
   // 无效指令, 这个必须在最后
   INSTPAT("??????? ????? ????? ??? ????? ???????", inv    , N, INV(s->pc));

@@ -56,3 +56,14 @@ word_t isa_reg_str2val(const char *s, bool *success) {
   *success = false;
   return 0;
 }
+
+// 对照表在指令集规范第二册
+word_t* isa_csr_str2ptr(word_t csr) {
+  switch(csr) {
+    case 0x341: return &cpu.mepc;
+    case 0x300: return &cpu.mstatus;
+    case 0x342: return &cpu.mcause;
+    case 0x305: return &cpu.mtvec;
+    default: panic("Unsupported CSR address: 0x%x", csr);
+  }
+}
