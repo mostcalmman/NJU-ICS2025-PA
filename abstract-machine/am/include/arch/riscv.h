@@ -11,8 +11,13 @@
 
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  void *pdir; // 地址空间占用reg[0]
-  uintptr_t gpr[NR_REGS - 1];
+  union {
+    struct {
+      void *pdir;
+      uintptr_t gpr_body[NR_REGS - 1];
+    };
+    uintptr_t gpr[NR_REGS];
+  };
   uintptr_t mcause;
   uintptr_t mstatus;
   uintptr_t mepc;
