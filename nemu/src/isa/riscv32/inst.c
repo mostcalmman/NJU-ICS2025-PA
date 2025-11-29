@@ -176,14 +176,14 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
   // 这两个的详细行为参考指令集规范第二册
   INSTPAT("????????????  ????? 010 ????? 1110011", csrrs  , I, 
-    word_t *csr = isa_csr_str2ptr(imm);
+    word_t *csr = isa_csr_str2ptr(imm & 0xfff);
     word_t t = *csr;
-    *csr = t | src1;
+    if (src1 != 0) *csr = t | src1;
     R(rd) = t;
   );
   INSTPAT("????????????  ????? 001 ????? 1110011", csrrw  , I, 
-    word_t *csr = isa_csr_str2ptr(imm);
-    word_t t = *csr;
+    word_t *csr = isa_csr_str2ptr(imm & 0xfff);
+    word_t t = (rd != 0) ? *csr : 0;
     *csr = src1;
     R(rd) = t;
   );
