@@ -6,13 +6,13 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 
 Context* __am_irq_handle(Context *c) {
   printf("\nContext\n");
-  for(int i = 0; i < 35; i++) {
-    printf("0x%x\n", (c+4*i));
-  }
+  uintptr_t *raw = (uintptr_t *)c;
+  for (int i = 0; i < 35; i++) printf("0x%08lx\n", raw[i]);
   printf("Context End\n\n");
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
+      case 11: ev.event = EVENT_YIELD; c->mepc += 4; break;
       default: ev.event = EVENT_ERROR; break;
     }
 
