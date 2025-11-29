@@ -9,22 +9,13 @@
 #define NR_REGS 32
 #endif
 
-// struct Context {
-//   // TODO: fix the order of these members to match trap.S
-//   void *pdir; // 地址空间占用reg[0]
-//   uintptr_t gpr[NR_REGS - 1];
-//   uintptr_t mcause;
-//   uintptr_t mstatus;
-//   uintptr_t mepc;
-// };
-
-
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  uintptr_t gpr[32];
-  uintptr_t mcause, mstatus, mepc;
-  void *pdir;
-  uintptr_t np;
+  void *pdir; // 地址空间占用reg[0]
+  uintptr_t gpr[NR_REGS - 1];
+  uintptr_t mcause;
+  uintptr_t mstatus;
+  uintptr_t mepc;
 };
 
 #ifdef __riscv_e
