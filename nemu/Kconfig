@@ -169,6 +169,10 @@ config DTRACE # at src/memory/Kconfig
   bool "Enable device trace"
   default y
 
+config ETRACE
+  bool "Enable exception trace"
+  default y
+
 config NEMU_ARGTRACE
   bool "Enable NEMU argument trace"
   default "true"

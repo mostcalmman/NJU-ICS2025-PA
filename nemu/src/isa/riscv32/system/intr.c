@@ -13,6 +13,7 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 
+#include "common.h"
 #include <isa.h>
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
@@ -22,10 +23,15 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   cpu.mepc = epc;
   cpu.mcause = NO;
 
+#ifdef CONFIG_ETRACE
+  Log("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
+#ifdef CONFIG_ITRACE_COND
+  log_write("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
+#endif
+#endif
 
   return cpu.mtvec;
 }
-
 word_t isa_query_intr() {
   return INTR_EMPTY;
 }
