@@ -2,6 +2,7 @@
 #define ARCH_H__
 
 #include <stdint.h>
+#include <x86_64-linux-gnu/sys/types.h>
 #ifdef __riscv_e
 #define NR_REGS 16
 #else
@@ -10,8 +11,11 @@
 
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  void *pdir; // 地址空间占用reg[0]
-  uintptr_t gpr[NR_REGS];
+  union {
+    void *pdir; // 地址空间占用reg[0]
+    uintptr_t gpr0;
+  };
+  uintptr_t gpr[NR_REGS - 1];
   uintptr_t mcause;
   uintptr_t mstatus;
   uintptr_t mepc;
