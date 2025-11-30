@@ -14,7 +14,7 @@ size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 
 static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Ehdr ehdr;
-  ramdisk_read(&ehdr, 0, sizeof(ehdr));
+  ramdisk_read(&ehdr, 0x3000000, sizeof(ehdr));
   assert(*(uint32_t *)ehdr.e_ident == 0x7f454c46); // 0x7f 'E' 'L' 'F'
   // TODO: 检查架构合法性
 
