@@ -8,10 +8,11 @@
 int printf(const char *fmt, ...) {
   void putch(char ch); 
   
-  char print_buf[1024];
+  char print_buf[4096];
   va_list args;
   va_start(args, fmt);
   if( vsnprintf(print_buf, sizeof(print_buf), fmt, args) >= sizeof(print_buf)) {
+    // 这里出错大概率是bug不够大
     assert(0);
   }  
   va_end(args);
@@ -225,6 +226,40 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
           out[count] = '%';
         }
         ++count;
+        break;
+      }
+      case 'p': {
+        void* p = va_arg(ap, void*);
+        uintptr_t addr = (uintptr_t)p;
+        char buf[32];
+        int i = 0;
+        if (addr == 0) {
+          buf[i++] = '0';
+        } else {
+          while (addr > 0) {
+            int digit = addr % 16;
+            if (digit < 10) buf[i++] = digit + '0';
+            else buf[i++] = digit - 10 + 'a';
+            addr /= 16;
+          }
+        }
+        // 输出 "0x"
+        if(out && count < n - 1){
+          out[count] = '0';
+        }
+        ++count;
+        if(out && count < n - 1){
+          out[count] = 'x';
+        }
+        ++count;
+
+        // Reverse the string
+        for (int j = i - 1; j >= 0; j--) {
+          if (out && count < n - 1) {
+            out[count] = buf[j];
+          }
+          ++count;
+        }
         break;
       }
       default: 
