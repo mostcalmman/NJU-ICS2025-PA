@@ -16,7 +16,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Ehdr ehdr;
   ramdisk_read(&ehdr, 0, sizeof(ehdr));
   printf("\n\n%x08\n\n", *(uint32_t *)ehdr.e_ident);
-  assert(*(uint32_t *)ehdr.e_ident == 0x7f454c46); // 0x7f 'E' 'L' 'F'
+  assert(*(uint32_t *)ehdr.e_ident == 0x464c457f); // 0x7f 'E' 'L' 'F'
   // TODO: 检查架构合法性
 
   int phdr_size = ehdr.e_phnum * ehdr.e_phentsize;
