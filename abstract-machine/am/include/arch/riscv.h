@@ -2,7 +2,6 @@
 #define ARCH_H__
 
 #include <stdint.h>
-#include <x86_64-linux-gnu/sys/types.h>
 #ifdef __riscv_e
 #define NR_REGS 16
 #else
