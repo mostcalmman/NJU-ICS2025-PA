@@ -173,7 +173,8 @@ static int decode_exec(Decode *s) {
 
   /* ------------------------- 系统调用 ------------------------- */
   // 这俩实际是TYPE_I, 但是用不到立即数, 所以用TYPE_N
-  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(R(17), s->pc));
+  // 目前不区分权限级别, 所以所有ecall都传11
+  INSTPAT("0000000 00000 00000 000 00000 1110011", ecall  , N, s->dnpc = isa_raise_intr(11, s->pc));
   INSTPAT("0000000 00001 00000 000 00000 1110011", ebreak , N, NEMUTRAP(s->pc, R(10))); // 把控制权转给Debugger, R(10) is $a0
   // 这两个的详细行为参考指令集规范第二册
   INSTPAT("????????????  ????? 010 ????? 1110011", csrrs  , I, 
