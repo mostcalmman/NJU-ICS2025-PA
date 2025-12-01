@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include "syscall.h"
 void do_syscall(Context *c) {
-  Log("\nStrace: syscall event at pc = 0x%x", c->mepc);
+  Log("Strace: syscall event at pc = 0x%x", c->mepc);
   Log("Strace: Context");
   uintptr_t *raw = (uintptr_t *)c;
   for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
-  Log("Context End\n");
+  Log("Context End");
   uintptr_t a[4];
   a[0] = c->GPR1;
 
