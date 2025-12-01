@@ -9,7 +9,9 @@ void do_syscall(Context *c) {
       yield();
       c->mepc+=4;
       break;
-    
+    case SYS_exit:
+      halt(0);
+      break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
