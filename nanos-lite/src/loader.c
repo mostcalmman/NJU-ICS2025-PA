@@ -9,6 +9,12 @@
 # define Elf_Phdr Elf32_Phdr
 #endif
 
+#ifdef __ISA_RISCV32__
+#define EXPECT_ISA EM_RISCV
+#elif defined(__ISA_NATIVE__)
+#define EXPECT_ISA EM_X86_64
+#endif
+
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 
@@ -17,8 +23,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   ramdisk_read(&ehdr, 0, sizeof(ehdr));
   // 注意是小端存储, 最低有效位在最后
   assert(*(uint32_t *)ehdr.e_ident == 0x464c457f); // 0x7f 'E' 'L' 'F'
-  // TODO: 检查架构合法性
-  
+  assert(ehdr.e_machine == EXPECT_ISA);
   int phdr_size = ehdr.e_phnum * ehdr.e_phentsize;
   Elf_Phdr *phdr = malloc(phdr_size);
   ramdisk_read(phdr, ehdr.e_phoff, phdr_size);
