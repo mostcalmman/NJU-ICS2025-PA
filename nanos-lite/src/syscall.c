@@ -7,7 +7,7 @@ void do_syscall(Context *c) {
   switch (a[0]) {
     case SYS_yield:
       yield();
-      return;
+      c->mepc+=4;
       break;
     
     default: panic("Unhandled syscall ID = %d", a[0]);
