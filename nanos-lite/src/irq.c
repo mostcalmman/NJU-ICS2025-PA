@@ -8,7 +8,6 @@ static Context* do_event(Event e, Context* c) {
       c->mepc+=4; 
       break;
     case EVENT_SYSCALL: 
-      Log("syscall recognized");
       do_syscall(c); 
       break;
     default: panic("Unhandled event ID = %d", e.event);
