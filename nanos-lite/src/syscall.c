@@ -9,6 +9,8 @@ void strace(Context *c){
   switch (c->GPR1) {
     case SYS_yield: syscall_name = "SYS_yield"; break;
     case SYS_exit: syscall_name = "SYS_exit"; break;
+    case SYS_write: syscall_name = "SYS_write"; break;
+    case SYS_read: syscall_name = "SYS_read"; break;
   }
 
   Log("Strace: syscall type = %s (id = %d)", syscall_name, c->GPR1);
