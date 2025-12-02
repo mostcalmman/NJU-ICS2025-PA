@@ -22,7 +22,7 @@
 #include "../monitor/sdb/sdb.h"
 #include "common.h"
 #include "macro.h"
-#include <ftrace.h>
+void ftrace_trace(Decode *_this, vaddr_t dnpc);
 // void paddr_write(paddr_t addr, int len, word_t data); // 测试用
 
 #ifdef CONFIG_DEADLOOP_DETECT

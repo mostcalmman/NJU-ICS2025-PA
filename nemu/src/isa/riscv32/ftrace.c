@@ -1,19 +1,26 @@
 #include "common.h"
+#include "cpu/decode.h"
 #include "debug.h"
 #include <locale.h>
 #include <stdio.h>
 #include <elf.h>
 #include <string.h>
-#include "ftrace.h"
+// #include "ftrace.h"
 #ifdef CONFIG_FTRACE
+typedef struct {
+    char name[32];
+    vaddr_t addr;
+    uint32_t size;
+} FunctionMap;
 static int func_count;
 static FunctionMap *function_map;
 static FILE *ftrace_log;
 static int g_ftrace_tab_num = 0;
+static const char *ignore_funcs[] = {"putch", NULL};
 
 
 // false表示解析失败, true表示成功
-bool parse_elf(const char *elf_file) {
+static bool parse_elf(const char *elf_file) {
     FILE *fp = fopen(elf_file, "rb"); // 以二进制只读方式打开
     if (!fp) {
         Log("Failed to open ELF file");
@@ -138,7 +145,7 @@ bool init_ftrace(const char *elf_file, const char *log_file) {
 }
 
 // 在function_map中查找对应addr的函数名
-const char* get_function_name(vaddr_t addr) {
+static const char* get_function_name(vaddr_t addr) {
     for(int i = 0; i < func_count; i++) {
         if(function_map[i].addr == addr) {
             return function_map[i].name;
@@ -148,7 +155,7 @@ const char* get_function_name(vaddr_t addr) {
 }
 
 // 根据地址查找它属于哪个函数
-const char* find_function_containing(vaddr_t addr) {
+static const char* find_function_containing(vaddr_t addr) {
     for(int i = 0; i < func_count; i++) {
         // 检查地址是否在 [func.addr, func.addr + func.size) 范围内
         if(addr >= function_map[i].addr && addr < (function_map[i].addr + function_map[i].size)) {
@@ -176,31 +183,49 @@ void ftrace_clean() {
     }
 }
 
-void ftrace_log_write(const char *buf) {
+static void ftrace_log_write(const char *buf) {
     if(ftrace_log) {
         fputs(buf, ftrace_log);
     }
 }
 
+static bool should_ignore(const char *name) {
+    if (name == NULL) return false;
+    for (int i = 0; ignore_funcs[i] != NULL; i++) {
+        if (strcmp(name, ignore_funcs[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void ftrace_trace(Decode *_this, vaddr_t dnpc){
-    // _this->logbuf[24]开始是反汇编助记符
-  char ftracebuf[4096];
+  // _this->logbuf[24]开始是反汇编助记符
+  char ftracebuf[16384];
   char *ptr = ftracebuf;
   ftracebuf[0] = '\0'; // 清空
   if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
+    const char *func_name = get_function_name(dnpc);
+
+    if(should_ignore(func_name)) return; // 过滤
+
     ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
     for(int i = 0; i < g_ftrace_tab_num; i++) {
         ptr += sprintf(ptr, "  ");
     }
-    sprintf(ptr, "call [%s@" FMT_WORD "]\n", get_function_name(dnpc) == NULL  ? "???" : get_function_name(dnpc), dnpc);
+    sprintf(ptr, "call [%s@" FMT_WORD "]\n", func_name == NULL  ? "???" : func_name, dnpc);
     g_ftrace_tab_num++;
   }else if(memcmp(_this->logbuf + 24, "ret", 3) == 0){
+    const char *func_name = find_function_containing(_this->pc);
+
+    if(should_ignore(func_name)) return; // 过滤
+
     g_ftrace_tab_num = g_ftrace_tab_num > 0 ? g_ftrace_tab_num - 1 : 0; // 防止负数
     ptr += sprintf(ptr, "%.12s", _this->logbuf); // 复制类似 "0x80000000: " 的字符串
     for(int i = 0; i < g_ftrace_tab_num; i++) {
         ptr += sprintf(ptr, "  ");
     }
-    sprintf(ptr, "ret  [%s]\n", find_function_containing(_this->pc) == NULL ? "???" : find_function_containing(_this->pc));
+    sprintf(ptr, "ret  [%s]\n", func_name == NULL ? "???" : func_name);
   }
   if (ftracebuf[0] != '\0') { ftrace_log_write(ftracebuf); }
 }
