@@ -1,4 +1,6 @@
 #include "common.h"
+#ifdef CONFIG_FTRACE
+
 #include "cpu/decode.h"
 #include "debug.h"
 #include <locale.h>
@@ -6,7 +8,6 @@
 #include <elf.h>
 #include <string.h>
 #include <libgen.h>
-#ifdef CONFIG_FTRACE
 typedef struct {
     char name[32];
     vaddr_t addr;
