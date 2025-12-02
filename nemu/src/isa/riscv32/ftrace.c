@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <elf.h>
 #include <string.h>
+#include <libgen.h>
 #ifdef CONFIG_FTRACE
 typedef struct {
     char name[32];
@@ -16,16 +17,26 @@ static FunctionMap *function_map;
 static FILE *ftrace_log;
 static int g_ftrace_tab_num = 0;
 static const char *ignore_funcs[] = {"putch", NULL};
+static bool got_elf = false;
 
 
 // false表示解析失败, true表示成功
-static bool parse_elf(const char *elf_file) {
+static bool parse_elf(const char *elf_file, FunctionMap **out_map, int *out_count) {
     FILE *fp = fopen(elf_file, "rb"); // 以二进制只读方式打开
-    if (!fp) {
+    if (fp && got_elf){
+        Log("Found ramdisk, it will be parsed too");
+    }
+    if (!fp && !got_elf) {
         Log("Failed to open ELF file");
         return false;
     }
-
+    if (!fp && got_elf) {
+        Log("No ramdisk found, only the main ELF will be used for ftrace");
+        return false;
+    }
+    if (fp && !got_elf) {
+        got_elf = true;
+    }
     // 检查ELF头合法性, 由于针对riscv32设计, 后面的元信息不需要处理
     Elf32_Ehdr ehdr;
     if(fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp) != 1) {
@@ -116,8 +127,9 @@ static bool parse_elf(const char *elf_file) {
     }
 
     // 节省空间
-    function_map = malloc(func_count * sizeof(FunctionMap));
-    memcpy(function_map, func_map, func_count * sizeof(FunctionMap));
+    *out_count = func_count;
+    *out_map = malloc(func_count * sizeof(FunctionMap));
+    memcpy(*out_map, func_map, func_count * sizeof(FunctionMap));
 
     free(shdr_table);
     free(shstrtab_data);
@@ -125,8 +137,23 @@ static bool parse_elf(const char *elf_file) {
     free(symtab_data);
     free(func_map);
     fclose(fp);
-    Log("ELF file parsed successfully, %d functions found", func_count);
+    Log("ELF file %s parsed successfully, %d functions found", elf_file, func_count);
     return true;
+}
+
+static char* ramdisk_get_file(const char *elf_file){
+    char *path_copy = strdup(elf_file);
+    if (path_copy == NULL) return NULL;
+    char *dir_path = dirname(path_copy);
+    size_t new_path_len = strlen(dir_path) + 1 + strlen("ramdisk.img") + 1;
+    char *new_path = (char *)malloc(new_path_len);
+    if (new_path == NULL) {
+        free(path_copy);
+        return NULL;
+    }
+    snprintf(new_path, new_path_len, "%s/%s", dir_path, "ramdisk.img");
+    free(path_copy);
+    return new_path;
 }
 
 bool init_ftrace(const char *elf_file, const char *log_file) {
@@ -140,7 +167,32 @@ bool init_ftrace(const char *elf_file, const char *log_file) {
         return false;
     }
     Log("Function trace enabled using ELF file: %s, log file: %s", elf_file, log_file);
-    return parse_elf(elf_file);
+    FunctionMap *temMap = NULL;
+    int temCount = 0;
+    if(parse_elf(elf_file, &temMap, &temCount)) {
+        if(function_map) assert(0); // 到这里肯定是出错了
+        function_map = temMap;
+        func_count = temCount;
+    }else{
+        return false;
+    }
+    // ramdisk解析
+    char *ramdisk_file = ramdisk_get_file(elf_file);
+    temMap = NULL;
+    if(ramdisk_file){
+        if(parse_elf(ramdisk_file, &temMap, &temCount)){
+            // 合并function_map和temMap
+            FunctionMap *new_map = malloc((func_count + temCount) * sizeof(FunctionMap));
+            memcpy(new_map, function_map, func_count * sizeof(FunctionMap));
+            memcpy(new_map + func_count, temMap, temCount * sizeof(FunctionMap));
+            free(function_map);
+            free(temMap);
+            function_map = new_map;
+            func_count += temCount;
+        }
+        free(ramdisk_file);
+    }
+    return true;
 }
 
 // 在function_map中查找对应addr的函数名
