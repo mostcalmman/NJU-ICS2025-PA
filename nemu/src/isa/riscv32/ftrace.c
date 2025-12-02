@@ -16,7 +16,7 @@ static int func_count;
 static FunctionMap *function_map;
 static FILE *ftrace_log;
 static int g_ftrace_tab_num = 0;
-static const char *ignore_funcs[] = {"putch", NULL};
+static const char *ignore_funcs[] = {"putch", "_fputc_r", "_putc_r", NULL};
 static bool got_elf = false;
 
 
@@ -241,14 +241,11 @@ static void ftrace_log_write(const char *buf) {
 
 static bool should_ignore(const char *name) {
     if (name == NULL) return false;
-    if (strcmp(name, ignore_funcs[0]) == 0) {
-        return true;
+    for (int i = 0; ignore_funcs[i] != NULL; i++) {
+        if (strcmp(name, ignore_funcs[i]) == 0) {
+            return true;
+        }
     }
-    // for (int i = 0; ignore_funcs[i] != NULL; i++) {
-    //     if (strcmp(name, ignore_funcs[i]) == 0) {
-    //         return true;
-    //     }
-    // }
     return false;
 }
 
