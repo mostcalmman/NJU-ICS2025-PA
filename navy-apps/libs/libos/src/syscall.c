@@ -73,14 +73,11 @@ int _write(int fd, void *buf, size_t count) {
 static intptr_t brk_pos = 0;
 extern char end;
 void *_sbrk(intptr_t increment) {
-  _write(1, "sbrk called\n", 12);
   intptr_t old_brk = brk_pos + (intptr_t)&end;
   if( !_syscall_(SYS_brk, increment + old_brk, 0, 0) ) {
     brk_pos += increment;
-    _write(1, "sbrk success\n", 13);
     return (void *)old_brk;
   }
-  _write(1, "sbrk failed\n", 12);
   return (void *)-1;
 }
 
