@@ -14,6 +14,7 @@
 ***************************************************************************************/
 
 #include "common.h"
+#include "utils.h"
 #include <isa.h>
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
@@ -24,6 +25,8 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   cpu.mcause = NO;
 
 #ifdef CONFIG_ETRACE
+  Log("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
+  log_write("\n\n\nLSR\n\n");
   log_write("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
 #endif
 
