@@ -135,7 +135,7 @@ static bool parse_elf(const char *elf_file, FunctionMap **out_map, int *out_coun
     free(symtab_data);
     free(func_map);
     fclose(fp);
-    Log("ELF file %s parsed successfully, %d functions found", elf_file, func_count);
+    Log("ELF file %s parsed successfully, %d functions found", elf_file, *out_count);
     return true;
 }
 
