@@ -67,6 +67,16 @@ uint64_t get_time();
   } while (0) \
 )
 
+#define log_write_trace(...) IFDEF(CONFIG_TARGET_NATIVE_ELF, \
+  do { \
+    extern FILE* log_fp; \
+    if (log_fp != NULL) { \
+      fprintf(log_fp, __VA_ARGS__); \
+      fflush(log_fp); \
+    } \
+  } while (0) \
+)
+
 #define _Log(...) \
   do { \
     printf(__VA_ARGS__); \
