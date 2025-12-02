@@ -191,8 +191,8 @@ static int decode_exec(Decode *s) {
   );
   INSTPAT("001100000010  00000 000 00000 1110011", mret   , N, 
     s->dnpc = cpu.mepc;
-    cpu.mstatus = cpu.mstatus | ((cpu.mstatus & 0x80) >> 4); // MIE 设为 MPIE
-    cpu.mstatus = cpu.mstatus | (~0x80); // MPIE 设为 1
+    // cpu.mstatus = cpu.mstatus | ((cpu.mstatus & 0x80) >> 4); // MIE 设为 MPIE
+    // cpu.mstatus = cpu.mstatus | (~0x80); // MPIE 设为 1
   );
 
   // 无效指令, 这个必须在最后
