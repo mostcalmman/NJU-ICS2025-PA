@@ -11,13 +11,14 @@ void strace(Context *c){
     case SYS_exit: syscall_name = "SYS_exit"; break;
     case SYS_write: syscall_name = "SYS_write"; break;
     case SYS_read: syscall_name = "SYS_read"; break;
+    case SYS_brk: syscall_name = "SYS_brk"; break;
   }
 
   Log("Strace: syscall type = %s (id = %d)", syscall_name, c->GPR1);
-  Log("Strace: Context");
-  uintptr_t *raw = (uintptr_t *)c;
-  for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
-  Log("Strace: Context End");
+  // Log("Strace: Context");
+  // uintptr_t *raw = (uintptr_t *)c;
+  // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
+  // Log("Strace: Context End");
 }
 
 
@@ -31,7 +32,6 @@ void do_syscall(Context *c) {
   switch (a[0]) {
     case SYS_yield:
       yield();
-      c->mepc += 4;
       break;
     case SYS_exit:
       halt(a[1]);
@@ -45,13 +45,15 @@ void do_syscall(Context *c) {
         }
       }
       c->GPRx = ret;
-      c->mepc += 4;
       break;
     }
     case SYS_read:
       assert(0);
-      c->mepc += 4;
       break;
+    case SYS_brk: {
+      c->GPRx = 0;
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
