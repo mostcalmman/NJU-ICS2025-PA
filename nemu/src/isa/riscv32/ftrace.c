@@ -184,7 +184,7 @@ void ftrace_log_write(const char *buf) {
 
 void ftrace_trace(Decode *_this, vaddr_t dnpc){
     // _this->logbuf[24]开始是反汇编助记符
-  char ftracebuf[128];
+  char ftracebuf[1024];
   char *ptr = ftracebuf;
   ftracebuf[0] = '\0'; // 清空
   if(memcmp(_this->logbuf + 24, "jal", 3) == 0){
