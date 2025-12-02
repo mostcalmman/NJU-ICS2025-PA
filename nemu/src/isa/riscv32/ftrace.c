@@ -191,6 +191,9 @@ static void ftrace_log_write(const char *buf) {
 
 static bool should_ignore(const char *name) {
     if (name == NULL) return false;
+    if (strcmp(name, "putch") == 0) {
+        return true;
+    }
     for (int i = 0; ignore_funcs[i] != NULL; i++) {
         if (strcmp(name, ignore_funcs[i]) == 0) {
             return true;
