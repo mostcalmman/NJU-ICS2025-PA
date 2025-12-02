@@ -67,7 +67,7 @@ uint64_t get_time();
   } while (0) \
 )
 
-#define log_write_trace(...) IFDEF(CONFIG_TARGET_NATIVE_ELF, \
+#define _log_write(...) IFDEF(CONFIG_TARGET_NATIVE_ELF, \
   do { \
     extern FILE* log_fp; \
     if (log_fp != NULL) { \
