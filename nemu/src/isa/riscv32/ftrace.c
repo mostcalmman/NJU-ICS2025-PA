@@ -116,20 +116,18 @@ static bool parse_elf(const char *elf_file, FunctionMap **out_map, int *out_coun
     // 遍历符号表, 提取函数符号和大小
     int num_symbols = symtab_shdr->sh_size / sizeof(Elf32_Sym);
     FunctionMap *func_map = malloc(num_symbols * sizeof(FunctionMap));
-    func_count = 0;
+    *out_count = 0;
     for(int i = 0; i < num_symbols; i++) {
         if(ELF32_ST_TYPE(symtab_data[i].st_info) == STT_FUNC) {
-            strcpy(func_map[func_count].name, strtab_data + symtab_data[i].st_name); // 根据偏置找名字
-            func_map[func_count].addr = symtab_data[i].st_value;
-            func_map[func_count].size = symtab_data[i].st_size;
-            func_count++;
+            strcpy(func_map[*out_count].name, strtab_data + symtab_data[i].st_name); // 根据偏置找名字
+            func_map[*out_count].addr = symtab_data[i].st_value;
+            func_map[*out_count].size = symtab_data[i].st_size;
+            (*out_count)++;
         }
     }
 
-    // 节省空间
-    *out_count = func_count;
-    *out_map = malloc(func_count * sizeof(FunctionMap));
-    memcpy(*out_map, func_map, func_count * sizeof(FunctionMap));
+    *out_map = malloc(*out_count * sizeof(FunctionMap));
+    memcpy(*out_map, func_map, *out_count * sizeof(FunctionMap));
 
     free(shdr_table);
     free(shstrtab_data);
