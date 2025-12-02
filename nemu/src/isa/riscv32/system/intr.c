@@ -14,7 +14,6 @@
 ***************************************************************************************/
 
 #include "common.h"
-#include "utils.h"
 #include <isa.h>
 
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
