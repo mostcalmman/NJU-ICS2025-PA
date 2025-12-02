@@ -11,6 +11,7 @@ int main() {
       printf("Hello World from Navy-apps for the %dth time!\n", i ++);
       j = 0;
     }
+    if(i==5) break;
   }
   return 0;
 }
