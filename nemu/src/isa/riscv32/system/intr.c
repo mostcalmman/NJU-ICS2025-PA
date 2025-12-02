@@ -29,7 +29,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   log_write("\n\n\nLSR\n\n");
   log_write("Exception NO: " FMT_WORD " at pc = 0x" FMT_PADDR ", mstatus: " FMT_WORD ", mtvec: " FMT_WORD, NO, epc, cpu.mstatus, cpu.mtvec);
   extern bool log_enable();
-  if (log_enable()) Log("LSRLSR");
+  if (log_enable()){ Log("LSRLSR");} else Log("LOGDISABLE");
 #endif
 
   return cpu.mtvec;
