@@ -5,11 +5,9 @@ static Context* do_event(Event e, Context* c) {
   switch (e.event) {
     case EVENT_YIELD: 
       printf("yield recognized\n");
-      c->mepc+=4; 
       break;
     case EVENT_SYSCALL: 
       do_syscall(c); 
-      c->mepc += 4;
       break;
     default: panic("Unhandled event ID = %d", e.event);
   }
