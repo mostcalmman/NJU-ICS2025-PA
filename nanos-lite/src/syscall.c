@@ -23,13 +23,32 @@ void do_syscall(Context *c) {
   strace(c);
   uintptr_t a[4];
   a[0] = c->GPR1;
+  a[1] = c->GPR2;
+  a[2] = c->GPR3;
+  a[3] = c->GPR4;
   switch (a[0]) {
     case SYS_yield:
       yield();
       c->mepc += 4;
       break;
     case SYS_exit:
-      halt(c->GPR2);
+      halt(a[1]);
+      break;
+    case SYS_write: {
+      uintptr_t ret = 0;
+      if(a[1]==1||a[1]==2){
+        for(int i=0;i<a[3];i++){
+          putch(((char*)a[2])[i]);
+          ++ret;
+        }
+      }
+      c->GPRx = ret;
+      c->mepc += 4;
+      break;
+    }
+    case SYS_read:
+      assert(0);
+      c->mepc += 4;
       break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
