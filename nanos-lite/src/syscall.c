@@ -15,7 +15,7 @@ void strace(Context *c){
   Log("Strace: Context");
   uintptr_t *raw = (uintptr_t *)c;
   for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
-  Log("Context End");
+  Log("Strace: Context End");
 }
 
 
