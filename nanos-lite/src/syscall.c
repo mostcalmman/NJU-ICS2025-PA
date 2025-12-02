@@ -4,7 +4,6 @@
 #include "am.h"
 
 void strace(Context *c){
-  Log("Strace: syscall event at pc = 0x%x", c->mepc);
   const char *syscall_name = "UNSUPPORTED";
   switch (c->GPR1) {
     case SYS_yield: syscall_name = "SYS_yield"; break;
@@ -13,8 +12,7 @@ void strace(Context *c){
     case SYS_read: syscall_name = "SYS_read"; break;
     case SYS_brk: syscall_name = "SYS_brk"; break;
   }
-
-  Log("Strace: syscall type = %s (id = %d)", syscall_name, c->GPR1);
+  Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d)", c->mepc, syscall_name, c->GPR1);
   // Log("Strace: Context");
   // uintptr_t *raw = (uintptr_t *)c;
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
