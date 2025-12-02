@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <elf.h>
 #include <string.h>
-// #include "ftrace.h"
 #ifdef CONFIG_FTRACE
 typedef struct {
     char name[32];

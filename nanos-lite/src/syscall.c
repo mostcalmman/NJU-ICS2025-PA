@@ -32,7 +32,7 @@ void do_syscall(Context *c) {
       yield();
       break;
     case SYS_exit:
-      halt(a[1]);
+      halt(0);
       break;
     case SYS_write: {
       uintptr_t ret = 0;
