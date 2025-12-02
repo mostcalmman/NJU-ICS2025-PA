@@ -22,7 +22,7 @@ void strace(Context *c){
 
 
 void do_syscall(Context *c) {
-  strace(c);
+  // strace(c);
   uintptr_t a[4];
   a[0] = c->GPR1;
   a[1] = c->GPR2;
