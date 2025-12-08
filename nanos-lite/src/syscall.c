@@ -3,6 +3,8 @@
 #include "am.h"
 #include <fs.h>
 
+#define CONFIG_STRACE
+
 void strace(Context *c){
   const char *syscall_name = "UNSUPPORTED";
   switch (c->GPR1) {
@@ -15,7 +17,10 @@ void strace(Context *c){
     case SYS_close: syscall_name = "SYS_close"; break;
     case SYS_lseek: syscall_name = "SYS_lseek"; break;
   }
-  Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d)", c->mepc, syscall_name, c->GPR1);
+  Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d), arg list: %d, %d, %d", c->mepc, syscall_name, c->GPR1, c->GPR2, c->GPR3, c->GPR4);
+  if (c->GPR1 == SYS_write || c->GPR1 == SYS_read || c->GPR1 == SYS_close || c->GPR1 == SYS_lseek) {
+    Log("Strace: file operation on file %s (fd = %d)", fs_getname(c->GPR2), c->GPR2);
+  }
   // Log("Strace: Context");
   // uintptr_t *raw = (uintptr_t *)c;
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
@@ -24,7 +29,9 @@ void strace(Context *c){
 
 
 void do_syscall(Context *c) {
+#ifdef CONFIG_STRACE
   strace(c);
+#endif
   uintptr_t a[4];
   a[0] = c->GPR1;
   a[1] = c->GPR2;
@@ -48,6 +55,9 @@ void do_syscall(Context *c) {
     }
     case SYS_open: {
       c->GPRx = fs_open((const char *)a[1], (int)a[2], (int)a[3]);
+#ifdef CONFIG_STRACE
+      Log("Strace: open file %s (fd = %d)", (const char *)a[1], c->GPRx);
+#endif
       break;
     }
     case SYS_read: {
