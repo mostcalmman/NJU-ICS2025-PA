@@ -1,6 +1,7 @@
 #include <common.h>
 #include "syscall.h"
 #include "am.h"
+#include <fs.h>
 
 void strace(Context *c){
   const char *syscall_name = "UNSUPPORTED";
@@ -10,6 +11,9 @@ void strace(Context *c){
     case SYS_write: syscall_name = "SYS_write"; break;
     case SYS_read: syscall_name = "SYS_read"; break;
     case SYS_brk: syscall_name = "SYS_brk"; break;
+    case SYS_open: syscall_name = "SYS_open"; break;
+    case SYS_close: syscall_name = "SYS_close"; break;
+    case SYS_lseek: syscall_name = "SYS_lseek"; break;
   }
   Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d)", c->mepc, syscall_name, c->GPR1);
   // Log("Strace: Context");
@@ -38,22 +42,37 @@ void do_syscall(Context *c) {
       halt(a[1]);
       // halt(0);
       break;
-    case SYS_write: {
-      uintptr_t ret = 0;
-      if(a[1]==1||a[1]==2){
-        for(int i=0;i<a[3];i++){
-          putch(((char*)a[2])[i]);
-          ++ret;
-        }
-      }
-      c->GPRx = ret;
-      break;
-    }
-    case SYS_read:
-      assert(0);
-      break;
     case SYS_brk: {
       c->GPRx = 0;
+      break;
+    }
+    case SYS_open: {
+      c->GPRx = fs_open((const char *)a[1], (int)a[2], (int)a[3]);
+      break;
+    }
+    case SYS_read: {
+      c->GPRx = fs_read((int)a[1], (void *)a[2], (size_t)a[3]);
+      break;
+    }
+    case SYS_write: {
+      // uintptr_t ret = 0;
+      // if(a[1]==1||a[1]==2){
+      //   for(int i=0;i<a[3];i++){
+      //     putch(((char*)a[2])[i]);
+      //     ++ret;
+      //   }
+      // }
+      // c->GPRx = ret;
+      // break;
+      c->GPRx = fs_write((int)a[1], (const void *)a[2], (size_t)a[3]);
+      break;
+    }
+    case SYS_lseek: {
+      c->GPRx = fs_lseek((int)a[1], (size_t)a[2], (int)a[3]);
+      break;
+    }
+    case SYS_close: {
+      c->GPRx = fs_close((int)a[1]);
       break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
