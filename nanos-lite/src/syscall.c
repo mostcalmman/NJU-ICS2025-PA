@@ -32,8 +32,8 @@ void do_syscall(Context *c) {
       break;
     case SYS_exit:
       // MARK: halt
-      halt(a[1]);
-      // halt(0);
+      // halt(a[1]);
+      halt(0);
       break;
     case SYS_write: {
       uintptr_t ret = 0;
