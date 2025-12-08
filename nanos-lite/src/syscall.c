@@ -32,8 +32,11 @@ void do_syscall(Context *c) {
       break;
     case SYS_exit:
       // MARK: halt
-      // halt(a[1]);
-      halt(0);
+      if( a[1]!=0 ){
+        Log("Program exited with code %d", a[1]);
+      }
+      halt(a[1]);
+      // halt(0);
       break;
     case SYS_write: {
       uintptr_t ret = 0;
