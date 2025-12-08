@@ -3,7 +3,7 @@
 #include "am.h"
 #include <fs.h>
 
-#define CONFIG_STRACE
+// #define CONFIG_STRACE
 
 void strace(Context *c){
   const char *syscall_name = "UNSUPPORTED";
