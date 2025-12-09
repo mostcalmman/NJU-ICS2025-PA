@@ -3,6 +3,11 @@
 #include "am.h"
 #include <fs.h>
 
+struct timeval {
+	long		tv_sec;		/* seconds */
+	long		tv_usec;	/* and microseconds */
+};
+
 // #define CONFIG_STRACE
 
 #ifdef CONFIG_STRACE
@@ -96,6 +101,19 @@ void do_syscall(Context *c) {
     }
     case SYS_close: {
       c->GPRx = fs_close((int)a[1]);
+      break;
+    }
+    case SYS_gettimeofday: {
+      if(a[2] != 0){
+        panic("timezone is not supported");
+      }
+      struct timeval *tv = (struct timeval *)a[1];
+      if (tv != NULL) {
+        uint64_t uptime = io_read(AM_TIMER_UPTIME).us;
+        tv->tv_sec = uptime / 1000000;
+        tv->tv_usec = uptime % 1000000;
+      }
+      c->GPRx = 0;
       break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
