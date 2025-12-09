@@ -49,7 +49,11 @@ char *fs_getname(int fd) {
 }
 
 void init_fs() {
-  // TODO: initialize the size of /dev/fb
+  AM_GPU_CONFIG_T display = io_read(AM_GPU_CONFIG);
+  assert(display.present);
+  int w = display.width;
+  int h = display.height;
+  file_table[FD_FB].size = w * h * sizeof(uint32_t);
 }
 
 int fs_open(const char *pathname, int flags, int mode) { 

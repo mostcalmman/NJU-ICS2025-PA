@@ -14,6 +14,10 @@ static int screen_w = 0, screen_h = 0;
 static struct timeval t_ori;
 static long t_us;
 
+static struct Canvas {
+  int w, h, loc_x, loc_y;
+} canvas;
+
 uint32_t NDL_GetTicks() {
   struct timeval now;
   gettimeofday(&now, NULL);
@@ -33,8 +37,17 @@ void NDL_OpenCanvas(int *w, int *h) {
   char buf[64];
   int nread = read(fd, buf, sizeof(buf) - 1);
   buf[nread] = '\0';
-  sscanf(buf, "WIDTH : %d\nHEIGHT : %d\n", w, h);
+  sscanf(buf, "WIDTH : %d\nHEIGHT : %d\n", &screen_w, &screen_h);
   close(fd);
+  if(*w == 0 && *h == 0) {
+    *w = screen_w;
+    *h = screen_h;
+  }
+  canvas.w = *w;
+  canvas.h = *h;
+  canvas.loc_x = (screen_w - canvas.w) / 2;
+  canvas.loc_y = (screen_h - canvas.h) / 2;
+
   if (getenv("NWM_APP")) {
     int fbctl = 4;
     fbdev = 5;
@@ -55,6 +68,15 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  int screen_loc_x = canvas.loc_x + x;
+  int screen_loc_y = canvas.loc_y + y;
+  size_t offset = screen_w * 4 * screen_loc_y + screen_loc_x * 4;
+  int fd = open("/dev/fb", 0, 0);
+  for (int i = 0; i < h; i ++) {
+    lseek(fd, offset + i * screen_w * 4, SEEK_SET);
+    write(fd, pixels + i * w, w * 4);
+  }
+  close(fd);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {

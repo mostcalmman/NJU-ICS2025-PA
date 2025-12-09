@@ -1,3 +1,4 @@
+#include "sys/_intsup.h"
 #include <common.h>
 
 #if defined(MULTIPROGRAM) && !defined(TIME_SHARING)
@@ -48,14 +49,20 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   char tem[64];
   int w = display.width;
   int h = display.height;
-  int n = sprintf(tem, "WIDTH : %d\nHEIGHT : %d\n", w, h);
-  size_t read_len = n < len ? n : len;
-  memcpy(buf, tem + offset, read_len);
-  return read_len;
+  int n = snprintf(tem, sizeof(tem), "WIDTH : %d\nHEIGHT : %d\n", w, h);
+  if (len > n) len = n;
+  memcpy(buf, tem + offset, len);
+  return len;
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-  return 0;
+  AM_GPU_CONFIG_T display = io_read(AM_GPU_CONFIG);
+  assert(display.present);
+  int screen_w = display.width;
+  int x = (offset / 4) % screen_w;
+  int y = (offset / 4) / screen_w;
+  io_write(AM_GPU_FBDRAW, x, y, (void *)buf, len / 4, 1, true);
+  return len;
 }
 
 void init_device() {
