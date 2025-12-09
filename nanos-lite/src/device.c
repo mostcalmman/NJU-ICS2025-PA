@@ -23,7 +23,20 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t events_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  int keycode = io_read(AM_INPUT_KEYBRD).keycode;
+  if(keycode == AM_KEY_NONE) return 0;
+  char tem[32];
+  bool down  = io_read(AM_INPUT_KEYBRD).keydown;
+  const char *key = keyname[keycode];
+  tem[0] = 'k';
+  tem[1] = down ? 'd' : 'u';
+  tem[2] = ' ';
+  strcpy(tem + 3, key);
+  tem[3 + strlen(key)] = '\n';
+  tem[4 + strlen(key)] = '\0';
+  size_t read_len = strlen(tem) + 1 < len ? strlen(tem) + 1 : len; // include '\0'
+  memcpy(buf, tem, read_len);
+  return read_len;
 }
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
