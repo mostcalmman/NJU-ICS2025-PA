@@ -29,7 +29,7 @@ int NDL_PollEvent(char *buf, int len) {
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
-  int fd = open("proc/dispinfo", 0, 0);
+  int fd = open("/proc/dispinfo", 0, 0);
   char buf[64];
   int nread = read(fd, buf, sizeof(buf) - 1);
   buf[nread] = '\0';
