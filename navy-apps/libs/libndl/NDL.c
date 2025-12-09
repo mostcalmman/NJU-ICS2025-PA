@@ -1,3 +1,4 @@
+#include "sys/time.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,8 +9,14 @@ static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 
+static struct timeval t_ori;
+static long t_us;
+
 uint32_t NDL_GetTicks() {
-  return 0;
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  long now_us = now.tv_sec * 1000000 + now.tv_usec;
+  return now_us - t_us;
 }
 
 int NDL_PollEvent(char *buf, int len) {
@@ -57,6 +64,8 @@ int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
+  gettimeofday(&t_ori, NULL);
+  t_us = t_ori.tv_sec * 1000000 + t_ori.tv_usec;
   return 0;
 }
 

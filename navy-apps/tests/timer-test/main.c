@@ -1,17 +1,16 @@
 #include "sys/time.h"
 #include <stdio.h>
 #include <time.h>
+uint32_t NDL_GetTicks();
 
 int main(){
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    time_t t = tv.tv_sec * 1000000 + tv.tv_usec;
+    uint32_t t = NDL_GetTicks();
     int i = 0;
-    while(i < 5){
-        gettimeofday(&tv, NULL);
-        if(tv.tv_sec * 1000000 + tv.tv_usec - t >= 500000){
-            t = tv.tv_sec * 1000000 + tv.tv_usec;
-            printf("Uptime: %ld seconds and %ld microseconds\n", tv.tv_sec, tv.tv_usec);
+    while (i<5) {
+        uint32_t t_now = NDL_GetTicks();
+        if (t_now - t >= 500000) {
+            printf("0.5 second passed! NDL_GetTicks = %u us\n", t_now);
+            t = t_now;
             i++;
         }
     }
