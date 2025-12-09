@@ -1,4 +1,3 @@
-#include "sys/_intsup.h"
 #include <common.h>
 
 #if defined(MULTIPROGRAM) && !defined(TIME_SHARING)
