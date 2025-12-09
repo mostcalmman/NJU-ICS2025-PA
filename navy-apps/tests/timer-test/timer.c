@@ -1,5 +1,5 @@
 #include <stdio.h>
-uint32_t NDL_GetTicks();
+#include "../../libs/libndl/include/NDL.h"
 
 int main(){
     uint32_t t = NDL_GetTicks();
