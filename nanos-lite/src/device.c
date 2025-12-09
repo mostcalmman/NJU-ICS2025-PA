@@ -29,17 +29,13 @@ size_t events_read(void *buf, size_t offset, size_t len) {
   char tem[32];
   bool down  = kbd.keydown;
   const char *key = keyname[keycode];
-  // tem[0] = 'k';
-  // tem[1] = down ? 'd' : 'u';
-  // tem[2] = ' ';
   if (down) {
     memcpy(tem, "kd ", 3);
   } else {
     memcpy(tem, "ku ", 3);
   }
   strcpy(tem + 3, key);
-  tem[3 + strlen(key)] = '\n';
-  tem[4 + strlen(key)] = '\0';
+  memcpy(tem + 3 + strlen(key), "\n\0", 2);
   size_t read_len = strlen(tem) + 1 < len ? strlen(tem) + 1 : len; // include '\0'
   memcpy(buf, tem, read_len);
   return read_len;
