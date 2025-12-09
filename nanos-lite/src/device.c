@@ -36,13 +36,22 @@ size_t events_read(void *buf, size_t offset, size_t len) {
   }
   strcpy(tem + 3, key);
   memcpy(tem + 3 + strlen(key), "\n\0", 2);
-  size_t read_len = strlen(tem) < len ? strlen(tem) : len; // include '\0'
+  size_t read_len = strlen(tem) < len ? strlen(tem) : len; // exclude '\0'
+  // size_t read_len = strlen(tem) + 1 < len ? strlen(tem) + 1 : len; // include '\0'
   memcpy(buf, tem, read_len);
   return read_len;
 }
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
-  return 0;
+  AM_GPU_CONFIG_T display = io_read(AM_GPU_CONFIG);
+  assert(display.present);
+  char tem[64];
+  int w = display.width;
+  int h = display.height;
+  int n = sprintf(tem, "WIDTH : %d\nHEIGHT : %d\n", w, h);
+  size_t read_len = n < len ? n : len;
+  memcpy(buf, tem + offset, read_len);
+  return read_len;
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
