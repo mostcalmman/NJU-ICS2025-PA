@@ -1,6 +1,4 @@
-#include "sys/time.h"
 #include <stdio.h>
-#include <time.h>
 uint32_t NDL_GetTicks();
 
 int main(){
