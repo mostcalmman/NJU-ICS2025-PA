@@ -36,10 +36,10 @@ size_t events_read(void *buf, size_t offset, size_t len) {
   }
   strcpy(tem + 3, key);
   memcpy(tem + 3 + strlen(key), "\n\0", 2);
-  size_t read_len = strlen(tem) < len ? strlen(tem) : len; // exclude '\0'
-  // size_t read_len = strlen(tem) + 1 < len ? strlen(tem) + 1 : len; // include '\0'
+  // size_t read_len = strlen(tem) < len ? strlen(tem) : len; // exclude '\0'
+  size_t read_len = strlen(tem) + 1 < len ? strlen(tem) + 1 : len; // include '\0'
   memcpy(buf, tem, read_len);
-  return read_len;
+  return read_len - 1; // exclude '\0' in return value
 }
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {

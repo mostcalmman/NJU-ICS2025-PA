@@ -7,12 +7,68 @@
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+
+  // 若 srcrect 为 NULL, 则拷贝整个源表面
+  int src_x, src_y, src_w, src_h;
+  if (srcrect) {
+    src_x = srcrect->x; src_y = srcrect->y; src_w = srcrect->w; src_h = srcrect->h;
+  } else {
+    src_x = 0; src_y = 0; src_w = src->w; src_h = src->h;
+  }
+
+  // 若 dstrect 为 NULL, 则拷贝到目标表面的 (0,0) 位置
+  int dst_x, dst_y;
+  if (dstrect) {
+    dst_x = dstrect->x; dst_y = dstrect->y;
+  } else {
+    dst_x = 0; dst_y = 0;
+  }
+
+  uint8_t *rec_start_pixel_src = src->pixels + src_y * src->pitch + src_x * src->format->BytesPerPixel;
+  uint8_t *rec_start_pixel_dst = dst->pixels + dst_y * dst->pitch + dst_x * dst->format->BytesPerPixel;
+  for (int i = 0; i < src_h; i ++) {
+    memcpy(rec_start_pixel_dst + i * dst->pitch,
+           rec_start_pixel_src + i * src->pitch,
+           src_w * src->format->BytesPerPixel);
+  }
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  assert(s);
+  if (w == 0 && h == 0) {
+    w = s->w;
+    h = s->h;
+  }
+  
+  uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
+  assert(pixels);
+
+  if (s->format->BitsPerPixel == 8) {
+    // 8位色: 通过调色板转换为 32 位色
+    SDL_Color *palette = s->format->palette->colors;
+    for (int i = 0; i < h; i++) {
+      for (int j = 0; j < w; j++) {
+        uint8_t index = *((uint8_t *)s->pixels + (y + i) * s->pitch + (x + j));
+        SDL_Color color = palette[index];
+        // NDL 期望 00RRGGBB 格式
+        pixels[i * w + j] = (color.a << 24) | (color.r << 16) | (color.g << 8) | color.b;
+      }
+    }
+  } else {
+    // 32位色: 直接复制
+    for (int i = 0; i < h; i++) {
+      memcpy(pixels + i * w, 
+             (uint8_t *)s->pixels + (y + i) * s->pitch + x * 4, 
+             w * 4);
+    }
+  }
+
+  NDL_DrawRect(pixels, x, y, w, h);
+
+  free(pixels);
 }
 
 // APIs below are already implemented.
