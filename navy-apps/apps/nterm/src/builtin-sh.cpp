@@ -26,7 +26,7 @@ static void sh_handle_cmd(const char *cmd) {
   if (cmd[0] == 'e' && cmd[1] == 'c' && cmd[2] == 'h' && cmd[3] == 'o' && cmd[4] == ' ') {
     int i = 5;
     while(cmd[i] == ' ') i++;
-    sh_printf("%s\n", cmd + i);
+    sh_printf("%s", cmd + i);
   }
 }
 
