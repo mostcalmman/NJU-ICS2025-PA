@@ -34,6 +34,30 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  int x, y, w, h;
+  if (dstrect) {
+    x = dstrect->x; y = dstrect->y; w = dstrect->w; h = dstrect->h;
+  } else {
+    x = 0; y = 0; w = dst->w; h = dst->h;
+  }
+
+  for (int i = 0; i < h; i ++) {
+    for (int j = 0; j < w; j ++) {
+      uint8_t *pixel = dst->pixels + (y + i) * dst->pitch + (x + j) * dst->format->BytesPerPixel;
+      if (dst->format->BitsPerPixel == 8) {
+        // 8位色通过调色板映射
+        uint8_t r = (color >> 16) & 0xff;
+        uint8_t g = (color >> 8) & 0xff;
+        uint8_t b = color & 0xff;
+        // 找到最接近的颜色索引
+        uint8_t index = SDL_MapRGBA(dst->format, r, g, b, 255);
+        *pixel = index;
+      } else {
+        assert(dst->format->BitsPerPixel == 32);
+        *((uint32_t *)pixel) = color;
+      }
+    }
+  }
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
@@ -58,6 +82,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
       }
     }
   } else {
+    assert(s->format->BitsPerPixel == 32);
     // 32位色: 直接复制
     for (int i = 0; i < h; i++) {
       memcpy(pixels + i * w, 
@@ -242,6 +267,23 @@ SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t
 }
 
 uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+  if (fmt->BytesPerPixel == 1) {
+    assert(fmt->palette);
+    int best_diff = 0x7fffffff;
+    uint8_t best_index = 0;
+    for (int i = 0; i < fmt->palette->ncolors; i ++) {
+      SDL_Color *c = &fmt->palette->colors[i];
+      // 计算曼哈顿距离寻找最接近的颜色
+      int diff = abs((int)c->r - r) + abs((int)c->g - g) + abs((int)c->b - b);
+      if (diff < best_diff) {
+        best_diff = diff;
+        best_index = i;
+        if (diff == 0) break; // 找到精确匹配
+      }
+    }
+    return best_index;
+  }
+
   assert(fmt->BytesPerPixel == 4);
   uint32_t p = (r << fmt->Rshift) | (g << fmt->Gshift) | (b << fmt->Bshift);
   if (fmt->Amask) p |= (a << fmt->Ashift);
