@@ -33,7 +33,6 @@ static void sh_handle_cmd(const char *cmd) {
   strncpy(buf, cmd, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
 
-  // 用空格切出程序名和参数
   char *argv[32];
   int argc = 0;
   char *token = strtok(buf, " ");
@@ -44,6 +43,7 @@ static void sh_handle_cmd(const char *cmd) {
   argv[argc] = NULL;
 
   if (argc > 0) {
+    argv[0][sizeof(argv[0]) - 1] = '\0';
     execvp(argv[0], argv);
   }
 }
