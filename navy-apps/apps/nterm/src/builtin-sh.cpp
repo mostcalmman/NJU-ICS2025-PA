@@ -30,7 +30,7 @@ static void sh_handle_cmd(const char *cmd) {
   }
   if (cmd[0] == '.' && cmd[1] == '/') {
     char *file = strtok((char*)(cmd + 2), " ");
-    if (file[-1] == '\n') file[-1] = '\0';
+    file[-1] = '\0';
     execvp(file, NULL);
   }
 }
