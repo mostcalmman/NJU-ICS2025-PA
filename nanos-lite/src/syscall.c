@@ -1,12 +1,15 @@
 #include <common.h>
 #include "syscall.h"
 #include "am.h"
+#include "proc.h"
 #include <fs.h>
 
 struct timeval {
 	long		tv_sec;		/* seconds */
 	long		tv_usec;	/* and microseconds */
 };
+
+void naive_uload(PCB *pcb, const char *filename);
 
 // #define CONFIG_STRACE
 
@@ -60,12 +63,11 @@ void do_syscall(Context *c) {
       yield();
       break;
     case SYS_exit:
-      // MARK: halt
       if( a[1]!=0 ){
-        Log("Program exited with code %d", a[1]);
+        Log("Error: Program exited with code %d", a[1]);
       }
-      halt(a[1]);
-      // halt(0);
+      naive_uload(NULL, "/bin/menu");
+      // halt(a[1]);
       break;
     case SYS_brk: {
       c->GPRx = 0;
@@ -114,6 +116,11 @@ void do_syscall(Context *c) {
         tv->tv_usec = uptime % 1000000;
       }
       c->GPRx = 0;
+      break;
+    }
+    case SYS_execve: {
+      Log("Switching to new program %s", (const char *)a[1]);
+      naive_uload(NULL, (const char *)a[1]);
       break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
