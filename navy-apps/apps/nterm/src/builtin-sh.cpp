@@ -32,6 +32,11 @@ static void sh_handle_cmd(const char *cmd) {
   static char buf[256];
   strncpy(buf, cmd, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
+  size_t len = strlen(buf);
+    // 检查倒数第一个字符是否是换行符 '\n'
+    if (len > 0 && buf[len - 1] == '\n') {
+        buf[len - 1] = '\0'; // 将 '\n' 替换为字符串结束符
+    }
 
   char *argv[32];
   int argc = 0;
@@ -43,10 +48,6 @@ static void sh_handle_cmd(const char *cmd) {
   argv[argc] = NULL;
 
   if (argc > 0) {
-    printf("%d\n", sizeof(argv[0]));
-    // printf("%s", argv[0]);
-    printf("%s", "bird");
-    argv[0][sizeof(argv[0])] = '\0';
     execvp(argv[0], argv);
   }
 }
