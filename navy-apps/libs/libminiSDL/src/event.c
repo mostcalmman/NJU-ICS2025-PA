@@ -1,7 +1,6 @@
 #include <NDL.h>
 #include <SDL.h>
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define keyname(k) #k,
@@ -11,6 +10,8 @@ static const char *keyname[] = {
   _KEYS(keyname)
 };
 
+static uint8_t keystate[sizeof(keyname) / sizeof(keyname[0])];
+
 int SDL_PushEvent(SDL_Event *ev) {
   assert(0);
   return 0;
@@ -18,25 +19,27 @@ int SDL_PushEvent(SDL_Event *ev) {
 
 int SDL_PollEvent(SDL_Event *ev) {
   char buf[64];
-    if (NDL_PollEvent(buf, sizeof(buf))) {
-      printf("%s\n", buf);
-      if (buf[0] == 'k' && (buf[1] == 'd' || buf[1] == 'u')) {
-        // keyboard event
-        ev->type = (buf[1] == 'd') ? SDL_KEYDOWN : SDL_KEYUP;
-        // parse key name
-        char mykeyname[32];
-        sscanf(buf + 3, "%s", mykeyname);
-        // map to SDLK_
-        ev->key.keysym.sym = SDLK_NONE;
-        for (int i = 1; i < sizeof(keyname)/sizeof(keyname[0]); i++) {
-          if (strcmp(mykeyname, keyname[i]) == 0) {
-            ev->key.keysym.sym = i;
-            break;
-          }
+  if (NDL_PollEvent(buf, sizeof(buf))) {
+    // printf("%s\n", buf); // 调试打印，可根据需要保留或删除
+    if (buf[0] == 'k' && (buf[1] == 'd' || buf[1] == 'u')) {
+      // keyboard event
+      ev->type = (buf[1] == 'd') ? SDL_KEYDOWN : SDL_KEYUP;
+      // parse key name
+      char mykeyname[32];
+      sscanf(buf + 3, "%s", mykeyname);
+      // map to SDLK_
+      ev->key.keysym.sym = SDLK_NONE;
+      for (int i = 1; i < sizeof(keyname)/sizeof(keyname[0]); i++) {
+        if (strcmp(mykeyname, keyname[i]) == 0) {
+          ev->key.keysym.sym = i;
+          
+          keystate[i] = (ev->type == SDL_KEYDOWN) ? 1 : 0;
+          break;
         }
-        return 1;
       }
+      return 1;
     }
+  }
   return 0;
 }
 
@@ -52,20 +55,6 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
-  int size = sizeof(keyname)/sizeof(keyname[0]);
-  uint8_t* state = malloc(sizeof(uint8_t) * size);
-  memset(state, 0, sizeof(uint8_t) * (*numkeys));
-  SDL_Event ev;
-  // while (SDL_PollEvent(&ev)) {
-  //   if (ev.type == SDL_KEYDOWN) {
-  //     state[ev.key.keysym.sym] = 1;
-  //   } else if (ev.type == SDL_KEYUP) {
-  //     state[ev.key.keysym.sym] = 0;
-  //   }
-  // }
-  if (SDL_PollEvent(&ev) && ev.type == SDL_KEYDOWN) {
-    state[ev.key.keysym.sym] = 1;
-  }
-  if(numkeys) *numkeys = size;
-  return state;
+  if (numkeys) *numkeys = sizeof(keyname) / sizeof(keyname[0]);
+  return keystate;
 }
