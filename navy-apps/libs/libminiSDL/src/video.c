@@ -306,3 +306,7 @@ int SDL_LockSurface(SDL_Surface *s) {
 void SDL_UnlockSurface(SDL_Surface *s) {
   assert(0);
 }
+
+void SDL_FillScreen(uint32_t color) {
+  NDL_FillScreen(color);
+}

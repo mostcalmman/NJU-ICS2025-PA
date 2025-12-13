@@ -82,6 +82,16 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   }
 }
 
+void NDL_FillScreen(uint32_t color) {
+  uint32_t *pixels = malloc(canvas.w * canvas.h * sizeof(uint32_t));
+  assert(pixels);
+  for (int i = 0; i < canvas.w * canvas.h; i ++) {
+    pixels[i] = color;
+  }
+  NDL_DrawRect(pixels, 0, 0, canvas.w, canvas.h);
+  free(pixels);
+}
+
 void NDL_OpenAudio(int freq, int channels, int samples) {
 }
 

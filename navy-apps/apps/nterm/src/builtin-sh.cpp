@@ -32,7 +32,7 @@ static void sh_handle_cmd(const char *cmd) {
   static char buf[256];
   strncpy(buf, cmd, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
-  
+
   size_t len = strlen(buf);
   // 检查倒数第一个字符是否是换行符 '\n'
   if (len > 0 && buf[len - 1] == '\n') {
@@ -49,6 +49,7 @@ static void sh_handle_cmd(const char *cmd) {
   argv[argc] = NULL;
 
   if (argc > 0) {
+    SDL_FillScreen(0x00000000);
     execvp(argv[0], argv);
   }
 }
