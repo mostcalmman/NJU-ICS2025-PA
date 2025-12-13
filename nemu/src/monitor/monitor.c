@@ -49,6 +49,7 @@ static char *img_file = NULL;
 static char *elf_file = NULL;
 static char *ftrace_log_file = NULL;
 static int difftest_port = 1234;
+IFDEF(CONFIG_MTRACE, FILE *mtrace_log_file = NULL);
 
 static long load_img() {
   if (img_file == NULL) {
@@ -144,6 +145,8 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_FTRACE, init_ftrace(elf_file, ftrace_log_file));
 
   // IFDEF(CONFIG_FTRACE, print_function_map());
+
+  IFDEF(CONFIG_MTRACE, mtrace_log_file = fopen("/home/liushengrui/ics2025/mtrace.txt", "w"));
 
   /* Display welcome message. */
   welcome();

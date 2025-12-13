@@ -25,6 +25,10 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #endif
 
+#ifdef CONFIG_MTRACE
+extern FILE *mtrace_log_file;
+#endif
+
 // guest: NEMU的物理地址
 // host: 运行NEMU的主机地址
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
@@ -58,7 +62,9 @@ word_t paddr_read(paddr_t addr, int len) {
   if (likely(in_pmem(addr))){
     word_t ret = pmem_read(addr, len);
 #ifdef CONFIG_MTRACE
-    Log("Memory read: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, ret);
+    char buf[128];
+    sprintf(buf, "Memory read: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, ret);
+    fputs(buf, mtrace_log_file);
 #endif
     return ret;
   } 
@@ -71,7 +77,9 @@ void paddr_write(paddr_t addr, int len, word_t data) {
   if (likely(in_pmem(addr))) { 
     pmem_write(addr, len, data);
 #ifdef CONFIG_MTRACE
-    Log("Memory write: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, data);
+    char buf[128];
+    sprintf(buf, "Memory write: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, data);
+    fputs(buf, mtrace_log_file);
 #endif
     return; 
   }
