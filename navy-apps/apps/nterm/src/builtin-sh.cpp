@@ -27,6 +27,7 @@ static void sh_handle_cmd(const char *cmd) {
     int i = 5;
     while(cmd[i] == ' ') i++;
     sh_printf("%s", cmd + i);
+    return;
   }
   char *file = strtok((char*)cmd, " ");
   char *argv[] = { file , NULL};
