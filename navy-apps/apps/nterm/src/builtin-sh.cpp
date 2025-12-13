@@ -29,9 +29,23 @@ static void sh_handle_cmd(const char *cmd) {
     sh_printf("%s", cmd + i);
     return;
   }
-  char *file = strtok((char*)cmd, " ");
-  char *argv[] = { file , NULL};
-  execvp(file, argv);
+  static char buf[256];
+  strncpy(buf, cmd, sizeof(buf) - 1);
+  buf[sizeof(buf) - 1] = '\0';
+
+  // 用空格切出程序名和参数
+  char *argv[32];
+  int argc = 0;
+  char *token = strtok(buf, " ");
+  while (token != NULL && argc < 31) {
+    argv[argc++] = token;
+    token = strtok(NULL, " ");
+  }
+  argv[argc] = NULL;
+
+  if (argc > 0) {
+    execvp(argv[0], argv);
+  }
 }
 
 void builtin_sh_run() {
