@@ -28,11 +28,17 @@ static void sh_handle_cmd(const char *cmd) {
     while(cmd[i] == ' ') i++;
     sh_printf("%s", cmd + i);
   }
+  if (cmd[0] == '.' && cmd[1] == '/') {
+    char *file = strtok((char*)(cmd + 2), " ");
+    execvp(file, NULL);
+  }
 }
 
 void builtin_sh_run() {
   sh_banner();
   sh_prompt();
+
+  setenv("PATH", "/bin", 0);
 
   while (1) {
     SDL_Event ev;
