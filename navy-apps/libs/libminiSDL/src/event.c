@@ -1,6 +1,7 @@
 #include <NDL.h>
 #include <SDL.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define keyname(k) #k,
@@ -51,6 +52,16 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
-  assert(0);
-  return NULL;
+  *numkeys = sizeof(keyname)/sizeof(keyname[0]);
+  uint8_t* state = malloc(sizeof(uint8_t) * (*numkeys));
+  memset(state, 0, sizeof(uint8_t) * (*numkeys));
+  SDL_Event ev;
+  while (SDL_PollEvent(&ev)) {
+    if (ev.type == SDL_KEYDOWN) {
+      state[ev.key.keysym.sym] = 1;
+    } else if (ev.type == SDL_KEYUP) {
+      state[ev.key.keysym.sym] = 0;
+    }
+  }
+  return state;
 }
