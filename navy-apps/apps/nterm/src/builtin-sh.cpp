@@ -30,7 +30,9 @@ static void sh_handle_cmd(const char *cmd) {
   }
   if (cmd[0] == '.' && cmd[1] == '/') {
     char *file = strtok((char*)(cmd + 2), " ");
-    file[-1] = '\0';
+    if (file[-1]=='\n') printf("MARK\n");
+    file[-1] = 'T';
+    file[-2] = 'T';
     execvp(file, NULL);
   }
 }
