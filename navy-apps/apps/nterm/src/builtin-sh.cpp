@@ -43,7 +43,7 @@ static void sh_handle_cmd(const char *cmd) {
   argv[argc] = NULL;
 
   if (argc > 0) {
-    argv[0][sizeof(argv[0]) - 1] = '\0';
+    argv[0][sizeof(argv[0])] = '\0';
     execvp(argv[0], argv);
   }
 }
