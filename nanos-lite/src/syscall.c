@@ -8,7 +8,7 @@ struct timeval {
 	long		tv_usec;	/* and microseconds */
 };
 
-#define CONFIG_STRACE
+// #define CONFIG_STRACE
 
 #ifdef CONFIG_STRACE
 static const char *syscall_names[] = {
