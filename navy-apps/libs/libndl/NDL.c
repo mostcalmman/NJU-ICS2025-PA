@@ -26,10 +26,7 @@ uint32_t NDL_GetTicks() {
 }
 
 int NDL_PollEvent(char *buf, int len) {
-  int fd = open("/dev/events", 0, 0);
-  int ret = read(fd, buf, len);
-  close(fd);
-  return ret;
+  return read(evtdev, buf, len);
 }
 
 void NDL_OpenCanvas(int *w, int *h) {
@@ -73,12 +70,16 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   int screen_loc_x = canvas.loc_x + x;
   int screen_loc_y = canvas.loc_y + y;
   size_t offset = screen_w * 4 * screen_loc_y + screen_loc_x * 4;
-  int fd = open("/dev/fb", 0, 0);
-  for (int i = 0; i < h; i ++) {
-    lseek(fd, offset + i * screen_w * 4, SEEK_SET);
-    size_t ret = write(fd, pixels + i * w, w * 4);
+  
+  if (w == screen_w) {
+    lseek(fbdev, offset, SEEK_SET);
+    write(fbdev, pixels, w * h * 4);
+  } else {
+    for (int i = 0; i < h; i ++) {
+      lseek(fbdev, offset + i * screen_w * 4, SEEK_SET);
+      write(fbdev, pixels + i * w, w * 4);
+    }
   }
-  close(fd);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
@@ -98,11 +99,17 @@ int NDL_QueryAudio() {
 int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
+  } else {
+    evtdev = open("/dev/events", 0, 0);
   }
+  fbdev = open("/dev/fb", 0, 0);
+
   gettimeofday(&t_ori, NULL);
   t_us = t_ori.tv_sec * 1000000 + t_ori.tv_usec;
   return 0;
 }
 
 void NDL_Quit() {
+  close(evtdev);
+  close(fbdev);
 }

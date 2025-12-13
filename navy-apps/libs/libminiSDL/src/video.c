@@ -69,6 +69,12 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
     h = s->h;
   }
   
+  // 如果是32位色且全屏更新, 直接透传像素指针, 避免malloc和memcpy
+  if (s->format->BitsPerPixel == 32 && w == s->w && s->pitch == w * 4) {
+    NDL_DrawRect((uint32_t *)((uint8_t *)s->pixels + y * s->pitch + x * 4), x, y, w, h);
+    return;
+  }
+
   uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
   assert(pixels);
 
