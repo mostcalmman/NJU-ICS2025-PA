@@ -63,7 +63,7 @@ word_t paddr_read(paddr_t addr, int len) {
     word_t ret = pmem_read(addr, len);
 #ifdef CONFIG_MTRACE
     char buf[128];
-    sprintf(buf, "Memory read: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, ret);
+    sprintf(buf, "Memory read: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD "\n", addr, len, ret);
     fputs(buf, mtrace_log_file);
 #endif
     return ret;
@@ -78,7 +78,7 @@ void paddr_write(paddr_t addr, int len, word_t data) {
     pmem_write(addr, len, data);
 #ifdef CONFIG_MTRACE
     char buf[128];
-    sprintf(buf, "Memory write: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD, addr, len, data);
+    sprintf(buf, "Memory write: addr = " FMT_PADDR ", len = %d, data = " FMT_WORD "\n", addr, len, data);
     fputs(buf, mtrace_log_file);
 #endif
     return; 
