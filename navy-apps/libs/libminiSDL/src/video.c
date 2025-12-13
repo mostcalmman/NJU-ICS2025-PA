@@ -46,7 +46,7 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
     for (int j = 0; j < w; j ++) {
       uint8_t *pixel = dst->pixels + (y + i) * dst->pitch + (x + j) * dst->format->BytesPerPixel;
       if (dst->format->BitsPerPixel == 8) {
-        printf("8bit\n");
+        // printf("8bit\n");
         // 8位色通过调色板映射
         uint8_t r = (color >> 16) & 0xff;
         uint8_t g = (color >> 8) & 0xff;
@@ -73,7 +73,7 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
   assert(pixels);
 
   if (s->format->BitsPerPixel == 8) {
-    printf("8bit\n");
+    // printf("8bit\n");
     // 8位色: 通过调色板转换为 32 位色
     SDL_Color *palette = s->format->palette->colors;
     for (int i = 0; i < h; i++) {

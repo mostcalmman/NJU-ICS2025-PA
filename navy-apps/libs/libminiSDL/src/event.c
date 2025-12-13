@@ -20,7 +20,7 @@ int SDL_PushEvent(SDL_Event *ev) {
 int SDL_PollEvent(SDL_Event *ev) {
   char buf[64];
   if (NDL_PollEvent(buf, sizeof(buf))) {
-    // printf("%s\n", buf); // 调试打印，可根据需要保留或删除
+    // printf("%s\n", buf);
     if (buf[0] == 'k' && (buf[1] == 'd' || buf[1] == 'u')) {
       // keyboard event
       ev->type = (buf[1] == 'd') ? SDL_KEYDOWN : SDL_KEYUP;
