@@ -44,9 +44,10 @@ int SDL_PollEvent(SDL_Event *ev) {
 }
 
 int SDL_WaitEvent(SDL_Event *event) {
-  while(1) {
-    if (SDL_PollEvent(event)) return 1;
+  while(SDL_PollEvent(event) == 0) {
+    SDL_Delay(10);
   }
+  return 1;
 }
 
 int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
