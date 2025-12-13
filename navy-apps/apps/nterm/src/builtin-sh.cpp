@@ -28,13 +28,9 @@ static void sh_handle_cmd(const char *cmd) {
     while(cmd[i] == ' ') i++;
     sh_printf("%s", cmd + i);
   }
-  if (cmd[0] == '.' && cmd[1] == '/') {
-    char *file = strtok((char*)(cmd + 2), " ");
-    if (file[-1]=='\n') printf("MARK\n");
-    file[-1] = 'T';
-    file[-2] = 'T';
-    execvp(file, NULL);
-  }
+  char *file = strtok((char*)cmd, " ");
+  char *argv[] = { file , NULL};
+  execvp(file, argv);
 }
 
 void builtin_sh_run() {
