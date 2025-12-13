@@ -56,12 +56,15 @@ uint8_t* SDL_GetKeyState(int *numkeys) {
   uint8_t* state = malloc(sizeof(uint8_t) * size);
   memset(state, 0, sizeof(uint8_t) * (*numkeys));
   SDL_Event ev;
-  while (SDL_PollEvent(&ev)) {
-    if (ev.type == SDL_KEYDOWN) {
-      state[ev.key.keysym.sym] = 1;
-    } else if (ev.type == SDL_KEYUP) {
-      state[ev.key.keysym.sym] = 0;
-    }
+  // while (SDL_PollEvent(&ev)) {
+  //   if (ev.type == SDL_KEYDOWN) {
+  //     state[ev.key.keysym.sym] = 1;
+  //   } else if (ev.type == SDL_KEYUP) {
+  //     state[ev.key.keysym.sym] = 0;
+  //   }
+  // }
+  if (SDL_PollEvent(&ev) && ev.type == SDL_KEYDOWN) {
+    state[ev.key.keysym.sym] = 1;
   }
   if(numkeys) *numkeys = size;
   return state;
