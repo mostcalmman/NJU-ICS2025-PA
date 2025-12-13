@@ -52,8 +52,8 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
-  *numkeys = sizeof(keyname)/sizeof(keyname[0]);
-  uint8_t* state = malloc(sizeof(uint8_t) * (*numkeys));
+  int size = sizeof(keyname)/sizeof(keyname[0]);
+  uint8_t* state = malloc(sizeof(uint8_t) * size);
   memset(state, 0, sizeof(uint8_t) * (*numkeys));
   SDL_Event ev;
   while (SDL_PollEvent(&ev)) {
@@ -63,5 +63,6 @@ uint8_t* SDL_GetKeyState(int *numkeys) {
       state[ev.key.keysym.sym] = 0;
     }
   }
+  if(numkeys) *numkeys = size;
   return state;
 }
