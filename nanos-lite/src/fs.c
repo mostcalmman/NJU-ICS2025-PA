@@ -70,8 +70,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;
     }
   }
-  Log("file %s not found", pathname);
-  return -1;
+  panic("file %s not found", pathname);
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
