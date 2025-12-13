@@ -44,7 +44,8 @@ static void sh_handle_cmd(const char *cmd) {
 
   if (argc > 0) {
     printf("%d\n", sizeof(argv[0]));
-    printf("%s", argv[0]);
+    // printf("%s", argv[0]);
+    printf("%s", "bird");
     argv[0][sizeof(argv[0])] = '\0';
     execvp(argv[0], argv);
   }
