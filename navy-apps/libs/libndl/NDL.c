@@ -116,7 +116,7 @@ int NDL_PlayAudio(void *buf, int len) {
 
 int NDL_QueryAudio() {
   int fd = open("/dev/sbctl", 0, 0);
-  int ret;
+  int ret = 0;
   read(fd, &ret, 4);
   close(fd);
   return ret;
