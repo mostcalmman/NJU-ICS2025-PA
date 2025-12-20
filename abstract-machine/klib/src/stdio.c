@@ -12,7 +12,7 @@ int printf(const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
   if( vsnprintf(print_buf, sizeof(print_buf), fmt, args) >= sizeof(print_buf)) {
-    // 这里出错大概率是bug不够大
+    // 这里出错大概率是buf不够大
     assert(0);
   }  
   va_end(args);
