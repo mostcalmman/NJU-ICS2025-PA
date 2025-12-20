@@ -20,12 +20,14 @@ static void update_audio_buf(){
     }
 }
 
-void CallbackHelper() {
+static bool CallbackHelper() {
   long now = NDL_GetTicks();
   if (now - last_callback_time >= interval) {
     last_callback_time = now;
     update_audio_buf();
+    return 1;
   }
+  return 0;
 }
 
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained) {
@@ -51,16 +53,16 @@ void SDL_CloseAudio() {
 void SDL_PauseAudio(int pause_on) {
   audio_paused = pause_on;
   if (!pause_on) {
-    last_callback_time = NDL_GetTicks();
-    update_audio_buf();
+    last_callback_time = NDL_GetTicks() - interval;
   }
 }
 
 // 非标准API，在SDL_Delay中被调用以驱动音频播放
 void SDL_RunAudio() {
   if (audio_paused) return;
-  CallbackHelper();
-  NDL_PlayAudio(audio_buf, audio_play_len);
+  if (CallbackHelper()) {
+    NDL_PlayAudio(audio_buf, audio_play_len);
+  }
 }
 
 void SDL_MixAudio(uint8_t *dst, uint8_t *src, uint32_t len, int volume) {
