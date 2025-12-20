@@ -19,7 +19,7 @@ typedef struct {
   size_t disk_offset;
   ReadFn read;
   WriteFn write;
-  size_t open_offset;
+  off_t open_offset;   // CHANGED: 用有符号 off_t 表示文件位置
 } Finfo;
 
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_CANVAS};
@@ -79,44 +79,48 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 size_t fs_read(int fd, void *buf, size_t len) {
   if (file_table[fd].size != 0) {
-    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
-    if (len > file_table[fd].size - file_table[fd].open_offset) {
-      len = file_table[fd].size - file_table[fd].open_offset;
-    }
+    if (file_table[fd].open_offset < 0) return 0;
+    if ((size_t)file_table[fd].open_offset >= file_table[fd].size) return 0;
+
+    size_t avail = file_table[fd].size - (size_t)file_table[fd].open_offset;
+    if (len > avail) len = avail;
   }
-  size_t ret = file_table[fd].read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
-  file_table[fd].open_offset += ret;
+
+  size_t ret = file_table[fd].read(buf,
+    file_table[fd].disk_offset + (size_t)file_table[fd].open_offset, len);
+  file_table[fd].open_offset += (off_t)ret;
   return ret;
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
   if (file_table[fd].size != 0) {
-    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
-    if (len > file_table[fd].size - file_table[fd].open_offset) {
-      len = file_table[fd].size - file_table[fd].open_offset;
-    }
+    if (file_table[fd].open_offset < 0) return 0;
+    if ((size_t)file_table[fd].open_offset >= file_table[fd].size) return 0;
+
+    size_t avail = file_table[fd].size - (size_t)file_table[fd].open_offset;
+    if (len > avail) len = avail;
   }
-  size_t ret = file_table[fd].write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
-  file_table[fd].open_offset += ret;
+
+  size_t ret = file_table[fd].write(buf,
+    file_table[fd].disk_offset + (size_t)file_table[fd].open_offset, len);
+  file_table[fd].open_offset += (off_t)ret;
   return ret;
 }
 
 off_t fs_lseek(int fd, off_t offset, int whence) {
+  off_t base = 0;
   switch (whence) {
-    case SEEK_SET:
-      file_table[fd].open_offset = offset;
-      break;
-    case SEEK_CUR:
-      file_table[fd].open_offset += offset;
-      break;
-    case SEEK_END:
-      file_table[fd].open_offset = file_table[fd].size + offset;
-      break;
-    default:
-      panic("whence = %d is invalid", whence);
+    case SEEK_SET: base = 0; break;
+    case SEEK_CUR: base = file_table[fd].open_offset; break;
+    case SEEK_END: base = (off_t)file_table[fd].size; break;
+    default: panic("whence = %d is invalid", whence);
   }
-  if (file_table[fd].open_offset < 0) file_table[fd].open_offset = 0;
-  return file_table[fd].open_offset;
+
+  off_t new_off = base + offset;
+  if (new_off < 0) new_off = 0;   // 不允许负位置（至少别让它 wrap）
+
+  file_table[fd].open_offset = new_off;
+  return new_off;
 }
 
 int fs_close(int fd) {
