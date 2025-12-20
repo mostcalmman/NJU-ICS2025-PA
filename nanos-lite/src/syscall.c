@@ -127,6 +127,10 @@ void do_syscall(Context *c) {
       c->GPRx = 1; // 返回个假的pid
       break;
     }
+    case SYS_kill: {
+      c->GPRx = 0; // 假装成功了
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }

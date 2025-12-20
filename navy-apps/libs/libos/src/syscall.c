@@ -127,8 +127,7 @@ int _stat(const char *fname, struct stat *buf) {
 }
 
 int _kill(int pid, int sig) {
-  _exit(-SYS_kill);
-  return -1;
+  return _syscall_(SYS_kill, pid, sig, 0);
 }
 
 pid_t _getpid() {
