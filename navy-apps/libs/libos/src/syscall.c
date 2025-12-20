@@ -132,8 +132,7 @@ int _kill(int pid, int sig) {
 }
 
 pid_t _getpid() {
-  _exit(-SYS_getpid);
-  return 1;
+  return _syscall_(SYS_getpid, 0, 0, 0);
 }
 
 pid_t _fork() {

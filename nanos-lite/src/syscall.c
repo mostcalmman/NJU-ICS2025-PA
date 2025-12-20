@@ -123,6 +123,10 @@ void do_syscall(Context *c) {
       naive_uload(NULL, (const char *)a[1]);
       break;
     }
+    case SYS_getpid: {
+      c->GPRx = 1; // 返回个假的pid
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 }
