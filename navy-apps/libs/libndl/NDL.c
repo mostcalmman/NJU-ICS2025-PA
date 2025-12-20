@@ -114,6 +114,7 @@ int NDL_PlayAudio(void *buf, int len) {
   return ret;
 }
 
+// 返回空闲的缓冲区大小
 int NDL_QueryAudio() {
   int fd = open("/dev/sbctl", 0, 0);
   int ret = 0;

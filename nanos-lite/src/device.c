@@ -73,14 +73,15 @@ size_t sb_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t sbctl_read(void *buf, size_t offset, size_t len) {
-  assert(sizeof(buf) >= 4);
-  ((int *)buf)[0] = io_read(AM_AUDIO_STATUS).count;
+  assert(len >= 4);
+  int count = io_read(AM_AUDIO_STATUS).count;
+  int size = io_read(AM_AUDIO_CONFIG).bufsize;
+  ((int *)buf)[0] = size - count;
   return 4;
 }
 
 size_t sbctl_write(const void *buf, size_t offset, size_t len) {
-  printf("%d\n\n", sizeof(buf));
-  assert(sizeof(buf) >= 12);
+  assert(len >= 12);
   io_write(AM_AUDIO_CTRL, ((const int *)buf)[0], ((const int *)buf)[1], ((const int *)buf)[2]);
   return 12;
 }
