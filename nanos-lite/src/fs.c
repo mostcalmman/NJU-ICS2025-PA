@@ -67,10 +67,9 @@ int fs_open(const char *pathname, int flags, int mode) {
   }
   for(int i = 0; i < sizeof(file_table)/sizeof(file_table[0]); i++) {
     if(strcmp(file_table[i].name, pathname) == 0) {
-      if (file_table[i].read == NULL || file_table[i].write == NULL) {
-        file_table[i].read = ramdisk_read;
-        file_table[i].write = ramdisk_write;
-      }
+      if (file_table[i].read == NULL)  file_table[i].read  = ramdisk_read;
+      if (file_table[i].write == NULL) file_table[i].write = ramdisk_write;
+
       file_table[i].open_offset = 0;
       return i;
     }
@@ -79,8 +78,11 @@ int fs_open(const char *pathname, int flags, int mode) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (len + file_table[fd].open_offset > file_table[fd].size && file_table[fd].size!=0) {
-    len = file_table[fd].size - file_table[fd].open_offset;
+  if (file_table[fd].size != 0) {
+    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
+    if (len > file_table[fd].size - file_table[fd].open_offset) {
+      len = file_table[fd].size - file_table[fd].open_offset;
+    }
   }
   size_t ret = file_table[fd].read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
   file_table[fd].open_offset += ret;
@@ -88,15 +90,18 @@ size_t fs_read(int fd, void *buf, size_t len) {
 }
 
 size_t fs_write(int fd, const void *buf, size_t len) {
-  if (len + file_table[fd].open_offset > file_table[fd].size && file_table[fd].size!=0) {
-    len = file_table[fd].size - file_table[fd].open_offset;
+  if (file_table[fd].size != 0) {
+    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
+    if (len > file_table[fd].size - file_table[fd].open_offset) {
+      len = file_table[fd].size - file_table[fd].open_offset;
+    }
   }
   size_t ret = file_table[fd].write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
   file_table[fd].open_offset += ret;
   return ret;
 }
 
-size_t fs_lseek(int fd, size_t offset, int whence) {
+off_t fs_lseek(int fd, off_t offset, int whence) {
   switch (whence) {
     case SEEK_SET:
       file_table[fd].open_offset = offset;
@@ -110,6 +115,7 @@ size_t fs_lseek(int fd, size_t offset, int whence) {
     default:
       panic("whence = %d is invalid", whence);
   }
+  if (file_table[fd].open_offset < 0) file_table[fd].open_offset = 0;
   return file_table[fd].open_offset;
 }
 

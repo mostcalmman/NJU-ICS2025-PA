@@ -4,10 +4,10 @@
 #include "proc.h"
 #include <fs.h>
 
-struct timeval {
-	long		tv_sec;		/* seconds */
-	long		tv_usec;	/* and microseconds */
-};
+// struct timeval {
+// 	long		tv_sec;		/* seconds */
+// 	long		tv_usec;	/* and microseconds */
+// };
 
 void naive_uload(PCB *pcb, const char *filename);
 
@@ -98,7 +98,7 @@ void do_syscall(Context *c) {
       break;
     }
     case SYS_lseek: {
-      c->GPRx = fs_lseek((int)a[1], (size_t)a[2], (int)a[3]);
+      c->GPRx = fs_lseek((int)a[1], (off_t)a[2], (int)a[3]);
       break;
     }
     case SYS_close: {
