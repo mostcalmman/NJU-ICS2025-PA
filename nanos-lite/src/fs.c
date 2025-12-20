@@ -79,9 +79,10 @@ int fs_open(const char *pathname, int flags, int mode) {
 }
 
 size_t fs_read(int fd, void *buf, size_t len) {
-  if (len + file_table[fd].open_offset > file_table[fd].size && file_table[fd].size!=0) {
+  if (len + file_table[fd].open_offset > file_table[fd].size) {
     len = file_table[fd].size - file_table[fd].open_offset;
   }
+  if(len==0) return 0;
   size_t ret = file_table[fd].read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
   file_table[fd].open_offset += ret;
   return ret;
