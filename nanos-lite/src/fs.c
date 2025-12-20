@@ -106,6 +106,12 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
 }
 
 off_t fs_lseek(int fd, off_t offset, int whence) {
+
+  if ( offset < 0 ) {
+    Log("%ld\n\n", offset);
+    Log("%d\n\n", whence);
+  }
+
   off_t base = 0;
   switch (whence) {
     case SEEK_SET: base = 0; break;
