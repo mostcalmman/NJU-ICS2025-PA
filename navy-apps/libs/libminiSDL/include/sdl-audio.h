@@ -1,6 +1,7 @@
 #ifndef __SDL_AUDIO_H__
 #define __SDL_AUDIO_H__
 
+#include <stdint.h>
 typedef struct {
   int freq;
   uint16_t format;

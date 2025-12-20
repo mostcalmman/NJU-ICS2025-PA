@@ -6,6 +6,9 @@ size_t serial_write(const void *buf, size_t offset, size_t len);
 size_t events_read(void *buf, size_t offset, size_t len);
 size_t dispinfo_read(void *buf, size_t offset, size_t len);
 size_t fb_write(const void *buf, size_t offset, size_t len);
+size_t sb_write(const void *buf, size_t offset, size_t len);
+size_t sbctl_read(void *buf, size_t offset, size_t len);
+size_t sbctl_write(const void *buf, size_t offset, size_t len);
 
 typedef size_t (*ReadFn) (void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
@@ -40,6 +43,8 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_FB]     = {"/dev/fb", 0, 0, invalid_read, fb_write},
   [FD_CANVAS] = {"unimplemented", 0, 0, invalid_read, fb_write},
   {"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
+  {"/dev/sbctl", 0, 0, sbctl_read, sbctl_write},
+  {"/dev/sb",0 ,0, invalid_read, sb_write},
                 
 #include "files.h"
 };

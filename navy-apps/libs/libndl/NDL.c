@@ -93,17 +93,33 @@ void NDL_FillScreen(uint32_t color) {
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
+  uint8_t buf[12];
+  ((int *)buf)[0] = freq;
+  ((int *)buf)[1] = channels;
+  ((int *)buf)[2] = samples;
+  int fd = open("/dev/sbctl", 0, 0);
+  write(fd, buf, 12);
+  close(fd);
 }
 
 void NDL_CloseAudio() {
+  return;
 }
 
 int NDL_PlayAudio(void *buf, int len) {
-  return 0;
+  if (len <= 0) return 0;
+  int fd = open("/dev/sb", 0, 0);
+  int ret = write(fd, buf, len);
+  close(fd);
+  return ret;
 }
 
 int NDL_QueryAudio() {
-  return 0;
+  int fd = open("/dev/sbctl", 0, 0);
+  int ret;
+  read(fd, &ret, 4);
+  close(fd);
+  return ret;
 }
 
 int NDL_Init(uint32_t flags) {

@@ -35,6 +35,7 @@ void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
 
 // Area buf
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
+  // 循环队列, 在队头播放, 在队尾写入
   uint32_t len = ctl->buf.end - ctl->buf.start;
   uint8_t *data = (uint8_t *)ctl->buf.start;
   uint32_t sbuf_size = inl(AUDIO_SBUF_SIZE_ADDR);

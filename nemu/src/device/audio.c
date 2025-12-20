@@ -26,7 +26,7 @@ enum {
   reg_samples,
   reg_sbuf_size,
   reg_init,
-  reg_count,
+  reg_count, // 流缓冲区中的数据量
   nr_reg
 };
 
