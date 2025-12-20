@@ -111,7 +111,7 @@ off_t fs_lseek(int fd, off_t offset, int whence) {
     Log("%ld\n\n", offset);
     Log("%d\n\n", whence);
   }
-
+  Log("aaa\n\n");
   off_t base = 0;
   switch (whence) {
     case SEEK_SET: base = 0; break;
