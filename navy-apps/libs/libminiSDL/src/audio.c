@@ -15,7 +15,9 @@ static int audio_paused = 1; // 默认为暂停状态
 static void update_audio_buf(){
   if (audio_spec.callback) {
       memset(audio_buf, 0, audio_len);
+      printf("audio_len: %d\n", audio_len);
       audio_play_len = NDL_QueryAudio() < audio_len ? NDL_QueryAudio() : audio_len;
+      printf("audio_play_len: %d\n", audio_play_len);
       audio_spec.callback(audio_spec.userdata, audio_buf, audio_play_len);
     }
 }
