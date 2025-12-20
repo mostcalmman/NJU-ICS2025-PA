@@ -80,6 +80,7 @@ size_t sbctl_read(void *buf, size_t offset, size_t len) {
 
 size_t sbctl_write(const void *buf, size_t offset, size_t len) {
   assert(sizeof(buf) >= 12);
+  printf("%d\n\n", sizeof(buf));
   io_write(AM_AUDIO_CTRL, ((const int *)buf)[0], ((const int *)buf)[1], ((const int *)buf)[2]);
   return 12;
 }
