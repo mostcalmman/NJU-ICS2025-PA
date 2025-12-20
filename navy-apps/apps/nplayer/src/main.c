@@ -84,6 +84,7 @@ int main(int argc, char *argv[]) {
   assert(fp);
   fseek(fp, 0, SEEK_END);
   size_t size = ftell(fp);
+  printf("File size: %d\n", size);
   void *buf = malloc(size);
   assert(size);
   fseek(fp, 0, SEEK_SET);
@@ -93,6 +94,9 @@ int main(int argc, char *argv[]) {
 
   int error;
   v = stb_vorbis_open_memory(buf, size, &error, NULL);
+  if (!v) {
+    printf("stb_vorbis_open_memory failed with error: %d\n", error);
+  }
   assert(v);
   info = stb_vorbis_get_info(v);
 
