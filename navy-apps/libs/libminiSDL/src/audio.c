@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-// 单位都是微秒
+// 单位都是毫秒
 static long last_callback_time = 0;
 static long interval = 0;
 static SDL_AudioSpec audio_spec;
@@ -40,7 +40,7 @@ bool CallbackHelper() {
 
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained) {
   NDL_OpenAudio(desired->freq, desired->channels, desired->samples);
-  interval = desired->samples * 1000000 / desired->freq;
+  interval = desired->samples * 1000 / desired->freq;
   last_callback_time = NDL_GetTicks();
 
   audio_spec = *desired;

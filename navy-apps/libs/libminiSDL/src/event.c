@@ -20,8 +20,10 @@ int SDL_PushEvent(SDL_Event *ev) {
 int SDL_PollEvent(SDL_Event *ev) {
   // MARK: CallbackHelper
   bool CallbackHelper();
+  void SDL_RunAudio();
   CallbackHelper();
   char buf[64];
+  SDL_RunAudio();
   if (NDL_PollEvent(buf, sizeof(buf))) {
     // printf("%s\n", buf);
     if (buf[0] == 'k' && (buf[1] == 'd' || buf[1] == 'u')) {
