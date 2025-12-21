@@ -1,5 +1,8 @@
+#include "proc.h"
 #include <fs.h>
 
+
+void naive_uload(PCB *pcb, const char *filename);
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 size_t serial_write(const void *buf, size_t offset, size_t len);
@@ -75,8 +78,8 @@ int fs_open(const char *pathname, int flags, int mode) {
     }
   }
   Log("file %s not found", pathname);
-  // assert(0);
-  halt(0);
+  naive_uload(NULL, "/bin/nterm");
+  panic("Should not reach here");
 }
 
 ssize_t fs_read(int fd, void *buf, size_t len) {
