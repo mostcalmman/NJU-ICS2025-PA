@@ -66,7 +66,7 @@ void do_syscall(Context *c) {
       if( a[1]!=0 ){
         Log("Error: Program exited with code %d", a[1]);
       }
-      naive_uload(NULL, "/bin/menu");
+      naive_uload(NULL, "/bin/nterm");
       // halt(a[1]);
       break;
     case SYS_brk: {
