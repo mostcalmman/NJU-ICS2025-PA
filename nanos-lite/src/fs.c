@@ -19,34 +19,10 @@ typedef struct {
   size_t disk_offset;
   ReadFn read;
   WriteFn write;
+  off_t open_offset;
 } Finfo;
 
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENT, FD_FB, FD_CANVAS};
-
-#define NR_FD 32
-#define FD_RESERVED (FD_CANVAS + 1)
-
-typedef struct {
-  int used;
-  int file_idx;   // index into file_table[]
-  off_t offset;   // per-fd offset
-} FDinfo;
-
-static FDinfo fd_table[NR_FD];
-
-static inline void fd_check(int fd) {
-  if (fd < 0 || fd >= NR_FD || !fd_table[fd].used) {
-    panic("bad fd = %d", fd);
-  }
-}
-
-static inline int fd_alloc(void) {
-  for (int fd = FD_RESERVED; fd < NR_FD; fd++) {
-    if (!fd_table[fd].used) return fd;
-  }
-  return -1;
-}
-
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -57,7 +33,6 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
   panic("should not reach here");
   return 0;
 }
-
 
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {
@@ -74,13 +49,8 @@ static Finfo file_table[] __attribute__((used)) = {
 #include "files.h"
 };
 
-static inline Finfo *fd_finfo(int fd) {
-  return &file_table[fd_table[fd].file_idx];
-}
-
 char *fs_getname(int fd) {
-  fd_check(fd);
-  return fd_finfo(fd)->name;
+  return file_table[fd].name;
 }
 
 void init_fs() {
@@ -89,108 +59,70 @@ void init_fs() {
   int w = display.width;
   int h = display.height;
   file_table[FD_FB].size = w * h * sizeof(uint32_t);
-
-  // init fd table: 保留 0..FD_CANVAS 为固定 fd
-  for (int i = 0; i < NR_FD; i++) fd_table[i] = (FDinfo){0};
-  for (int fd = 0; fd < FD_RESERVED; fd++) {
-    fd_table[fd].used = 1;
-    fd_table[fd].file_idx = fd;
-    fd_table[fd].offset = 0;
-  }
 }
 
-int fs_open(const char *pathname, int flags, int mode) {
-  if (!pathname) panic("pathname is NULL");
-
-  int file_idx = -1;
-  for (int i = 0; i < (int)(sizeof(file_table) / sizeof(file_table[0])); i++) {
-    if (strcmp(file_table[i].name, pathname) == 0) { file_idx = i; break; }
+int fs_open(const char *pathname, int flags, int mode) { 
+  if (!pathname) {
+    panic("pathname is NULL");
   }
-  if (file_idx < 0) panic("file %s not found", pathname);
+  for(int i = 0; i < sizeof(file_table)/sizeof(file_table[0]); i++) {
+    if(strcmp(file_table[i].name, pathname) == 0) {
+      if (file_table[i].read == NULL)  file_table[i].read  = ramdisk_read;
+      if (file_table[i].write == NULL) file_table[i].write = ramdisk_write;
 
-  if (file_table[file_idx].read == NULL)  file_table[file_idx].read  = ramdisk_read;
-  if (file_table[file_idx].write == NULL) file_table[file_idx].write = ramdisk_write;
-
-  // 对保留设备：返回固定 fd（避免破坏现有假设）
-  if (file_idx < FD_RESERVED) {
-    fd_table[file_idx].used = 1;
-    fd_table[file_idx].file_idx = file_idx;
-    fd_table[file_idx].offset = 0;
-    return file_idx;
+      file_table[i].open_offset = 0;
+      return i;
+    }
   }
-
-  int fd = fd_alloc();
-  if (fd < 0) panic("too many open files");
-
-  fd_table[fd].used = 1;
-  fd_table[fd].file_idx = file_idx;
-  fd_table[fd].offset = 0;
-  return fd;
+  Log("file %s not found", pathname);
+  assert(0);
 }
 
 ssize_t fs_read(int fd, void *buf, size_t len) {
-  fd_check(fd);
-  Finfo *f = fd_finfo(fd);
+  if (file_table[fd].size != 0) {
+    if (file_table[fd].open_offset < 0) return 0;
+    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
 
-  if (f->size != 0) {
-    if (fd_table[fd].offset < 0) return 0;
-    if ((size_t)fd_table[fd].offset >= f->size) return 0;
-
-    size_t avail = f->size - (size_t)fd_table[fd].offset;
+    size_t avail = file_table[fd].size - file_table[fd].open_offset;
     if (len > avail) len = avail;
   }
 
-  size_t r = f->read(buf, f->disk_offset + (size_t)fd_table[fd].offset, len);
-  fd_table[fd].offset += (off_t)r;
-  return (ssize_t)r;
+  ssize_t ret = file_table[fd].read(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+  file_table[fd].open_offset += ret;
+  return ret;
 }
 
 ssize_t fs_write(int fd, const void *buf, size_t len) {
-  fd_check(fd);
-  Finfo *f = fd_finfo(fd);
+  if (file_table[fd].size != 0) {
+    if (file_table[fd].open_offset < 0) return 0;
+    if (file_table[fd].open_offset >= file_table[fd].size) return 0;
 
-  if (f->size != 0) {
-    if (fd_table[fd].offset < 0) return 0;
-    if ((size_t)fd_table[fd].offset >= f->size) return 0;
-
-    size_t avail = f->size - (size_t)fd_table[fd].offset;
+    size_t avail = file_table[fd].size - file_table[fd].open_offset;
     if (len > avail) len = avail;
   }
 
-  size_t w = f->write(buf, f->disk_offset + (size_t)fd_table[fd].offset, len);
-  fd_table[fd].offset += (off_t)w;
-  return (ssize_t)w;
+  ssize_t ret = file_table[fd].write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+  file_table[fd].open_offset += ret;
+  return ret;
 }
 
 off_t fs_lseek(int fd, off_t offset, int whence) {
-  fd_check(fd);
-  Finfo *f = fd_finfo(fd);
 
   off_t base = 0;
   switch (whence) {
     case SEEK_SET: base = 0; break;
-    case SEEK_CUR: base = fd_table[fd].offset; break;
-    case SEEK_END: base = (off_t)f->size; break;
+    case SEEK_CUR: base = file_table[fd].open_offset; break;
+    case SEEK_END: base = (off_t)file_table[fd].size; break;
     default: panic("whence = %d is invalid", whence);
   }
 
   off_t new_off = base + offset;
   if (new_off < 0) new_off = 0;
-  fd_table[fd].offset = new_off;
+
+  file_table[fd].open_offset = new_off;
   return new_off;
 }
 
 int fs_close(int fd) {
-  fd_check(fd);
-
-  // 保留 fd 不真正释放，只重置 offset
-  if (fd < FD_RESERVED) {
-    fd_table[fd].offset = 0;
-    return 0;
-  }
-
-  fd_table[fd].used = 0;
-  fd_table[fd].file_idx = -1;
-  fd_table[fd].offset = 0;
   return 0;
 }
