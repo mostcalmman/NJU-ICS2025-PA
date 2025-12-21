@@ -12,6 +12,10 @@ typedef struct {
 } Mix_Music;
 
 typedef struct {
+    int allocated;
+    uint8_t *abuf;
+    uint32_t alen;
+    uint8_t volume;
 } Mix_Chunk;
 
 #ifdef __cplusplus
