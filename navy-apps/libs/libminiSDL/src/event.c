@@ -62,6 +62,8 @@ uint8_t* SDL_GetKeyState(int *numkeys) {
   // MARK: CallbackHelper
   bool CallbackHelper();
   CallbackHelper();
+  void SDL_RunAudio();
+  SDL_RunAudio();
   if (numkeys) *numkeys = sizeof(keyname) / sizeof(keyname[0]);
   return keystate;
 }
