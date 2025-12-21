@@ -18,6 +18,9 @@ int SDL_PushEvent(SDL_Event *ev) {
 }
 
 int SDL_PollEvent(SDL_Event *ev) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   char buf[64];
   if (NDL_PollEvent(buf, sizeof(buf))) {
     // printf("%s\n", buf);
@@ -56,6 +59,9 @@ int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
 }
 
 uint8_t* SDL_GetKeyState(int *numkeys) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   if (numkeys) *numkeys = sizeof(keyname) / sizeof(keyname[0]);
   return keystate;
 }

@@ -1,10 +1,14 @@
 #include <NDL.h>
 #include <sdl-video.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
 
@@ -34,6 +38,9 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   int x, y, w, h;
   if (dstrect) {
     x = dstrect->x; y = dstrect->y; w = dstrect->w; h = dstrect->h;
@@ -62,6 +69,9 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   assert(s);
   if (w == 0 && h == 0) {
     w = s->w;

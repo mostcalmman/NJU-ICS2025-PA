@@ -11,18 +11,23 @@ static uint8_t *audio_buf = NULL;
 static uint32_t audio_len = 0;
 static uint32_t audio_play_len = 0;
 static int audio_paused = 1; // 默认为暂停状态
+static int g_audio_cb_depth = 0;
 
 static void update_audio_buf(){
   if (audio_spec.callback) {
       memset(audio_buf, 0, audio_len);
-      printf("audio_len: %d\n", audio_len);
+      // printf("audio_len: %d\n", audio_len);
       audio_play_len = NDL_QueryAudio() < audio_len ? NDL_QueryAudio() : audio_len;
-      printf("audio_play_len: %d\n", audio_play_len);
+      // printf("audio_play_len: %d\n", audio_play_len);
+      // 进入回调, 设置标志, 防止重入
+      g_audio_cb_depth ++;
       audio_spec.callback(audio_spec.userdata, audio_buf, audio_play_len);
+      g_audio_cb_depth --;
     }
 }
 
-static bool CallbackHelper() {
+bool CallbackHelper() {
+  if(g_audio_cb_depth > 0) return false;
   long now = NDL_GetTicks();
   if (now - last_callback_time >= interval) {
     last_callback_time = now;
