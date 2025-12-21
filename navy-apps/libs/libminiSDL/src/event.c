@@ -47,9 +47,7 @@ int SDL_PollEvent(SDL_Event *ev) {
 }
 
 int SDL_WaitEvent(SDL_Event *event) {
-  while(SDL_PollEvent(event) == 0) {
-    SDL_Delay(10);
-  }
+  while(SDL_PollEvent(event) == 0);
   return 1;
 }
 

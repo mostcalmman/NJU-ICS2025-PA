@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <sdl-timer.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 SDL_TimerID SDL_AddTimer(uint32_t interval, SDL_NewTimerCallback callback, void *param) {
   assert(0);
@@ -18,6 +19,9 @@ uint32_t SDL_GetTicks() {
 }
 
 void SDL_Delay(uint32_t ms) {
+  // MARK: CallbackHelper
+  bool CallbackHelper();
+  CallbackHelper();
   void SDL_RunAudio();
   uint32_t start = SDL_GetTicks();
   while (SDL_GetTicks() - start < ms) {
