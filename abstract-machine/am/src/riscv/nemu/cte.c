@@ -9,6 +9,7 @@ Context* __am_irq_handle(Context *c) {
   // uintptr_t *raw = (uintptr_t *)c;
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
   // printf("Context End\n\n");
+  assert(user_handler != NULL);
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
@@ -29,7 +30,7 @@ Context* __am_irq_handle(Context *c) {
     }
 
     c = user_handler(ev, c);
-    // assert(c != NULL);
+    assert(c != NULL);
   }
 
   return c;
