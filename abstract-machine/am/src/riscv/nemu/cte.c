@@ -10,28 +10,26 @@ Context* __am_irq_handle(Context *c) {
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
   // printf("Context End\n\n");
   assert(user_handler != NULL);
-  if (user_handler) {
-    Event ev = {0};
-    switch (c->mcause) {
-      case 11: 
-        c->mepc += 4;
-        if(c->GPR1 == -1) {
-          ev.event = EVENT_YIELD;
-        }else {
-          ev.event = EVENT_SYSCALL;
-        }
-        break;
-      case 12:
-      case 13:
-      case 15: 
-        ev.event = EVENT_PAGEFAULT; break;
-      default: 
-        ev.event = EVENT_ERROR; break;
-    }
-
-    c = user_handler(ev, c);
-    assert(c != NULL);
+  Event ev = {0};
+  switch (c->mcause) {
+    case 11: 
+      c->mepc += 4;
+      if(c->GPR1 == -1) {
+        ev.event = EVENT_YIELD;
+      }else {
+        ev.event = EVENT_SYSCALL;
+      }
+      break;
+    case 12:
+    case 13:
+    case 15: 
+      ev.event = EVENT_PAGEFAULT; break;
+    default: 
+      ev.event = EVENT_ERROR; break;
   }
+
+  c = user_handler(ev, c);
+  assert(c != NULL);
 
   return c;
 }
@@ -49,7 +47,10 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 }
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  return NULL;
+  Context *c = (Context *)kstack.end - sizeof(Context);
+  c->mepc = (uintptr_t)entry;
+  c->mstatus = 0x1800; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest
+  return c;
 }
 
 void yield() {
