@@ -51,7 +51,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->mepc = (uintptr_t)entry;
   c->mstatus = 0x1800; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest
   c->gpr[10] = (uintptr_t)arg;
-  c->gpr[2] = (uintptr_t)c - 16;
+  c->gpr[2] = (uintptr_t)c;
   return c;
 }
 
