@@ -6,6 +6,7 @@ static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename);
 
 static void inline context_kload(PCB* pcb, void (*entry)(void *), void *arg){
   pcb->cp = kcontext((Area){pcb->stack, pcb->stack + STACK_SIZE}, entry, arg);
@@ -25,14 +26,17 @@ void hello_fun(void *arg) {
 }
 
 void init_proc() {
+  Log("Initializing processes...");
+  
   context_kload(&pcb[0], hello_fun, (void*)1);
-  context_kload(&pcb[1], hello_fun, (void*)2);
+  // context_kload(&pcb[1], hello_fun, (void*)2);
+  context_uload(&pcb[1], "/bin/pal");
   switch_boot_pcb();
   yield();
 
-  Log("Initializing processes...");
 
   // load program here
+  Log("Should not reach here. Switching to naive load...");
   naive_uload(NULL,"/bin/nterm");
 
 }
