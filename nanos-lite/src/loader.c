@@ -56,7 +56,5 @@ void context_uload(PCB *pcb, const char *filename) {
   pcb->cp = ucontext(&pcb->as,
       (Area){pcb->stack, pcb->stack + STACK_SIZE},
       entry);
-  // pcb->cp->GPRx = (uintptr_t)heap.end;
-  uintptr_t tmp = (uintptr_t)heap.end;
-  asm volatile("mv a0, %0" : : "r"(tmp));
+  pcb->cp->GPR4 = (uintptr_t)heap.end;
 }
