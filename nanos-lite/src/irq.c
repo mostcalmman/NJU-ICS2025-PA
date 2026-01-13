@@ -10,8 +10,8 @@ static Context* do_event(Event e, Context* c) {
     case EVENT_SYSCALL: 
       do_syscall(c); 
       break;
-    // case EVENT_IRQ_TIMER:
-    //   break; // 暂时什么都不做
+    case EVENT_IRQ_TIMER:
+      break; // 暂时什么都不做
     default: panic("Unhandled event ID = %d", e.event);
   }
 
