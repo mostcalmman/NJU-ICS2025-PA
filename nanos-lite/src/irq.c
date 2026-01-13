@@ -1,14 +1,18 @@
 #include <common.h>
 void do_syscall(Context *c);
+Context* schedule(Context *prev);
 
 static Context* do_event(Event e, Context* c) {
   switch (e.event) {
     case EVENT_YIELD: 
-      printf("yield recognized\n");
+      Log("yield recognized");
+      c = schedule(c);
       break;
     case EVENT_SYSCALL: 
       do_syscall(c); 
       break;
+    case EVENT_IRQ_TIMER:
+      break; // 暂时什么都不做
     default: panic("Unhandled event ID = %d", e.event);
   }
 
