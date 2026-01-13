@@ -12,7 +12,7 @@ struct Context {
   // TODO: fix the order of these members to match trap.S
   union {
     struct {
-      void *pdir;
+      void *pdir; // GPR0 恒为0, 这个位置借用来存放 pdir
       uintptr_t gpr_body[NR_REGS - 1];
     };
     uintptr_t gpr[NR_REGS];
