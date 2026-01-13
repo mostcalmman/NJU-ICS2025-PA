@@ -177,7 +177,7 @@ bool init_ftrace(const char *elf_file, const char *log_file) {
     }
     // ramdisk解析
     char *ramdisk_file = ramdisk_get_file(elf_file);
-    Log("Trying to parse ramdisk ELF file: %s", ramdisk_file);
+    Log("Trying to parse ramdisk ELF file");
     temMap = NULL;
     if(ramdisk_file){
         if(parse_elf(ramdisk_file, &temMap, &temCount)){
