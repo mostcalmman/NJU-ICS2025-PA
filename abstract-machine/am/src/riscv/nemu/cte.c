@@ -47,7 +47,7 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 }
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  Context *c = (Context *)kstack.end - 1;
+  Context *c = (Context *)kstack.end + 1;
   c->mepc = (uintptr_t)entry;
   c->mstatus = 0x1800; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest
   return c;
