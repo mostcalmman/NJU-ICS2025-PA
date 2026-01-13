@@ -25,6 +25,8 @@ int main() {
 
   init_fs();
 
+  yield();
+
   init_proc();
 
   Log("Finish initialization");
