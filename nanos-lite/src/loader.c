@@ -51,10 +51,68 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
-void context_uload(PCB *pcb, const char *filename) {
+static void* constructUserArgs(void *sp, const char *filename, char *const argv[], char *const envp[]) {
+  // 暂时认为传进来的argv[0]是第一个参数, filename是程序名
+
+  uintptr_t user_argv[127];
+  uintptr_t user_envp[127];
+  
+  // 构造的*argv[0], 即文件名
+  sp -= strlen(filename) + 1;
+  strcpy(sp, filename);
+  user_argv[0] = (uintptr_t)sp;
+  int argc = 1;
+
+  // 剩下的**argv(倒着放)
+  for (char* const *p = argv; p && *p; ++p) {
+    sp -= strlen(*p) + 1;
+    strcpy(sp, *p);
+    user_argv[argc] = (uintptr_t)sp;
+    ++argc;
+  }
+
+  // **envp(倒着放)
+  int envc = 0;
+  for (char* const *p = envp; p && *p; ++p) {
+    sp -= strlen(*p) + 1;
+    strcpy(sp, *p);
+    user_envp[envc] = (uintptr_t)sp;
+    ++envc;
+  }
+
+  // 放一个NULL
+  sp -= sizeof(char*);
+  *(void**)sp = NULL; // sp转为二阶指针, sp指向的才是一个指针, 才可以存NULL
+
+  // envp指针数组
+  for (int i = envc - 1; i >=0; --i) {
+    sp -= sizeof(char*);
+    *(uintptr_t*)sp = user_envp[i];
+  }
+
+  // 放一个NULL
+  sp -= sizeof(char*);
+  *(void**)sp = NULL;
+
+  // argv指针数组
+  for (int i = argc - 1; i >=0; --i) {
+    sp -= sizeof(char*);
+    *(uintptr_t*)sp = user_argv[i];
+  }
+
+  // argc
+  sp -= sizeof(int);
+  *(int*)sp = argc;
+
+  return sp;
+}
+
+// 这部分代码应该是可移植的
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
   void *entry = (void*)loader(pcb, filename);
-  pcb->cp = ucontext(&pcb->as,
-      (Area){pcb->stack, pcb->stack + STACK_SIZE},
-      entry);
-  pcb->cp->GPRx = (uintptr_t)heap.end;
+  pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
+  pcb->cp->GPRx = (uintptr_t)heap.end; // 创建用户栈
+  void *sp = (void *)pcb->cp->GPRx;
+  sp = constructUserArgs(sp, filename, argv, envp);
+  pcb->cp->GPRx = (uintptr_t)sp;
 }
