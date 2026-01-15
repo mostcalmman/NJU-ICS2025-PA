@@ -28,7 +28,7 @@ void hello_fun(void *arg) {
 void init_proc() {
   Log("Initializing processes...");
   
-  context_uload(&pcb[0], "/bin/pal", (char*[]){"--skip"}, (char*[]) {NULL});
+  context_uload(&pcb[0], "/bin/exec-test", (char*[]){NULL}, (char*[]) {NULL});
   // context_kload(&pcb[0], hello_fun, (void*)1);
   // context_uload(&pcb[1], "/bin/pal", (char*[]){"--skip"}, (char*[]) {NULL});
   // context_uload(&pcb[1], "/bin/pal", (char*[]){NULL}, (char*[]) {NULL});
@@ -45,9 +45,5 @@ void init_proc() {
 Context* schedule(Context *prev) {
   current->cp = prev;
   current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
-  if(current == &pcb[0]) {
-    Log("0");
-  }
-  current = &pcb[0]; // 先只跑第0个进程
   return current->cp;
 }
