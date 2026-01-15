@@ -50,7 +50,10 @@ static void sh_handle_cmd(const char *cmd) {
 
   if (argc > 0) {
     SDL_FillScreen(0x00000000);
-    sprintf(argv[0], "/bin/%s", argv[0]);
+    char filename[32];
+    strcpy(filename, "/bin/");
+    strcat(filename, argv[0]);
+    argv[0] = filename;
     for (int i = 0; i < argc; i++) {
       printf("argv[%d] = %s\n", i, argv[i]);
     }
