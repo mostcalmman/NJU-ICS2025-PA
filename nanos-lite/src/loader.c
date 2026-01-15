@@ -111,7 +111,10 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
-  pcb->cp->GPRx = (uintptr_t)heap.end; // 创建用户栈
+
+  // pcb->cp->GPRx = (uintptr_t)heap.end; // 创建用户栈
+  pcb->cp->GPRx = (uintptr_t)new_page(8); // 创建用户栈
+
   void *sp = (void *)pcb->cp->GPRx;
   sp = constructUserArgs(sp, filename, argv, envp);
   pcb->cp->GPRx = (uintptr_t)sp;

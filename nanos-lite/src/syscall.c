@@ -9,7 +9,10 @@
 // 	long		tv_usec;	/* and microseconds */
 // };
 
+extern PCB *current;
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+void switch_boot_pcb();
 
 // #define CONFIG_STRACE
 
@@ -66,8 +69,9 @@ void do_syscall(Context *c) {
       if( a[1]!=0 ){
         Log("Error: Program exited with code %d", a[1]);
       }
-      naive_uload(NULL, "/bin/nterm");
-      // halt(a[1]);
+      context_uload(current, "/bin/nterm", NULL, NULL);
+      switch_boot_pcb();
+      yield();
       break;
     case SYS_brk: {
       c->GPRx = 0;
@@ -118,9 +122,13 @@ void do_syscall(Context *c) {
       c->GPRx = 0;
       break;
     }
+    // 让新进程接管旧进程, PCB覆盖, 但需要新的用户栈(因为执行系统调用是在旧进程的用户栈上的)
     case SYS_execve: {
-      Log("Switching to new program %s", (const char *)a[1]);
-      naive_uload(NULL, (const char *)a[1]);
+      // naive_uload(NULL, (const char *)a[1]);
+      Log("Execve: loading new program %s", (const char *)a[1]);
+      context_uload(current, (const char *)a[1], (char* const*)a[2], (char* const*)a[3]);      
+      switch_boot_pcb(); // 切换current到boot pcb, 下一次yield就会切回0号进程
+      yield();
       break;
     }
     case SYS_getpid: {
