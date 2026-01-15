@@ -59,6 +59,8 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   int argc = 0;
   int envc = 0;
 
+  assert(argv);
+
   // **argv(倒着放)
   for (char* const *p = argv; p && *p; ++p) {
     sp -= strlen(*p) + 1;
