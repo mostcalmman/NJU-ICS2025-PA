@@ -57,13 +57,12 @@ static void sh_handle_cmd(const char *cmd) {
     for (int i = 0; i < argc; i++) {
       printf("argv[%d] = %s\n", i, argv[i]);
     }
-    char *const envp[] = {
-      (char*)"PATH=/bin",
-      (char*)"TERM=ansi",
-      NULL
-    };
-    execve(argv[0], argv, envp);
-    // execvp(argv[0], argv);
+    // char *const envp[] = {
+    //   (char*)"PATH=/bin",
+    //   NULL
+    // };
+    // execve(argv[0], argv, envp);
+    execvp(argv[0], argv);
   }
 }
 
