@@ -52,18 +52,14 @@ void naive_uload(PCB *pcb, const char *filename) {
 }
 
 static void* constructUserArgs(void *sp, const char *filename, char *const argv[], char *const envp[]) {
-  // 暂时认为传进来的argv[0]是第一个参数, filename是程序名
+  // 传进来的第一个参数argv[0]是程序名
 
   uintptr_t user_argv[127];
   uintptr_t user_envp[127];
-  
-  // 构造的*argv[0], 即文件名
-  sp -= strlen(filename) + 1;
-  strcpy(sp, filename);
-  user_argv[0] = (uintptr_t)sp;
-  int argc = 1;
+  int argc = 0;
+  int envc = 0;
 
-  // 剩下的**argv(倒着放)
+  // **argv(倒着放)
   for (char* const *p = argv; p && *p; ++p) {
     sp -= strlen(*p) + 1;
     strcpy(sp, *p);
@@ -72,7 +68,6 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   }
 
   // **envp(倒着放)
-  int envc = 0;
   for (char* const *p = envp; p && *p; ++p) {
     sp -= strlen(*p) + 1;
     strcpy(sp, *p);
