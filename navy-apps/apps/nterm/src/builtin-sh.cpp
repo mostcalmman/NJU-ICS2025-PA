@@ -50,6 +50,9 @@ static void sh_handle_cmd(const char *cmd) {
 
   if (argc > 0) {
     SDL_FillScreen(0x00000000);
+    for (int i = 0; i < argc; i++) {
+      sh_printf("argv[%d] = %s\n", i, argv[i]);
+    }
     execvp(argv[0], argv);
   }
 }
