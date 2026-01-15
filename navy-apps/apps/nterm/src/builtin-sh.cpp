@@ -53,9 +53,9 @@ static void sh_handle_cmd(const char *cmd) {
     for (int i = 0; i < argc; i++) {
       printf("argv[%d] = %s\n", i, argv[i]);
     }
-    char* tempargv[] = {"pal", "--skip", NULL};
-    // execvp(argv[0], argv);
-    execvp(tempargv[0], tempargv);
+    // char* tempargv[] = {"pal", "--skip", NULL};
+    execvp(argv[0], argv);
+    // execvp(tempargv[0], tempargv);
   }
 }
 
