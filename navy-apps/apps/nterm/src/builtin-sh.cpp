@@ -29,7 +29,7 @@ static void sh_handle_cmd(const char *cmd) {
     sh_printf("%s", cmd + i);
     return;
   }
-  static char buf[256];
+  char buf[256];
   strncpy(buf, cmd, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
 
