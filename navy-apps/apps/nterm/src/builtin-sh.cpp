@@ -55,7 +55,8 @@ static void sh_handle_cmd(const char *cmd) {
     }
     char* tempargv[] = {"/bin/pal", "--skip", NULL};
     // execvp(argv[0], argv);
-    execvp(tempargv[0], tempargv);
+    // execvp(tempargv[0], tempargv);
+    execve(tempargv[0], tempargv, NULL);
   }
 }
 
