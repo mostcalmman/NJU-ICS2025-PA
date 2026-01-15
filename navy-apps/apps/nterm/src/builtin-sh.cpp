@@ -50,13 +50,12 @@ static void sh_handle_cmd(const char *cmd) {
 
   if (argc > 0) {
     SDL_FillScreen(0x00000000);
+    sprintf(argv[0], "/bin/%s", argv[0]);
     for (int i = 0; i < argc; i++) {
       printf("argv[%d] = %s\n", i, argv[i]);
     }
-    char* tempargv[] = {"/bin/pal", "--skip", NULL};
+    execve(argv[0], argv, NULL);
     // execvp(argv[0], argv);
-    // execvp(tempargv[0], tempargv);
-    execve(tempargv[0], tempargv, NULL);
   }
 }
 
