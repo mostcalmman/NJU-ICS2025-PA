@@ -61,6 +61,7 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
 
   if (!argv) {
     // 如果argv为空, 就放程序名
+    Log("argv is NULL");
     sp -= strlen(filename) + 1;
     strcpy(sp, filename);
     user_argv[0] = (uintptr_t)sp;

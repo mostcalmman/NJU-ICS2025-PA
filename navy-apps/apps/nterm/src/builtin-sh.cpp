@@ -50,18 +50,9 @@ static void sh_handle_cmd(const char *cmd) {
 
   if (argc > 0) {
     SDL_FillScreen(0x00000000);
-    // char filename[32];
-    // strcpy(filename, "/bin/");
-    // strcat(filename, argv[0]);
-    // argv[0] = filename;
     for (int i = 0; i < argc; i++) {
       printf("argv[%d] = %s\n", i, argv[i]);
     }
-    // char *const envp[] = {
-    //   (char*)"PATH=/bin",
-    //   NULL
-    // };
-    // execve(argv[0], argv, envp);
     execvp(argv[0], argv);
   }
 }
@@ -70,7 +61,7 @@ void builtin_sh_run() {
   sh_banner();
   sh_prompt();
 
-  setenv("PATH", "/bin", 0);
+  setenv("PATH", "/bin:/usr/bin", 0);
 
   while (1) {
     SDL_Event ev;
