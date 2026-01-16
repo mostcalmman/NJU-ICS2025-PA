@@ -106,13 +106,11 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
 
 // 这部分代码应该是可移植的
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
+  void *usersp = (char*)new_page(8) + 8 * PGSIZE; // 创建用户栈
+  usersp = constructUserArgs(usersp, filename, argv, envp);
+
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
-
-  // pcb->cp->GPRx = (uintptr_t)heap.end; // 创建用户栈
-  pcb->cp->GPRx = (uintptr_t)new_page(8); // 创建用户栈
-
-  void *sp = (void *)pcb->cp->GPRx;
-  sp = constructUserArgs(sp, filename, argv, envp);
-  pcb->cp->GPRx = (uintptr_t)sp;
+  
+  pcb->cp->GPRx = (uintptr_t)usersp;
 }

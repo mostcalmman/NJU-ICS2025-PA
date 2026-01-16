@@ -3,8 +3,10 @@
 static void *pf = NULL;
 
 void* new_page(size_t nr_page) {
+  void *page_start = pf;
   pf += nr_page * PGSIZE;
-  return pf;
+  memset(page_start, 0, nr_page * PGSIZE); 
+  return page_start;
 }
 
 #ifdef HAS_VME
