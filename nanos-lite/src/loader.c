@@ -22,6 +22,14 @@ size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
 
+  if (fd == -1) {
+      Log("Error: Can not open file '%s'", filename);
+      // 可以在这里做一个 fallback，比如尝试去掉 /bin/ 前缀再次打开
+      // fd = fs_open(filename + 5, 0, 0); 
+      // if (fd == -1) ...
+      assert(0); 
+  }
+
   Elf_Ehdr ehdr;
   // ramdisk_read(&ehdr, 0, sizeof(ehdr));
   fs_read(fd, &ehdr, sizeof(ehdr));
