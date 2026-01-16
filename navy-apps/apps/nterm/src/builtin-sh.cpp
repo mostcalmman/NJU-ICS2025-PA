@@ -49,10 +49,10 @@ static void sh_handle_cmd(const char *cmd) {
   argv[argc] = NULL;
 
   if (argc > 0) {
-    SDL_FillScreen(0x00000000);
-    for (int i = 0; i < argc; i++) {
-      printf("argv[%d] = %s\n", i, argv[i]);
-    }
+    // SDL_FillScreen(0x00000000);
+    // for (int i = 0; i < argc; i++) {
+    //   printf("argv[%d] = %s\n", i, argv[i]);
+    // }
     execvp(argv[0], argv);
   }
 }
