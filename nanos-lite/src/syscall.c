@@ -14,7 +14,7 @@ void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
 void switch_boot_pcb();
 
-#define CONFIG_STRACE
+// #define CONFIG_STRACE
 
 #ifdef CONFIG_STRACE
 static const char *syscall_names[] = {
@@ -128,9 +128,13 @@ void do_syscall(Context *c) {
     }
     // 让新进程接管旧进程, PCB覆盖, 但需要新的用户栈(因为执行系统调用是在旧进程的用户栈上的)
     case SYS_execve: {
-      // naive_uload(NULL, (const char *)a[1]);
+      int ret = fs_open((const char*)a[1], 0, 0);
+      if (ret < 0) {
+        c->GPRx = ret;
+        break;
+      }
       Log("Execve: loading new program %s", (const char *)a[1]);
-      context_uload(current, (const char *)a[1], (char* const*)a[2], (char* const*)a[3]);      
+      context_uload(current, (const char *)a[1], (char* const*)a[2], (char* const*)a[3]);
       switch_boot_pcb(); // 切换current到boot pcb, 下一次yield就会切回0号进程
       yield();
       break;

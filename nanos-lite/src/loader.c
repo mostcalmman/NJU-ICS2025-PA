@@ -22,11 +22,6 @@ size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 static uintptr_t loader(PCB *pcb, const char *filename) {
   int fd = fs_open(filename, 0, 0);
 
-  if (fd == -1) {
-      Log("Error: Can not open file '%s'", filename);
-      assert(0); 
-  }
-
   Elf_Ehdr ehdr;
   // ramdisk_read(&ehdr, 0, sizeof(ehdr));
   fs_read(fd, &ehdr, sizeof(ehdr));
@@ -64,14 +59,20 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   int argc = 0;
   int envc = 0;
 
-  assert(argv);
-
-  // **argv(倒着放)
-  for (char* const *p = argv; p && *p; ++p) {
-    sp -= strlen(*p) + 1;
-    strcpy(sp, *p);
-    user_argv[argc] = (uintptr_t)sp;
-    ++argc;
+  if (!argv) {
+    // 如果argv为空, 就放程序名
+    sp -= strlen(filename) + 1;
+    strcpy(sp, filename);
+    user_argv[0] = (uintptr_t)sp;
+    argc = 1;
+  } else{
+    // **argv(倒着放)
+    for (char* const *p = argv; p && *p; ++p) {
+      sp -= strlen(*p) + 1;
+      strcpy(sp, *p);
+      user_argv[argc] = (uintptr_t)sp;
+      ++argc;
+    }
   }
 
   // **envp(倒着放)
