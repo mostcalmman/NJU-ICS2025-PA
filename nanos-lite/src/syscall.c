@@ -41,6 +41,10 @@ static const char *syscall_names[] = {
 };
 
 static void strace(Context *c){
+  if (c->GPR1 == SYS_write || c->GPR1 == SYS_read || c->GPR1 == SYS_close || c->GPR1 == SYS_lseek) {
+    if ( c->GPR2 == 3) return; // 忽略对 /dev/events 的读写
+  }
+  if (c->GPR1 == SYS_gettimeofday) return; // 忽略 gettimeofday 调用
   Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d), arg list: %d, %d, %d", c->mepc, syscall_names[c->GPR1], c->GPR1, c->GPR2, c->GPR3, c->GPR4);
   if (c->GPR1 == SYS_write || c->GPR1 == SYS_read || c->GPR1 == SYS_close || c->GPR1 == SYS_lseek) {
     Log("Strace: file operation on file %s (fd = %d)", fs_getname(c->GPR2), c->GPR2);
