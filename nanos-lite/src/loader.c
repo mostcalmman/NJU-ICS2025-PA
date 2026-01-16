@@ -24,9 +24,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
   if (fd == -1) {
       Log("Error: Can not open file '%s'", filename);
-      // 可以在这里做一个 fallback，比如尝试去掉 /bin/ 前缀再次打开
-      // fd = fs_open(filename + 5, 0, 0); 
-      // if (fd == -1) ...
       assert(0); 
   }
 
