@@ -71,6 +71,9 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
+  if ((uintptr_t)va == 0xa1200000) {
+    printf("Mapping MMIO address 0xa1200000 to %p", pa);
+  }
   // prot 暂时不用
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 取出1级页表项
