@@ -36,8 +36,9 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
 
   int i;
   for (i = 0; i < LENGTH(segments); i ++) {
+    printf("Mapping kernel address space %p - %p\n", segments[i].start, segments[i].end);
     void *va = segments[i].start;
-    for (; va <= segments[i].end; va += PGSIZE) {
+    for (; va < segments[i].end; va += PGSIZE) {
       map(&kas, va, va, 0);
     }
   }
@@ -71,7 +72,7 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  printf("Mapping address %p to %p\n", va, pa);
+  // printf("Mapping address %p to %p\n", va, pa);
   // prot 暂时不用
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 取出1级页表项
