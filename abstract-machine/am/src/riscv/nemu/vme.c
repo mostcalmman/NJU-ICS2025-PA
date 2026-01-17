@@ -2,7 +2,11 @@
 #include <nemu.h>
 #include <klib.h>
 
-static AddrSpace kas = {};
+#define PDX(va) (((uintptr_t)(va) >> 22) & 0x3ff) // VPN[1]
+#define PTX(va) (((uintptr_t)(va) >> 12) & 0x3ff) // VPN[0]
+#define PTE_ADDR(pte) (((uintptr_t)(pte) & ~0xfff)) // 低12位置0
+
+static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
 static void* (*pgalloc_usr)(int) = NULL;
 static void (*pgfree_usr)(void*) = NULL;
 static int vme_enable = 0;
@@ -67,6 +71,20 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
+  // prot 暂时不用
+  PTE* pdir = (PTE*)as->ptr; // 页目录基质
+  PTE* pte1 = &pdir[PDX(va)]; // 取出1级页表项
+
+  // 分配新的页表
+  if (!(*pte1 & PTE_V)) {
+    void* new_page_table = pgalloc_usr(PGSIZE);
+    memset(new_page_table, 0, PGSIZE);
+    *pte1 = ((uintptr_t)new_page_table >> 12 << 10) | PTE_V; // 右移12位获得PPN, 左移10位放到PTE的正确位置, 把V置为1
+  }
+
+  PTE* page_table = (PTE*)PTE_ADDR((*pte1 >> 10 << 12)); // 用1级页表项拼出页表基址
+  PTE* pte0 = &page_table[PTX(va)]; // 取出0级页表项, 用于指向真实的page frame
+  *pte0 = ((uintptr_t)pa >> 12 << 10) | PTE_V; // 把pa写进0级页表项
 }
 
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
