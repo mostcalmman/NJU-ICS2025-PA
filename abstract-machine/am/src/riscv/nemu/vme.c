@@ -71,7 +71,7 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  printf("Mapping address %p to %p", va, pa);
+  printf("Mapping address %p to %p\n", va, pa);
   // prot 暂时不用
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 取出1级页表项
