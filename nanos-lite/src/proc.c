@@ -32,8 +32,8 @@ void init_proc() {
   Log("Initializing processes...");
   
   
-  context_kload(&pcb[0], hello_fun, (void*)1);
-  // context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal"}, (char*[]) {NULL});
+  // context_kload(&pcb[0], hello_fun, (void*)1);
+  context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal"}, (char*[]) {NULL});
   // context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal", "--skip"}, (char*[]) {NULL});
   // context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal"}, (char*[]) {NULL});
   switch_boot_pcb();
