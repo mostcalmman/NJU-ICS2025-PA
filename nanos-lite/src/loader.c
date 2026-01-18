@@ -108,6 +108,7 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
     PUSH_STR(filename)
     user_argv[0] = (uintptr_t)vsp;
     argc = 1;
+      Log("MARK");
   } else{
     // **argv(倒着放)
     for (char* const *p = argv; p && *p; ++p) {
@@ -161,9 +162,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   void *usrsp_p = stackpg + STACK_SIZE;
   Log("User vstack range [%p, %p), pstack range [%p, %p)", usr_stack_top, usrsp_v, stackpg, usrsp_p);
 
-  Log("MARK");
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
-  Log("MARK2");
 
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
