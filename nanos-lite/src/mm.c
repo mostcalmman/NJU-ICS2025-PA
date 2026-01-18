@@ -30,10 +30,10 @@ int mm_brk(uintptr_t brk) {
 
 void init_mm() {
   pf = (void *)ROUNDUP(heap.start, PGSIZE);
-  Log("Physical heap ranges: [%p, %p)", heap.start, heap.end);
   extern char _stack_top;
   extern char _stack_pointer;
   Log("Physical stack ranges: [%p, %p)", &_stack_top, &_stack_pointer);
+  Log("Physical heap ranges: [%p, %p)", heap.start, heap.end);
   Log("Free physical pages starting from %p", pf);
 
 #ifdef HAS_VME
