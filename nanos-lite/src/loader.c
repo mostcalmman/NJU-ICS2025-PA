@@ -102,6 +102,7 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
   int argc = 0;
   int envc = 0;
 
+    Log("MARK");
   if (!argv) {
     // 如果argv为空, 就放程序名
     Log("argv is NULL");
