@@ -75,8 +75,8 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
     // **argv(倒着放)
     for (char* const *p = argv; p && *p; ++p) {
       sp -= strlen(*p) + 1;
+      Log("sp: %p, arg: %s", sp, *p);
       strcpy(sp, *p);
-      Log("Mark");
       user_argv[argc] = (uintptr_t)sp;
       ++argc;
     }
