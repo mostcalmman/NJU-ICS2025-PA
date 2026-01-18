@@ -75,10 +75,10 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
     // **argv(倒着放)
     for (char* const *p = argv; p && *p; ++p) {
       sp -= strlen(*p) + 1;
+      Log("Mark");
       strcpy(sp, *p);
       user_argv[argc] = (uintptr_t)sp;
       ++argc;
-      Log("Mark");
     }
   }
 
