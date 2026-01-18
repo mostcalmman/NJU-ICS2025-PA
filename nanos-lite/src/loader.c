@@ -46,7 +46,8 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       void *usrpg = new_page(nr_pg);
       for (int j = 0; j < nr_pg; j ++) {
         uintptr_t pg_start_vaddr = p_start_vaddr_page_start + j * PGSIZE;
-        // 这里有问题, 但暂时不修
+
+        // MARK: 这里可能有问题
         if (query_pa(&pcb->as, (void*)pg_start_vaddr) != NULL) {
           Log("Page at vaddr %p has been mapped before!", (void*)pg_start_vaddr);
           continue; // 已经映射过了
@@ -55,9 +56,9 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
         map(&pcb->as, (void*)(pg_start_vaddr), usrpg + j * PGSIZE, 14); // R W X
         Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg + j * PGSIZE);
       }
-      Log("Loaded segment %d: vaddr [%p, %p), filesz = %d, memsz = %d, paddr = %p", 
-        i, (void*)phdr[i].p_vaddr, (void*)(phdr[i].p_vaddr + phdr[i].p_memsz), phdr[i].p_filesz, 
-        phdr[i].p_memsz, query_pa(&pcb->as, (void*)phdr[i].p_vaddr));
+      // Log("Loaded segment %d: vaddr [%p, %p), filesz = %d, memsz = %d, paddr = %p", 
+      //   i, (void*)phdr[i].p_vaddr, (void*)(phdr[i].p_vaddr + phdr[i].p_memsz), phdr[i].p_filesz, 
+      //   phdr[i].p_memsz, query_pa(&pcb->as, (void*)phdr[i].p_vaddr));
       fs_read(fd, query_pa(&pcb->as, (void*)phdr[i].p_vaddr), phdr[i].p_filesz);
       memset(query_pa(&pcb->as, (void*)(phdr[i].p_vaddr + phdr[i].p_filesz)), 0, phdr[i].p_memsz - phdr[i].p_filesz);
       // fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
