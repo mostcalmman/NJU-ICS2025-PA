@@ -125,6 +125,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
     void *stackpg = new_page(1);
     map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
   }
+    Log("Mark");
   void *usrsp = pcb->as.area.end;
   usrsp = constructUserArgs(usrsp, filename, argv, envp);
 
@@ -132,5 +133,4 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   
   pcb->cp->GPRx = (uintptr_t)usrsp;
-  Log("Mark");
 }
