@@ -33,9 +33,10 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   int phdr_size = ehdr.e_phnum * ehdr.e_phentsize;
   Elf_Phdr *phdr = malloc(phdr_size);
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
-  fs_read(fd, phdr, phdr_size);Log("MARK");
+  fs_read(fd, phdr, phdr_size);
   uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
+    Log("MARK");
     if (phdr[i].p_type == PT_LOAD) {
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
       int nr_pg = phdr[i].p_memsz % PGSIZE == 0 ? phdr[i].p_memsz / PGSIZE : phdr[i].p_memsz / PGSIZE + 1;
