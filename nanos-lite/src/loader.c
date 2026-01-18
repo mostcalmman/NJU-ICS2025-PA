@@ -37,22 +37,24 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
-      Log("MARK1");
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
       int nr_pg = phdr[i].p_memsz % PGSIZE == 0 ? phdr[i].p_memsz / PGSIZE : phdr[i].p_memsz / PGSIZE + 1;
+      uintptr_t p_paddr = 0;
       for (int j = 0; j < nr_pg; j ++) {
         void *usrpg = new_page(1);
+        if(j == 0) { p_paddr = (uintptr_t)usrpg; }
         map(&pcb->as, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg, 14); // R W X
-        Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
+        // Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
       }
+      Log("MARK1");
+      fs_read(fd, (void *)p_paddr, phdr[i].p_filesz);
+      memset((void *)(p_paddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
+      // fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
+      // memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
       Log("MARK2");
-      fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
-      Log("MARK3");
-      memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
+
       uintptr_t end_vaddr = phdr[i].p_vaddr + phdr[i].p_memsz;
-      if (end_vaddr > max_vaddr) {
-        max_vaddr = end_vaddr;
-      }
+      if (end_vaddr > max_vaddr) { max_vaddr = end_vaddr; }
     }
   }
 
