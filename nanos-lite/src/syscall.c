@@ -13,6 +13,7 @@ extern PCB *current;
 void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
 void switch_boot_pcb();
+int mm_brk(uintptr_t brk);
 
 // #define CONFIG_STRACE
 
@@ -80,7 +81,7 @@ void do_syscall(Context *c) {
       yield();
       break;
     case SYS_brk: {
-      c->GPRx = 0;
+      c->GPRx = mm_brk((uintptr_t)a[1]);
       break;
     }
     case SYS_open: {
