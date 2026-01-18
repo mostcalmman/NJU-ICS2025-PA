@@ -159,7 +159,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   }
   void *usrsp_v = pcb->as.area.end;
   void *usrsp_p = stackpg + STACK_SIZE;
-  Log("User stack range [%p, %p)", usr_stack_top, usrsp_v);
+  Log("User vstack range [%p, %p), pstack range [%p, %p)", usr_stack_top, usrsp_v, stackpg, usrsp_p);
 
   Log("MARK");
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
