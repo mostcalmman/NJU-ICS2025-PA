@@ -4,6 +4,7 @@
 
 void __am_get_cur_as(Context *c);
 void __am_switch(Context *c);
+extern AddrSpace kas;
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
@@ -58,7 +59,8 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->mstatus = 0x1800; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest
   c->gpr[10] = (uintptr_t)arg;
   c->gpr[2] = (uintptr_t)c;
-  c->pdir = NULL;
+  // c->pdir = NULL;
+  c->pdir= kas.ptr;
   return c;
 }
 

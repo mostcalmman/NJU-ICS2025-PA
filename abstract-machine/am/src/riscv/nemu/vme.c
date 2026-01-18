@@ -6,7 +6,8 @@
 #define PTX(va) (((uintptr_t)(va) >> 12) & 0x3ff) // VPN[0]
 #define PTE_ADDR(pte) (((uintptr_t)(pte) & ~0xfff)) // 低12位置0
 
-static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
+// static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
+AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
 static void* (*pgalloc_usr)(int) = NULL;
 static void (*pgfree_usr)(void*) = NULL;
 static int vme_enable = 0;
@@ -65,26 +66,15 @@ void __am_get_cur_as(Context *c) {
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
 }
 
-// void __am_switch(Context *c) {
-//   if (vme_enable && c->pdir != NULL) {
-//     set_satp(c->pdir);
-//   }
-// }
 void __am_switch(Context *c) {
-  if (vme_enable) {
-    if (c->pdir != NULL) {
-      set_satp(c->pdir);
-    } else {
-      // 切换到内核地址空间
-      extern AddrSpace kas;
-      set_satp(kas.ptr);
-    }
+  if (vme_enable && c->pdir != NULL) {
+    set_satp(c->pdir);
   }
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
   // printf("Mapping address %p to %p\n", va, pa);
-
+  
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 从页目录中取出页表项
 
