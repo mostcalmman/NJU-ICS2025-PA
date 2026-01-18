@@ -15,7 +15,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 void switch_boot_pcb();
 int mm_brk(uintptr_t brk);
 
-// #define CONFIG_STRACE
+#define CONFIG_STRACE
 
 #ifdef CONFIG_STRACE
 static const char *syscall_names[] = {
