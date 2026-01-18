@@ -90,6 +90,17 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   *pte0 = ((uintptr_t)pa >> 12 << 10) | PTE_V | prot; // 把pa写进0级页表项
 }
 
+// 查询某个va是否被映射过, 映射过就返回对应的pa, 否则返回NULL
+void* query_pa(AddrSpace *as, void *va) {
+  PTE *pdir = (PTE*)as->ptr;
+  PTE pte1 = pdir[PDX(va)];
+  if (!(pte1 & PTE_V)) return NULL;
+  PTE* ptable = (PTE*)(pte1 >> 10 << 12);
+  PTE pte0 = ptable[PTX(va)];
+  if (!(pte0 & PTE_V)) return NULL;
+  return (void*)((pte0 >> 10 << 12) | ((uintptr_t)va & 0xfff));
+}
+
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context *c = (Context *)kstack.end - 1;
   c->mepc = (uintptr_t)entry;
