@@ -33,7 +33,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   int phdr_size = ehdr.e_phnum * ehdr.e_phentsize;
   Elf_Phdr *phdr = malloc(phdr_size);
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
-  fs_read(fd, phdr, phdr_size);
+  fs_read(fd, phdr, phdr_size);Log("MARK");
   uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
@@ -151,7 +151,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
 
-  void *entry = (void*)loader(pcb, filename);Log("MARK");
+  void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   Log("User heap starts at %p", (void*)pcb->max_brk);
   
