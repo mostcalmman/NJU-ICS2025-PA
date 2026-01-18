@@ -26,6 +26,7 @@ void free_page(void *p) {
 
 /* The brk() system call handler. */
 int mm_brk(uintptr_t brk) {
+  return 0;
   extern char end;
   uintptr_t old_brk = current->max_brk == 0 ? (uintptr_t)&end : current->max_brk;
   uintptr_t page_aligned_brk = ROUNDUP(old_brk, PGSIZE);
