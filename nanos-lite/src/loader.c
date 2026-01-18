@@ -122,9 +122,8 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
     PUSH_STR(*p)
     user_envp[envc] = (uintptr_t)vsp;
     ++envc;
-      Log("MARK");
   }
-
+  Log("MARK");
   // 放一个NULL
   // sp -= sizeof(char*);
   // *(void**)sp = NULL; // sp转为二阶指针, sp指向的才是一个指针, 才可以存NULL
