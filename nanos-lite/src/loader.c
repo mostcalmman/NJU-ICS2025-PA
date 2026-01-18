@@ -16,6 +16,8 @@
 #define EXPECT_ISA EM_X86_64
 #endif
 
+#define USER_SPACE RANGE(0x40000000, 0x80000000)
+
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 
@@ -32,11 +34,14 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Phdr *phdr = malloc(phdr_size);
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
   fs_read(fd, phdr, phdr_size);
-  // ramdisk_read(phdr, ehdr.e_phoff, phdr_size);
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
-      // ramdisk_read((void *)phdr[i].p_vaddr, phdr[i].p_offset, phdr[i].p_filesz);
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
+      int nr_pg = phdr[i].p_memsz % PGSIZE == 0 ? phdr[i].p_memsz / PGSIZE : phdr[i].p_memsz / PGSIZE + 1;
+      for (int j = 0; j < nr_pg; j ++) {
+        void *usrpg = new_page(1);
+        map(&pcb->as, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg, 14); // R W X
+      }
       fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
       memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
     }
@@ -112,11 +117,19 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
 }
 
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
-  void *usersp = (char*)new_page(8) + 8 * PGSIZE; // 创建用户栈
-  usersp = constructUserArgs(usersp, filename, argv, envp);
+  protect(&pcb->as); // 将内核地址映射保护到pcb的地址空间中
+
+  // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
+  void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
+  for (int i = 0; i < 8; i ++) {
+    void *stackpg = new_page(1);
+    map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
+  }
+  void *usrsp = pcb->as.area.end;
+  usrsp = constructUserArgs(usrsp, filename, argv, envp);
 
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   
-  pcb->cp->GPRx = (uintptr_t)usersp;
+  pcb->cp->GPRx = (uintptr_t)usrsp;
 }

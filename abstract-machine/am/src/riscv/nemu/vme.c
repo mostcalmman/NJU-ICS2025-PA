@@ -39,7 +39,7 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
     // printf("Mapping kernel address space [%p, %p)\n", segments[i].start, segments[i].end);
     void *va = segments[i].start;
     for (; va < segments[i].end; va += PGSIZE) {
-      map(&kas, va, va, 0);
+      map(&kas, va, va, 14); // 0b1110 R W X
     }
   }
 
@@ -86,7 +86,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
 
   PTE* page_table = (PTE*)PTE_ADDR((*pte1 >> 10 << 12)); // 用1级页表项拼出页表基址
   PTE* pte0 = &page_table[PTX(va)]; // 取出0级页表项, 用于指向真实的page frame
-  *pte0 = ((uintptr_t)pa >> 12 << 10) | PTE_V; // 把pa写进0级页表项
+  *pte0 = ((uintptr_t)pa >> 12 << 10) | PTE_V | prot; // 把pa写进0级页表项
 }
 
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
@@ -94,5 +94,6 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   c->mepc = (uintptr_t)entry;
   c->mstatus = 0x1800;
   c->gpr[2] = (uintptr_t)c;
+  c->pdir = as->ptr;
   return c;
 }
