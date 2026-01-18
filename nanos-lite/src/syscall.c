@@ -15,7 +15,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 void switch_boot_pcb();
 int mm_brk(uintptr_t brk);
 
-#define CONFIG_STRACE
+// #define CONFIG_STRACE
 
 #ifdef CONFIG_STRACE
 static const char *syscall_names[] = {
@@ -74,6 +74,7 @@ void do_syscall(Context *c) {
       if( a[1]!=0 ){
         Log("Error: Program exited with code %d", a[1]);
       }
+      Log("Halting...");
       halt(a[1]);
       panic("Shoud not reach here!");
       context_uload(current, "/bin/nterm", NULL, NULL);
