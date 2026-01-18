@@ -127,6 +127,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
     map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
   }
   void *usrsp = pcb->as.area.end;
+  Log("User stack top at %p", usrsp);
   usrsp = constructUserArgs(usrsp, filename, argv, envp);
       Log("Mark");
   void *entry = (void*)loader(pcb, filename);
