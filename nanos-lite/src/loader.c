@@ -63,7 +63,7 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   uintptr_t user_envp[127];
   int argc = 0;
   int envc = 0;
-
+Log("Mark");
   if (!argv) {
     // 如果argv为空, 就放程序名
     Log("argv is NULL");
@@ -129,7 +129,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   void *usrsp = pcb->as.area.end;
   Log("User stack top at %p", usrsp);
   usrsp = constructUserArgs(usrsp, filename, argv, envp);
-      Log("Mark");
+
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   
