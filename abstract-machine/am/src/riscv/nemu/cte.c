@@ -12,7 +12,6 @@ Context* __am_irq_handle(Context *c) {
   // uintptr_t *raw = (uintptr_t *)c;
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
   // printf("Context End\n\n");
-  printf("MARK");
   __am_get_cur_as(c);
   assert(user_handler != NULL);
   Event ev = {0};
@@ -36,9 +35,7 @@ Context* __am_irq_handle(Context *c) {
   c = user_handler(ev, c);
   assert(c != NULL);
 
-  if (c->pdir != NULL) {
-     __am_switch(c); // 切换到新的地址空间
-  }
+  __am_switch(c); // 切换到新的地址空间
   return c;
 }
 
