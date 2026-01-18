@@ -79,7 +79,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
 
   // 分配新的页表
   if (!(*pte1 & PTE_V)) {
-    printf("Allocating new page table for va %p\n", va);
+    // printf("Allocating new page table for va %p\n", va);
     void* new_page_table = pgalloc_usr(PGSIZE);
     memset(new_page_table, 0, PGSIZE);
     *pte1 = ((uintptr_t)new_page_table >> 12 << 10) | PTE_V; // 右移12位获得PPN, 左移10位放到PTE的正确位置, 把V置为1
