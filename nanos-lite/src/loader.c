@@ -66,8 +66,12 @@ void naive_uload(PCB *pcb, const char *filename) {
     *(type *)psp = val; \
   }
 static void* constructUserArgs(void *vsp, void *psp, const char *filename, char *const argv[], char *const envp[]) {
-  // 传进来的第一个参数argv[0]是程序名
-
+  /*
+  传进来的第一个参数argv[0]是程序名
+  此时仍然处于内核空间, 无法直接向用户空间的虚拟地址上写内容
+  但内核空间采用身份映射(Identity Mapping(, 物理地址pa在数值上等于内核可以直接访问的指针
+  所以直接把对vsp的操作改为对psp的即可
+  */ 
 
   uintptr_t user_argv[127];
   uintptr_t user_envp[127];
@@ -125,13 +129,16 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 
   // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
   void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
-  void *stackpg_list[8];
+  void *psp_page_start = NULL;
   for (int i = 0; i < 8; i ++) {
-    stackpg_list[i] = new_page(1);
-    map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg_list[i], 14); // R W X
+    void *stackpg = new_page(1);
+    if (i == 7) {
+      psp_page_start = stackpg;
+    }
+    map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
   }
   void *usrsp_v = pcb->as.area.end;
-  void *usrsp_p = stackpg_list[7] + PGSIZE;
+  void *usrsp_p = psp_page_start + PGSIZE;
   Log("User stack range [%p, %p)", usr_stack_top, usrsp_v);
 
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
