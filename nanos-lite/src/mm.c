@@ -4,7 +4,6 @@
 static void *pf = NULL;
 
 void* new_page(size_t nr_page) {
-  Log("allocating %d pages from %p", nr_page, pf);
   void *page_start = pf;
   pf += nr_page * PGSIZE;
   memset(page_start, 0, nr_page * PGSIZE); 
