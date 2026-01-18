@@ -40,14 +40,14 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   paddr_t pte1_addr = pdir_base + (PDX(vaddr) * 4);
   PTE pte1 = paddr_read(pte1_addr, 4);
   if(!(pte1 & 0x1)) {
-    Log("%x", vaddr);
+    Log("0x%x", vaddr);
     assert(0); // not valid
   }
   paddr_t pt_base = (pte1 >> 10) << 12;
   paddr_t pte0_addr = pt_base + (PTX(vaddr) * 4);
   PTE pte0 = paddr_read(pte0_addr, 4);
   if(!(pte0 & 0x1)) {
-    Log("%x", vaddr);
+    Log("0x%x", vaddr);
     assert(0); // not valid
   }
   paddr_t paddr = PTE_ADDR(pte0 >> 10 << 12) | PTE_OFFSET(vaddr);
