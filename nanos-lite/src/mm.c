@@ -1,3 +1,4 @@
+#include "proc.h"
 #include <memory.h>
 
 static void *pf = NULL;
@@ -25,6 +26,21 @@ void free_page(void *p) {
 
 /* The brk() system call handler. */
 int mm_brk(uintptr_t brk) {
+  extern char end;
+  uintptr_t old_brk = current->max_brk == 0 ? (uintptr_t)&end : current->max_brk;
+  uintptr_t page_aligned_brk = ROUNDUP(old_brk, PGSIZE);
+  if(brk <= page_aligned_brk) {
+    current->max_brk = brk;
+    return 0;
+  }
+  int nr_page = (brk - page_aligned_brk) % PGSIZE == 0 ? 
+                (brk - page_aligned_brk) / PGSIZE : 
+                (brk - page_aligned_brk) / PGSIZE + 1;
+  for(int i = 0; i < nr_page; i ++) {
+    void *new_pg = new_page(1);
+    map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg, 14); // R W X
+  }
+  current->max_brk = brk;
   return 0;
 }
 
