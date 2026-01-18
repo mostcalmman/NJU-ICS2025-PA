@@ -63,8 +63,9 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   uintptr_t user_envp[127];
   int argc = 0;
   int envc = 0;
-Log("Mark");
+
   if (!argv) {
+    Log("Mark");
     // 如果argv为空, 就放程序名
     Log("argv is NULL");
     sp -= strlen(filename) + 1;
