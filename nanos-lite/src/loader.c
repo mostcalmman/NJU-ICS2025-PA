@@ -158,9 +158,8 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   Log("User stack range [%p, %p)", usr_stack_top, usrsp_v);
 
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
-  Log("Mark");
 
-  void *entry = (void*)loader(pcb, filename);
+  void *entry = (void*)loader(pcb, filename);Log("Mark");
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   Log("User heap starts at %p", (void*)pcb->max_brk);
   
