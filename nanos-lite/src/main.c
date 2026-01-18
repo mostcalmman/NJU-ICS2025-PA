@@ -24,7 +24,7 @@ int main() {
 #endif
 
   init_fs();
-
+Log("MARK");
   init_proc();
 
   Log("Finish initialization");
