@@ -58,6 +58,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       Log("Mark3");
       fs_read(fd, query_pa(&pcb->as, (void*)phdr[i].p_vaddr), phdr[i].p_filesz);
       memset(query_pa(&pcb->as, (void*)(phdr[i].p_vaddr + phdr[i].p_filesz)), 0, phdr[i].p_memsz - phdr[i].p_filesz);
+      Log("Mark4");
       // fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
       // memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
 
