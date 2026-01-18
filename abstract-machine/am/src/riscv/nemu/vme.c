@@ -36,7 +36,7 @@ bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
 
   int i;
   for (i = 0; i < LENGTH(segments); i ++) {
-    printf("Mapping kernel address space [%p, %p)\n", segments[i].start, segments[i].end);
+    // printf("Mapping kernel address space [%p, %p)\n", segments[i].start, segments[i].end);
     void *va = segments[i].start;
     for (; va < segments[i].end; va += PGSIZE) {
       map(&kas, va, va, 0);
