@@ -53,7 +53,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
         map(&pcb->as, (void*)(pg_start_vaddr), usrpg, 14); // R W X
         // Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
       }
-      Log("Loaded segment %d: vaddr [%p, %p), filesz = %d, memsz = %d, paddr %p", 
+      Log("Loaded segment %d: vaddr [%p, %p), filesz = %d, memsz = %d, paddr = 0x%p", 
         i, (void*)phdr[i].p_vaddr, (void*)(phdr[i].p_vaddr + phdr[i].p_memsz), phdr[i].p_filesz, 
         phdr[i].p_memsz, query_pa(&pcb->as, (void*)phdr[i].p_vaddr));
       fs_read(fd, query_pa(&pcb->as, (void*)phdr[i].p_vaddr), phdr[i].p_filesz);
