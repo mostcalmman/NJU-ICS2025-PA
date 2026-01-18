@@ -108,13 +108,13 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
     PUSH_STR(filename)
     user_argv[0] = (uintptr_t)vsp;
     argc = 1;
-      Log("MARK");
   } else{
     // **argv(倒着放)
     for (char* const *p = argv; p && *p; ++p) {
       PUSH_STR(*p)
       user_argv[argc] = (uintptr_t)vsp;
       ++argc;
+        Log("MARK");
     }
   }
 
