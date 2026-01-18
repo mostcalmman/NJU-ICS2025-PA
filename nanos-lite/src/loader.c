@@ -45,10 +45,10 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       int nr_pg = (p_end_vaddr_page_end - p_start_vaddr_page_start) / PGSIZE;
       for (int j = 0; j < nr_pg; j ++) {
         uintptr_t pg_start_vaddr = p_start_vaddr_page_start + j * PGSIZE;
-        if (query_pa(&pcb->as, (void*)pg_start_vaddr) != NULL) {
-          Log("Page at vaddr %p has been mapped before!", (void*)pg_start_vaddr);
-          continue; // 已经映射过了
-        }
+        // if (query_pa(&pcb->as, (void*)pg_start_vaddr) != NULL) {
+        //   Log("Page at vaddr %p has been mapped before!", (void*)pg_start_vaddr);
+        //   continue; // 已经映射过了
+        // }
 
         void *usrpg = new_page(1);
         map(&pcb->as, (void*)(pg_start_vaddr), usrpg, 14); // R W X
