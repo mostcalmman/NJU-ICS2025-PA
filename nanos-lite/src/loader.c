@@ -56,8 +56,18 @@ void naive_uload(PCB *pcb, const char *filename) {
   ((void(*)())entry) ();
 }
 
-static void* constructUserArgs(void *sp, const char *filename, char *const argv[], char *const envp[]) {
+#define PUSH_STR(src) { \
+    size_t len = strlen(src) + 1; \
+    psp -= len; vsp -= len; \
+    strcpy((char *)psp, src); \
+  }
+#define PUSH_VAL(type, val) { \
+    psp -= sizeof(type); vsp -= sizeof(type); \
+    *(type *)psp = val; \
+  }
+static void* constructUserArgs(void *vsp, void *psp, const char *filename, char *const argv[], char *const envp[]) {
   // 传进来的第一个参数argv[0]是程序名
+
 
   uintptr_t user_argv[127];
   uintptr_t user_envp[127];
@@ -67,54 +77,47 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
   if (!argv) {
     // 如果argv为空, 就放程序名
     Log("argv is NULL");
-    sp -= strlen(filename) + 1;
-    strcpy(sp, filename);
-    user_argv[0] = (uintptr_t)sp;
+    PUSH_STR(filename)
+    user_argv[0] = (uintptr_t)vsp;
     argc = 1;
   } else{
     // **argv(倒着放)
     for (char* const *p = argv; p && *p; ++p) {
-      sp -= strlen(*p) + 1;
-      Log("sp: %p, arg: %s", sp, *p);
-      strcpy(sp, *p);
-      user_argv[argc] = (uintptr_t)sp;
+      PUSH_STR(*p)
+      user_argv[argc] = (uintptr_t)vsp;
       ++argc;
     }
   }
 
   // **envp(倒着放)
   for (char* const *p = envp; p && *p; ++p) {
-    sp -= strlen(*p) + 1;
-    strcpy(sp, *p);
-    user_envp[envc] = (uintptr_t)sp;
+    PUSH_STR(*p)
+    user_envp[envc] = (uintptr_t)vsp;
     ++envc;
   }
 
   // 放一个NULL
-  sp -= sizeof(char*);
-  *(void**)sp = NULL; // sp转为二阶指针, sp指向的才是一个指针, 才可以存NULL
+  // sp -= sizeof(char*);
+  // *(void**)sp = NULL; // sp转为二阶指针, sp指向的才是一个指针, 才可以存NULL
+  PUSH_VAL(void*, NULL)
 
   // envp指针数组
   for (int i = envc - 1; i >=0; --i) {
-    sp -= sizeof(char*);
-    *(uintptr_t*)sp = user_envp[i];
+    PUSH_VAL(uintptr_t, user_envp[i]);
   }
 
   // 放一个NULL
-  sp -= sizeof(char*);
-  *(void**)sp = NULL;
+  PUSH_VAL(void*, NULL)
 
   // argv指针数组
   for (int i = argc - 1; i >=0; --i) {
-    sp -= sizeof(char*);
-    *(uintptr_t*)sp = user_argv[i];
+    PUSH_VAL(uintptr_t, user_argv[i]);
   }
 
   // argc
-  sp -= sizeof(int);
-  *(int*)sp = argc;
+  PUSH_VAL(int, argc)
 
-  return sp;
+  return vsp;
 }
 
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
@@ -122,16 +125,19 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 
   // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
   void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
+  void *stackpg_list[8];
   for (int i = 0; i < 8; i ++) {
-    void *stackpg = new_page(1);
-    map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
+    stackpg_list[i] = new_page(1);
+    map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg_list[i], 14); // R W X
   }
-  void *usrsp = pcb->as.area.end;
-  Log("User stack range [%p, %p)", usr_stack_top, usrsp);
-  usrsp = constructUserArgs(usrsp, filename, argv, envp);
+  void *usrsp_v = pcb->as.area.end;
+  void *usrsp_p = stackpg_list[7] + PGSIZE;
+  Log("User stack range [%p, %p)", usr_stack_top, usrsp_v);
+
+  usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
 
   void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   
-  pcb->cp->GPRx = (uintptr_t)usrsp;
+  pcb->cp->GPRx = (uintptr_t)usrsp_v;
 }
