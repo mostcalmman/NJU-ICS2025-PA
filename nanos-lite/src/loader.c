@@ -122,8 +122,8 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 
   // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
   void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
-  Log("Mapping user stack range [%p, %p)", usr_stack_top, usr_stack_top + STACK_SIZE);
   for (int i = 0; i < 8; i ++) {
+    Log("Mapping user stack page from %p to %p", (void*)(usr_stack_top + i * PGSIZE), (void*)(usr_stack_top + (i + 1) * PGSIZE));
     void *stackpg = new_page(1);
     map(&pcb->as, (void*)(usr_stack_top + i * PGSIZE), stackpg, 14); // R W X
   }
