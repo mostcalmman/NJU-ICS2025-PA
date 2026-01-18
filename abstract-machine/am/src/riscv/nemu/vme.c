@@ -96,8 +96,8 @@ void* query_pa(AddrSpace *as, void *va) {
   PTE pte1 = pdir[PDX(va)];
   if (!(pte1 & PTE_V)) return NULL;
 
-  PTE* ptable = (PTE*)((pte1 >> 10) << 12);
-  
+  PTE* ptable = (PTE*)(pte1 >> 10 << 12);
+
   PTE pte0 = ptable[PTX(va)];
   if (!(pte0 & PTE_V)) return NULL;
   return (void*)((pte0 >> 10 << 12) | ((uintptr_t)va & 0xfff));
