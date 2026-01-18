@@ -118,7 +118,6 @@ static void* constructUserArgs(void *sp, const char *filename, char *const argv[
 
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
   protect(&pcb->as); // 将内核地址映射保护到pcb的地址空间中
-  Log("Mark");
 
   // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
   void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
@@ -133,4 +132,5 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   
   pcb->cp->GPRx = (uintptr_t)usrsp;
+  Log("Mark");
 }
