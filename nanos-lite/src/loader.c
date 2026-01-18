@@ -47,6 +47,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       Log("MARK");
       fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
+      Log("MARK");
       memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
       uintptr_t end_vaddr = phdr[i].p_vaddr + phdr[i].p_memsz;
       if (end_vaddr > max_vaddr) {
