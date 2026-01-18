@@ -65,15 +65,26 @@ void __am_get_cur_as(Context *c) {
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
 }
 
+// void __am_switch(Context *c) {
+//   if (vme_enable && c->pdir != NULL) {
+//     set_satp(c->pdir);
+//   }
+// }
 void __am_switch(Context *c) {
-  if (vme_enable && c->pdir != NULL) {
-    set_satp(c->pdir);
+  if (vme_enable) {
+    if (c->pdir != NULL) {
+      set_satp(c->pdir);
+    } else {
+      // 切换到内核地址空间
+      extern AddrSpace kas;
+      set_satp(kas.ptr);
+    }
   }
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
   // printf("Mapping address %p to %p\n", va, pa);
-  
+
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 从页目录中取出页表项
 
