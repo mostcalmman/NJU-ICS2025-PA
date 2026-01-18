@@ -34,6 +34,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   Elf_Phdr *phdr = malloc(phdr_size);
   fs_lseek(fd, ehdr.e_phoff, SEEK_SET);
   fs_read(fd, phdr, phdr_size);
+  uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
@@ -44,8 +45,14 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       }
       fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
       memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
+      uintptr_t end_vaddr = phdr[i].p_vaddr + phdr[i].p_memsz;
+      if (end_vaddr > max_vaddr) {
+        max_vaddr = end_vaddr;
+      }
     }
   }
+
+  pcb->max_brk = max_vaddr;
 
   return ehdr.e_entry;
 }
