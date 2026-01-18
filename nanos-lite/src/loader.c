@@ -149,7 +149,7 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
 }
 
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]) {
-  protect(&pcb->as); // 将内核地址映射保护到pcb的地址空间中
+  // protect(&pcb->as); // 将内核地址映射保护到pcb的地址空间中
 
   // 创建用户栈, 处于[as.area.end - 32KB, as.area.end)
   void *usr_stack_top = pcb->as.area.end - STACK_SIZE;
