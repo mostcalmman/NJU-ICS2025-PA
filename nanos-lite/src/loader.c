@@ -167,5 +167,6 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   Log("User heap starts at %p", (void*)pcb->max_brk);
   
-  pcb->cp->GPRx = (uintptr_t)usrsp_v;
+  // pcb->cp->GPRx = (uintptr_t)usrsp_v;
+  pcb->cp->gpr[2] = (uintptr_t)usrsp_v;
 }
