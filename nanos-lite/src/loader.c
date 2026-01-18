@@ -114,7 +114,6 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
       PUSH_STR(*p)
       user_argv[argc] = (uintptr_t)vsp;
       ++argc;
-        Log("MARK");
     }
   }
 
@@ -123,6 +122,7 @@ static void* constructUserArgs(void *vsp, void *psp, const char *filename, char 
     PUSH_STR(*p)
     user_envp[envc] = (uintptr_t)vsp;
     ++envc;
+      Log("MARK");
   }
 
   // 放一个NULL
