@@ -42,6 +42,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       for (int j = 0; j < nr_pg; j ++) {
         void *usrpg = new_page(1);
         map(&pcb->as, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg, 14); // R W X
+        Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
       }
       fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
       memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
