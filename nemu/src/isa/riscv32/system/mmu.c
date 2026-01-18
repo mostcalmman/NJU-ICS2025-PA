@@ -40,7 +40,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   paddr_t pte1_addr = pdir_base + (PDX(vaddr) * 4);
   PTE pte1 = paddr_read(pte1_addr, 4);
   if(!(pte1 & 0x1)) {
-    Log("0x%x", vaddr);
+    Log("Page table is invalid(addr = %x, value = 0x%x), operating on 0x%x", pte1_addr, (uint32_t)pte1, vaddr);
     assert(0); // not valid
   }
   paddr_t pt_base = (pte1 >> 10) << 12;

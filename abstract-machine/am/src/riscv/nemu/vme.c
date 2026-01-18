@@ -75,7 +75,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   // printf("Mapping address %p to %p\n", va, pa);
   // prot 暂时不用
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
-  PTE* pte1 = &pdir[PDX(va)]; // 取出1级页表项
+  PTE* pte1 = &pdir[PDX(va)]; // 从页目录中取出页表项
 
   // 分配新的页表
   if (!(*pte1 & PTE_V)) {
