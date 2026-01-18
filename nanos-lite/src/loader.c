@@ -38,6 +38,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
+      Log("Mark");
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
 
       uintptr_t p_start_vaddr_page_start = ROUNDDOWN(phdr[i].p_vaddr, PGSIZE);
