@@ -34,8 +34,8 @@ Context* __am_irq_handle(Context *c) {
 
   c = user_handler(ev, c);
   assert(c != NULL);
-  // printf("MARK");
-  if(c->pdir == NULL) printf("aaa");
+  printf("MARK\n");
+  if(c->pdir == NULL) printf("aaa\n");
   __am_switch(c); // 切换到新的地址空间
   return c;
 }
