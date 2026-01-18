@@ -49,7 +49,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
 
         void *usrpg = new_page(1);
         map(&pcb->as, (void*)(pg_start_vaddr), usrpg, 14); // R W X
-        // Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
+        Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
       }
       fs_read(fd, query_pa(&pcb->as, (void*)phdr[i].p_vaddr), phdr[i].p_filesz);
       memset(query_pa(&pcb->as, (void*)(phdr[i].p_vaddr + phdr[i].p_filesz)), 0, phdr[i].p_memsz - phdr[i].p_filesz);
@@ -159,7 +159,7 @@ void context_uload(PCB *pcb, const char *filename, char *const argv[], char *con
 
   usrsp_v = constructUserArgs(usrsp_v, usrsp_p, filename, argv, envp);
 
-  void *entry = (void*)loader(pcb, filename);Log("Mark");
+  void *entry = (void*)loader(pcb, filename);
   pcb->cp = ucontext(&pcb->as, (Area){pcb->stack, pcb->stack + STACK_SIZE}, entry);
   Log("User heap starts at %p", (void*)pcb->max_brk);
   
