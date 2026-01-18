@@ -38,7 +38,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
   uintptr_t max_vaddr = 0;
   for (int i = 0; i < ehdr.e_phnum; i ++) {
     if (phdr[i].p_type == PT_LOAD) {
-      Log("Mark");
       fs_lseek(fd, phdr[i].p_offset, SEEK_SET);
 
       uintptr_t p_start_vaddr_page_start = ROUNDDOWN(phdr[i].p_vaddr, PGSIZE);
@@ -47,18 +46,18 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
       for (int j = 0; j < nr_pg; j ++) {
         uintptr_t pg_start_vaddr = p_start_vaddr_page_start + j * PGSIZE;
         if (query_pa(&pcb->as, (void*)pg_start_vaddr) != NULL) {
-          Log("Mark2");
           continue; // 已经映射过了
         }
 
         void *usrpg = new_page(1);
         map(&pcb->as, (void*)(pg_start_vaddr), usrpg, 14); // R W X
-        Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
+        // Log("Mapped user page %d for segment %d at vaddr %p to phys addr %p", j, i, (void*)(phdr[i].p_vaddr + j * PGSIZE), usrpg);
       }
-      Log("Mark3");
+      Log("Loaded segment %d: vaddr [%p, %p), filesz = %d, memsz = %d, paddr %p", 
+        i, (void*)phdr[i].p_vaddr, (void*)(phdr[i].p_vaddr + phdr[i].p_memsz), phdr[i].p_filesz, 
+        phdr[i].p_memsz, query_pa(&pcb->as, (void*)phdr[i].p_vaddr));
       fs_read(fd, query_pa(&pcb->as, (void*)phdr[i].p_vaddr), phdr[i].p_filesz);
       memset(query_pa(&pcb->as, (void*)(phdr[i].p_vaddr + phdr[i].p_filesz)), 0, phdr[i].p_memsz - phdr[i].p_filesz);
-      Log("Mark4");
       // fs_read(fd, (void *)phdr[i].p_vaddr, phdr[i].p_filesz);
       // memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz);
 
