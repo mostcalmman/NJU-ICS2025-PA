@@ -35,7 +35,9 @@ Context* __am_irq_handle(Context *c) {
   c = user_handler(ev, c);
   assert(c != NULL);
 
-  __am_switch(c); // 切换到新的地址空间
+  if (c->pdir != NULL) {
+     __am_switch(c); // 切换到新的地址空间
+  }
   return c;
 }
 
@@ -57,6 +59,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->mstatus = 0x1800; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest
   c->gpr[10] = (uintptr_t)arg;
   c->gpr[2] = (uintptr_t)c;
+  c->pdir = NULL;
   return c;
 }
 
