@@ -87,6 +87,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   }
   if((uintptr_t)pa == 0x82c7f000){
     printf("\n\nMapping address %p to %p\n\n", va, pa);
+    assert(0);
   }
   
   
