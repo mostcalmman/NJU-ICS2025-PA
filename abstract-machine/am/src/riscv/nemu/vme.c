@@ -63,8 +63,8 @@ void unprotect(AddrSpace *as) {
 
 void __am_get_cur_as(Context *c) {
   // void* old_pdir = c->pdir;
-  // c->pdir = (vme_enable ? (void *)get_satp() : NULL);
-  c->pdir = (vme_enable ? (void *)c->pdir : NULL);
+  c->pdir = (vme_enable ? (void *)get_satp() : NULL);
+  // c->pdir = (vme_enable ? (void *)c->pdir : NULL);
 }
 
 void __am_switch(Context *c) {
