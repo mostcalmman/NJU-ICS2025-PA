@@ -26,6 +26,7 @@ typedef struct {
   word_t mcause;
   word_t mtvec;
   word_t satp;
+  bool INTR;
 #ifdef CONFIG_IRINGBUF
   word_t iringbuf[20]; // 缓存20条指令
   word_t iringbuf_pc[20];

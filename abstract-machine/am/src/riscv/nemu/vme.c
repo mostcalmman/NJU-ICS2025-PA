@@ -62,6 +62,7 @@ void unprotect(AddrSpace *as) {
 }
 
 void __am_get_cur_as(Context *c) {
+  // MARK: 不知道对不对
   void* old_pdir = (void *)get_satp();
   if (old_pdir == kas.ptr) {
     c->pdir = NULL;
@@ -118,7 +119,7 @@ void* query_pa(AddrSpace *as, void *va) {
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context *c = (Context *)kstack.end - 1;
   c->mepc = (uintptr_t)entry;
-  c->mstatus = 0x1800;
+  c->mstatus = 0x1888; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest; 在此基础上, MIE 和 MPIE 设为 1
   c->gpr[2] = (uintptr_t)c;
   c->pdir = as->ptr;
   return c;
