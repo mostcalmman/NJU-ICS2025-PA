@@ -33,7 +33,7 @@ void init_proc() {
   
   
   // context_kload(&pcb[1], hello_fun, (void*)1);
-  context_uload(&pcb[0], "/bin/cpu-exec", (char*[]){"/bin/cpu-exec", "--skip", NULL}, (char*[]) {NULL});
+  context_uload(&pcb[0], "/bin/pal", (char*[]){"/bin/pal", "--skip", NULL}, (char*[]) {NULL});
   // context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm"}, (char*[]) {NULL});
   // context_uload(&pcb[0], "/bin/dummy", (char*[]){"/bin/dummy"}, (char*[]) {NULL});
   

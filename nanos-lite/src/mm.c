@@ -40,6 +40,7 @@ int mm_brk(uintptr_t brk) {
     map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg, 14); // R W X
   }
   current->max_brk = brk;
+  Log("brk from %p to %p, allocated %d pages", (void*)old_brk, (void*)brk, nr_page);
   return 0;
 }
 
