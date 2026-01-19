@@ -35,9 +35,10 @@ int mm_brk(uintptr_t brk) {
   int nr_page = (brk - page_aligned_brk) % PGSIZE == 0 ? 
                 (brk - page_aligned_brk) / PGSIZE : 
                 (brk - page_aligned_brk) / PGSIZE + 1;
+  void *new_pg = new_page(nr_page);
   for(int i = 0; i < nr_page; i ++) {
-    void *new_pg = new_page(1);
-    map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg, 14); // R W X
+    // void *new_pg = new_page(1);
+    map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg + i * PGSIZE, 14); // R W X
   }
   current->max_brk = brk;
   Log("brk from %p to %p, allocated %d pages", (void*)old_brk, (void*)brk, nr_page);
