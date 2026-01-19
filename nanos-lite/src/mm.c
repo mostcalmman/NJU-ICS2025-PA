@@ -31,6 +31,7 @@ int mm_brk(uintptr_t brk) {
   Log("mm_brk called: old_brk=%p, brk=%p, page_aligned_brk=%p", (void*)old_brk, (void*)brk, (void*)page_aligned_brk);
   if(brk <= page_aligned_brk) {
     current->max_brk = brk;
+    Log("skipped\n");
     return 0;
   }
   int nr_page = (brk - page_aligned_brk) % PGSIZE == 0 ? 
@@ -42,7 +43,7 @@ int mm_brk(uintptr_t brk) {
     map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg + i * PGSIZE, 14); // R W X
   }
   current->max_brk = brk;
-  // Log("brk from %p to %p, allocated %d pages", (void*)old_brk, (void*)brk, nr_page);
+  Log("brk from %p to %p\n", (void*)old_brk, (void*)brk);
   return 0;
 }
 
