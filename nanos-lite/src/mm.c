@@ -31,7 +31,7 @@ int mm_brk(uintptr_t brk) {
   // Log("mm_brk called: old_brk=%p, brk=%p, page_aligned_brk=%p", (void*)old_brk, (void*)brk, (void*)page_aligned_brk);
   if(brk <= page_aligned_brk) {
     current->max_brk = brk;
-    Log("skipped");
+    // Log("skipped");
     return 0;
   }
   int nr_page = (brk - page_aligned_brk) % PGSIZE == 0 ? 
