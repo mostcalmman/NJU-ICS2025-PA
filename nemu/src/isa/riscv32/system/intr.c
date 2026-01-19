@@ -41,6 +41,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
 word_t isa_query_intr() {
   // 只实现时钟中断, 所以中断引脚高电平就是时钟中断
+  // 检查mstatus确保处于开中断(也确保了初始化完成)
   if (cpu.INTR && ((cpu.mstatus >> 3) & 0x1)) {
     cpu.INTR = false;
     return IRQ_TIMER;
