@@ -12,7 +12,7 @@ Context* __am_irq_handle(Context *c) {
   // uintptr_t *raw = (uintptr_t *)c;
   // for (int i = 0; i < 35; i++) printf("0x%x\n", raw[i]);
   // printf("Context End\n\n");
-  __am_get_cur_as(c);
+  // __am_get_cur_as(c);
   assert(user_handler != NULL);
   Event ev = {0};
   switch (c->mcause) {
