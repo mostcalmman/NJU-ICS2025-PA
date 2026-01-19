@@ -197,6 +197,8 @@ void cpu_exec(uint64_t n) {
     case NEMU_QUIT: statistic();
   }
 
+  Log("MARK");
+
   check_timer_intr();
 
   word_t intr = isa_query_intr();
