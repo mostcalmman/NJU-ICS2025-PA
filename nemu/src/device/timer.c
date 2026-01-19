@@ -31,6 +31,7 @@ static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
     rtc_port_base[0] = (uint32_t)us;
     rtc_port_base[1] = us >> 32;
   }
+  Log("MARK");
 }
 
 void check_timer_intr() {
