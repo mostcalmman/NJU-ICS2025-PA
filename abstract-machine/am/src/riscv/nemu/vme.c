@@ -69,12 +69,22 @@ void unprotect(AddrSpace *as) {
 }
 
 void __am_get_cur_as(Context *c) {
+  // c->pdir = (vme_enable ? (void *)get_satp() : NULL);
+  void *old_pdir = c->pdir;
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
+  printf("__am_get_cur_as: old_pdir=%p, new_pdir=%p, satp=%p\n", 
+         old_pdir, c->pdir, (void*)get_satp());
 }
 
 void __am_switch(Context *c) {
+  // if (vme_enable && c->pdir != NULL) {
+  //   set_satp(c->pdir);
+  // }
+  printf("__am_switch: c->pdir=%p, current satp=%p\n", 
+         c->pdir, (void*)get_satp());
   if (vme_enable && c->pdir != NULL) {
     set_satp(c->pdir);
+    printf("  -> switched to %p\n", c->pdir);
   }
 }
 
