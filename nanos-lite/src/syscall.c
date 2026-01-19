@@ -68,6 +68,7 @@ void do_syscall(Context *c) {
 #endif
   switch (a[0]) {
     case SYS_yield:
+      panic("Yield syscall should be handled in irq.c!");
       yield();
       break;
     case SYS_exit:
