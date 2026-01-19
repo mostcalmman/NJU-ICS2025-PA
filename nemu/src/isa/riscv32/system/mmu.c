@@ -36,7 +36,7 @@ int isa_mmu_check(vaddr_t vaddr, int len, int type) {
 
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   bool flag = false;
-  if ((vaddr & ~0xfff) == 0x7ffff000 && vaddr == 0x7ffffcd0) {
+  if ((vaddr & ~0xfff) == 0xc0000000) {
     Log("Translating special vaddr 0x%x", vaddr);
     flag = true;
   }
