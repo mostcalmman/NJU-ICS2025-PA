@@ -33,8 +33,8 @@ void init_proc() {
   
   
   context_kload(&pcb[1], hello_fun, (void*)1);
-  // context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal", "--skip", NULL}, (char*[]) {NULL});
-  context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm"}, (char*[]) {NULL});
+  context_uload(&pcb[1], "/bin/pal", (char*[]){"/bin/pal", "--skip", NULL}, (char*[]) {NULL});
+  // context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm"}, (char*[]) {NULL});
   // context_uload(&pcb[0], "/bin/dummy", (char*[]){"/bin/dummy"}, (char*[]) {NULL});
   
   switch_boot_pcb();
@@ -48,10 +48,10 @@ void init_proc() {
 }
 
 Context* schedule(Context *prev) {
-  assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
-  if (current == &pcb_boot) {
-    Log("Switching from boot PCB to PCB 0");
-  }
+  // assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
+  // if (current == &pcb_boot) {
+  //   Log("Switching from boot PCB to PCB 0");
+  // }
   // else {
   //   Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
   // }
