@@ -82,7 +82,10 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  printf("Mapping address %p to %p\n", va, pa);
+  if((uintptr_t)va <= 0x80000000){
+    printf("Mapping address %p to %p\n", va, pa);
+  }
+  
   
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
   PTE* pte1 = &pdir[PDX(va)]; // 从页目录中取出页表项
