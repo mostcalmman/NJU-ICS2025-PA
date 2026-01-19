@@ -60,7 +60,8 @@ __am_asm_trap:
   mv a0, sp
   call __am_irq_handle
 
-  LOAD sp, (2 * XLEN)(a0) # 恢复内核栈sp, a0是返回的Context *
+#   LOAD sp, (2 * XLEN)(a0) # 恢复内核栈sp, a0是返回的Context *
+  mv sp, a0
 
   LOAD t1, OFFSET_STATUS(sp)
   LOAD t2, OFFSET_EPC(sp)
