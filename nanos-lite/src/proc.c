@@ -32,7 +32,7 @@ void init_proc() {
   Log("Initializing processes...");
   
   
-  context_kload(&pcb[1], hello_fun, (void*)1);
+  // context_kload(&pcb[1], hello_fun, (void*)1);
   context_uload(&pcb[0], "/bin/pal", (char*[]){"/bin/pal", "--skip", NULL}, (char*[]) {NULL});
   // context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm"}, (char*[]) {NULL});
   // context_uload(&pcb[0], "/bin/dummy", (char*[]){"/bin/dummy"}, (char*[]) {NULL});
@@ -56,7 +56,7 @@ Context* schedule(Context *prev) {
   //   Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
   // }
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
-  // current = &pcb[0];
+  // current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = &pcb[0];
   return current->cp;
 }
