@@ -48,13 +48,13 @@ void init_proc() {
 }
 
 Context* schedule(Context *prev) {
-  // assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
-  // if (current == &pcb_boot) {
-  //   Log("Switching from boot PCB to PCB 0");
-  // }
-  // else {
-  //   Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
-  // }
+  assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
+  if (current == &pcb_boot) {
+    Log("Switching from boot PCB to PCB 0");
+  }
+  else {
+    Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
+  }
   current->cp = prev;
   current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   // current = &pcb[0];
