@@ -83,13 +83,7 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  // if((uintptr_t)va < 0x80000000){
-  //   printf("Mapping address %p to %p\n", va, pa);
-  // }
-  // if((uintptr_t)pa == 0x82c7f000){
-  //   printf("\n\nMapping address %p to %p\n\n", va, pa);
-  //   // assert(0);
-  // }
+  printf("Mapping address %p to %p\n", va, pa);
   
   
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
@@ -98,7 +92,7 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   // 分配新的页表
   if (!(*pte1 & PTE_V)) {
     void* new_page_table = pgalloc_usr(PGSIZE);
-    printf("Allocating new page table for va %p at %p\n", va, new_page_table);
+    // printf("Allocating new page table for va %p at %p\n", va, new_page_table);
     memset(new_page_table, 0, PGSIZE);
     *pte1 = ((uintptr_t)new_page_table >> 12 << 10) | PTE_V; // 右移12位获得PPN, 左移10位放到PTE的正确位置, 把V置为1
   }
