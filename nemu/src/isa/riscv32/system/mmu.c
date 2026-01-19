@@ -54,6 +54,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   }
   if(!(pte1 & 0x1)) {
     fprintf(fp, "Page table is invalid(addr = %x, value = 0x%x), operating on 0x%x", pte1_addr, (uint32_t)pte1, vaddr);
+    fflush(fp);
     assert(0);
   }
   paddr_t pt_base = (pte1 >> 10) << 12;
@@ -61,6 +62,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   PTE pte0 = paddr_read(pte0_addr, 4);
   if(!(pte0 & 0x1)) {
     fprintf(fp, "Page frame is invalid(addr = %x, value = 0x%x), operating on 0x%x", pte0_addr, (uint32_t)pte0, vaddr);
+    fflush(fp);
     assert(0);
   }
   paddr_t paddr = PTE_ADDR(pte0 >> 10 << 12) | PTE_OFFSET(vaddr);
