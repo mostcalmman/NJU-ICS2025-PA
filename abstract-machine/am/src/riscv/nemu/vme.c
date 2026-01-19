@@ -6,8 +6,7 @@
 #define PTX(va) (((uintptr_t)(va) >> 12) & 0x3ff) // VPN[0]
 #define PTE_ADDR(pte) (((uintptr_t)(pte) & ~0xfff)) // 低12位置0
 
-// static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
-AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
+static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
 static void* (*pgalloc_usr)(int) = NULL;
 static void (*pgfree_usr)(void*) = NULL;
 static int vme_enable = 0;
