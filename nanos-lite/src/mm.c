@@ -44,6 +44,7 @@ int mm_brk(uintptr_t brk) {
   }
   current->max_brk = brk;
   Log("brk from %p to %p", (void*)old_brk, (void*)brk);
+  Log("free P_page from %p", new_pg + nr_page * PGSIZE);
   return 0;
 }
 
