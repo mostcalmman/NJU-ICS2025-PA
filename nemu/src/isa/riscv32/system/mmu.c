@@ -35,7 +35,11 @@ int isa_mmu_check(vaddr_t vaddr, int len, int type) {
 }
 
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
-  FILE *fp = fopen("/home/liushengrui/ics2025/_Log", "a");
+  static FILE *fp = NULL;
+  if (fp == NULL) {
+    fp = fopen("/home/liushengrui/ics2025/_Log", "a");
+    if (fp == NULL) { assert(0); } // 确保打开成功
+  }
   bool flag = false;
   if ((vaddr & ~0xfff) == 0x7ffff000 && vaddr > 0x7ffffc68) {
     fprintf(fp, "Translating special vaddr 0x%x", vaddr);
