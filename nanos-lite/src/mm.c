@@ -28,7 +28,7 @@ void free_page(void *p) {
 int mm_brk(uintptr_t brk) {
   uintptr_t old_brk = current->max_brk;
   uintptr_t page_aligned_brk = ROUNDUP(old_brk, PGSIZE);
-  Log("mm_brk called: old_brk=%p, brk=%p, page_aligned_brk=%p", (void*)old_brk, (void*)brk, (void*)page_aligned_brk);
+  // Log("mm_brk called: old_brk=%p, brk=%p, page_aligned_brk=%p", (void*)old_brk, (void*)brk, (void*)page_aligned_brk);
   if(brk <= page_aligned_brk) {
     current->max_brk = brk;
     Log("skipped");
@@ -43,8 +43,8 @@ int mm_brk(uintptr_t brk) {
     map(&current->as, (void*)(page_aligned_brk + i * PGSIZE), new_pg + i * PGSIZE, 14); // R W X
   }
   current->max_brk = brk;
-  Log("brk from %p to %p", (void*)old_brk, (void*)brk);
-  Log("free P_page from %p", new_pg + nr_page * PGSIZE);
+  // Log("brk from %p to %p", (void*)old_brk, (void*)brk);
+  // Log("free P_page from %p", new_pg + nr_page * PGSIZE);
   return 0;
 }
 
