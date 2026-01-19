@@ -34,9 +34,9 @@ static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
     if (us - last_irq_us >= IRQ_TIMER_INTERVAL) {
     last_irq_us = us;
     timer_intr();
-    Log("IRQ");
+    // Log("IRQ");
   }
-  Log("MARK");
+  // Log("MARK");
   }
 }
 

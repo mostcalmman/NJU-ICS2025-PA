@@ -124,6 +124,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   // IRINGBUF
   IFDEF(CONFIG_IRINGBUF, writeIringbuf(s));
 
+  word_t intr = isa_query_intr();
+  if (intr != INTR_EMPTY) {
+    cpu.pc = isa_raise_intr(intr, cpu.pc);
+  }
 }
 
 static void execute(uint64_t n) {
@@ -195,14 +199,5 @@ void cpu_exec(uint64_t n) {
           nemu_state.halt_pc);
       // fall through
     case NEMU_QUIT: statistic();
-  }
-
-  Log("MARK");
-
-  check_timer_intr();
-
-  word_t intr = isa_query_intr();
-  if (intr != INTR_EMPTY) {
-    cpu.pc = isa_raise_intr(intr, cpu.pc);
   }
 }
