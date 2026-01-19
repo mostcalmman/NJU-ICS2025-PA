@@ -37,7 +37,7 @@ int isa_mmu_check(vaddr_t vaddr, int len, int type) {
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   bool flag = false;
   if ((vaddr & ~0xfff) == 0x7ffff000) {
-    Log("Translating special vaddr 0x%x\n", vaddr);
+    Log("Translating special vaddr 0x%x", vaddr);
     flag = true;
   }
   uintptr_t satp = get_satp();
@@ -45,7 +45,7 @@ paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
   paddr_t pte1_addr = pdir_base + (PDX(vaddr) * 4);
   PTE pte1 = paddr_read(pte1_addr, 4);
   if (flag) {
-    Log("PTE1 addr: 0x%x, value: 0x%x", pte1_addr, (uint32_t)pte1);
+    Log("PTE1 addr: 0x%x, value: 0x%x\n", pte1_addr, (uint32_t)pte1);
   }
   if(!(pte1 & 0x1)) {
     Log("Page table is invalid(addr = %x, value = 0x%x), operating on 0x%x", pte1_addr, (uint32_t)pte1, vaddr);
