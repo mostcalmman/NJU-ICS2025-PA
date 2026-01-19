@@ -38,6 +38,7 @@ void check_timer_intr() {
   if (us - last_irq_us >= IRQ_TIMER_INTERVAL) {
     last_irq_us = us;
     timer_intr();
+    Log("IRQ");
   }
 }
 
