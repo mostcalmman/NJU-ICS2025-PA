@@ -35,6 +35,9 @@ int isa_mmu_check(vaddr_t vaddr, int len, int type) {
 }
 
 paddr_t isa_mmu_translate(vaddr_t vaddr, int len, int type) {
+  if ((vaddr & ~0xfff) == 0x7ffff000) {
+    printf("Translating special vaddr 0x%x\n", vaddr);
+  }
   uintptr_t satp = get_satp();
   paddr_t pdir_base = (satp & 0x3fffff) << 12;
   paddr_t pte1_addr = pdir_base + (PDX(vaddr) * 4);
