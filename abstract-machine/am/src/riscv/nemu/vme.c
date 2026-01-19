@@ -82,7 +82,7 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  if((uintptr_t)va <= 0x80000000){
+  if((uintptr_t)va < 0x80000000){
     printf("Mapping address %p to %p\n", va, pa);
   }
   
