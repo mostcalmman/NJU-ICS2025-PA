@@ -56,13 +56,6 @@ void protect(AddrSpace *as) {
   as->pgsize = PGSIZE;
   // map kernel space
   memcpy(updir, kas.ptr, PGSIZE);
-
-  // 调试：打印复制的页表项
-  for (int i = 0; i < 1024; i++) {
-    if (updir[i] & PTE_V) {
-      printf("PDX[%d] = 0x%x\n", i, updir[i]);
-    }
-  }
 }
 
 void unprotect(AddrSpace *as) {
