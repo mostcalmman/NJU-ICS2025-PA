@@ -30,6 +30,8 @@ extern uint64_t total_exec_count;
 #define MAX_INSTR_LIMIT 10000000
 #endif
 
+void check_timer_intr();
+
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
  * This is useful when you use the `si' command.
@@ -194,6 +196,8 @@ void cpu_exec(uint64_t n) {
       // fall through
     case NEMU_QUIT: statistic();
   }
+
+  check_timer_intr();
 
   word_t intr = isa_query_intr();
   if (intr != INTR_EMPTY) {

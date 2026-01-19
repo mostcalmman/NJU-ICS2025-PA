@@ -30,10 +30,14 @@ static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
     uint64_t us = get_time();
     rtc_port_base[0] = (uint32_t)us;
     rtc_port_base[1] = us >> 32;
-    if (us - last_irq_us >= IRQ_TIMER_INTERVAL) {
-      last_irq_us = us;
-      timer_intr();
-    }
+  }
+}
+
+void check_timer_intr() {
+  uint64_t us = get_time();
+  if (us - last_irq_us >= IRQ_TIMER_INTERVAL) {
+    last_irq_us = us;
+    timer_intr();
   }
 }
 
