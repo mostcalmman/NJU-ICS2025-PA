@@ -38,6 +38,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
   return cpu.mtvec;
 }
+
 word_t isa_query_intr() {
   // 只实现时钟中断, 所以中断引脚高电平就是时钟中断
   if (cpu.INTR) {
