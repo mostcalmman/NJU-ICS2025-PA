@@ -83,7 +83,7 @@ void __am_switch(Context *c) {
 }
 
 void map(AddrSpace *as, void *va, void *pa, int prot) {
-  // printf("Mapping address %p to %p\n", va, pa);
+  printf("Mapping address %p to %p\n", va, pa);
   
   
   PTE* pdir = (PTE*)as->ptr; // 页目录基质
