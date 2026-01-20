@@ -71,12 +71,6 @@ void do_syscall(Context *c) {
       yield();
       break;
     case SYS_exit:
-      if( a[1]!=0 ){
-        Log("Error: Program exited with code %d", a[1]);
-      }
-      Log("Halting...");
-      halt(a[1]);
-      panic("Shoud not reach here!");
       context_uload(current, "/bin/nterm", NULL, NULL);
       switch_boot_pcb();
       yield();
