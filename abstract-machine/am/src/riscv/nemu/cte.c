@@ -64,7 +64,6 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->GPR2 = (uintptr_t)arg;
   c->gpr[2] = (uintptr_t)c;
   c->pdir = NULL;
-  printf("kstack area [%p, %p), context at %p\n", kstack.start, kstack.end, c);
   return c;
 }
 
