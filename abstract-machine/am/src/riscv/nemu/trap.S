@@ -37,7 +37,7 @@ f(30) f(31)
 #define OFFSET_EPC    ((NR_REGS + 2) * XLEN)
 #define OFFSET_NP     ((NR_REGS + 3) * XLEN)
 
-#define KERNAL 0
+#define KERNEL 0
 #define USER 1
 
 .align 3
@@ -57,7 +57,7 @@ from_kernel:
   MAP(REGS, PUSH)
 
   # c->np = KERNEL
-  li t0, KERNAL
+  li t0, KERNEL
   STORE t0, OFFSET_NP(sp)
   # c-sp = sp + CONTEXT_SIZE (原本的sp)
   addi t0, sp, CONTEXT_SIZE
