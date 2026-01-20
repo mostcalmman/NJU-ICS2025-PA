@@ -5,6 +5,7 @@
 #define PDX(va) (((uintptr_t)(va) >> 22) & 0x3ff) // VPN[1]
 #define PTX(va) (((uintptr_t)(va) >> 12) & 0x3ff) // VPN[0]
 #define PTE_ADDR(pte) (((uintptr_t)(pte) & ~0xfff)) // 低12位置0
+#define USER 1
 
 static AddrSpace kas = {}; // Kernel address space, 负责管理虚拟内核空间
 static void* (*pgalloc_usr)(int) = NULL;
@@ -123,4 +124,5 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   c->gpr[2] = (uintptr_t)c;
   c->pdir = as->ptr;
   return c;
+  c->np = USER;
 }

@@ -3,6 +3,7 @@
 #include <klib.h>
 
 #define IRQ_TIMER 0x80000007
+#define KERNEL 0
 
 void __am_get_cur_as(Context *c);
 void __am_switch(Context *c);
@@ -50,6 +51,7 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
   // initialize exception entry
   // printf("MARK\n");
   asm volatile("csrw mtvec, %0" : : "r"(__am_asm_trap));
+  asm volatile("csrw mscratch, zero"); // kas = 0
 
   // register event handler
   user_handler = handler;
@@ -64,6 +66,7 @@ Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   c->GPR2 = (uintptr_t)arg;
   c->gpr[2] = (uintptr_t)c;
   c->pdir = NULL;
+  c->np = KERNEL;
   return c;
 }
 
