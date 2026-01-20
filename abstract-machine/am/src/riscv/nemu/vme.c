@@ -63,7 +63,7 @@ void unprotect(AddrSpace *as) {
 }
 
 void __am_get_cur_as(Context *c) {
-  // MARK: 不知道对不对
+  // 在彻底虚拟化后这里的修复就不再需要了
   // void* old_pdir = (void *)get_satp();
   // if (old_pdir == kas.ptr) {
   //   c->pdir = NULL;
