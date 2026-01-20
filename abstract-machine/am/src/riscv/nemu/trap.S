@@ -44,9 +44,8 @@ f(30) f(31)
 .globl __am_asm_trap
 __am_asm_trap:
   # mscratch中保存的是ksp
-  # gpr[sp]代表c->sp, 也就是usp
   # 在内核态下它始终为0, 真正的ksp在sp寄存器里; 在用户态下它保存着内核栈sp(即ksp)
-  # 切换到内核栈
+  # gpr[sp]代表c->sp, 也就是usp
   csrrw sp, mscratch, sp # sp <-> mscratch
   bnez sp, from_user # ksp != 0: 用户态, 要切换到内核态; ksp == 0: 内核态
 
