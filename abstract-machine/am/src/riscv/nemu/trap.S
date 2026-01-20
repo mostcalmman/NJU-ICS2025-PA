@@ -60,9 +60,9 @@ __am_asm_trap:
   mv a0, sp
   call __am_irq_handle
 
-  # LOAD sp, (2 * XLEN)(a0) # 恢复内核栈sp, a0是返回的Context *
-  lw sp, (2 * 4)(a0)
-  # mv sp, a0
+  # MARK: 1
+  LOAD sp, (2 * XLEN)(a0) # 恢复内核栈sp, a0是返回的Context *
+  # mv sp, a0 # 这样写也行, 因为(2 * XLEN)(a0)保存的sp正式返回的Context *的地址
 
   LOAD t1, OFFSET_STATUS(sp)
   LOAD t2, OFFSET_EPC(sp)
