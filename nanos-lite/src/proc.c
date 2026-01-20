@@ -9,6 +9,7 @@ void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
 
 static void inline context_kload(PCB* pcb, void (*entry)(void *), void *arg){
+  Log("Context kload");
   pcb->cp = kcontext((Area){pcb->stack, pcb->stack + STACK_SIZE}, entry, arg);
 }
 
