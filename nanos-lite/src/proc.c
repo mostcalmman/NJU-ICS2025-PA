@@ -34,7 +34,8 @@ void init_proc() {
   Log("Initializing processes...");
   
   
-  context_kload(&pcb[0], hello_fun, (void*)1);
+  // context_kload(&pcb[0], hello_fun, (void*)1);
+  context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm", NULL}, (char*[]) {NULL});
   context_uload(&pcb[1], "/bin/nslider", (char*[]){"/bin/nslider", NULL}, (char*[]) {NULL});
   context_uload(&pcb[2], "/bin/pal", (char*[]){"/bin/pal", NULL}, (char*[]) {NULL});
   context_uload(&pcb[3], "/bin/bird", (char*[]){"/bin/bird", NULL}, (char*[]) {NULL});
