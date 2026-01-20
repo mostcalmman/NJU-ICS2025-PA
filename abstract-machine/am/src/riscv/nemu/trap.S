@@ -33,7 +33,7 @@ f(30) f(31)
 
 #define CONTEXT_SIZE  ((NR_REGS + 4) * XLEN)
 #define OFFSET_SP     (2 * XLEN)
-#define OFFSET_SP_N  -((NR_REGS + 2) * XLEN) # 从栈顶访问
+#define OFFSET_SP_N  (-((NR_REGS + 2) * XLEN)) # 从栈顶访问
 #define OFFSET_CAUSE  ((NR_REGS + 0) * XLEN)
 #define OFFSET_STATUS ((NR_REGS + 1) * XLEN)
 #define OFFSET_EPC    ((NR_REGS + 2) * XLEN)
@@ -108,5 +108,5 @@ not_store_ksp:
   addi sp, sp, CONTEXT_SIZE
   # 切换回原来的栈
 #   LOAD sp, OFFSET_SP_N(sp)
-  lw sp, -((NR_REGS + 2) * XLEN)(sp) # 恢复原sp
+  LOAD sp, -((NR_REGS + 2) * XLEN)(sp) # 恢复原sp
   mret
