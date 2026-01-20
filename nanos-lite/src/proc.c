@@ -50,6 +50,12 @@ void init_proc() {
 
 }
 
+void change_fg_pcb(int target){
+  assert(target == 1 || target ==2 || target ==3);
+  fg_pcb = &pcb[target];
+  // yield();
+}
+
 Context* schedule(Context *prev) {
   // assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
   // if (current == &pcb_boot) {
