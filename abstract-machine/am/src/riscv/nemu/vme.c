@@ -123,6 +123,6 @@ Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   c->mstatus = 0x1888; // PA 中用不到特权级, 但是设为 0x1800 可通过diffTest; 在此基础上, MIE 和 MPIE 设为 1
   c->gpr[2] = (uintptr_t)c;
   c->pdir = as->ptr;
-  return c;
   c->np = USER;
+  return c;
 }
