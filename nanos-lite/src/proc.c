@@ -5,11 +5,12 @@
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
+PCB *fg_pcb = NULL;
 void naive_uload(PCB *pcb, const char *filename);
 void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
 
 static void inline context_kload(PCB* pcb, void (*entry)(void *), void *arg){
-  Log("Context kload");
+  // Log("Context kload");
   pcb->cp = kcontext((Area){pcb->stack, pcb->stack + STACK_SIZE}, entry, arg);
 }
 
@@ -37,6 +38,7 @@ void init_proc() {
   context_uload(&pcb[1], "/bin/nslider", (char*[]){"/bin/nslider", NULL}, (char*[]) {NULL});
   context_uload(&pcb[2], "/bin/pal", (char*[]){"/bin/pal", "--skip", NULL}, (char*[]) {NULL});
   context_uload(&pcb[3], "/bin/bird", (char*[]){"/bin/bird", NULL}, (char*[]) {NULL});
+  fg_pcb = &pcb[1];
   
   switch_boot_pcb();
   yield();
@@ -57,7 +59,7 @@ Context* schedule(Context *prev) {
   //   Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
   // }
   current->cp = prev;
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  current = (current == &pcb[0] ? fg_pcb : &pcb[0]);
   // current = &pcb[0];
   return current->cp;
 }
