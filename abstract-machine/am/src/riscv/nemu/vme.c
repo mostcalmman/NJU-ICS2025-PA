@@ -64,11 +64,11 @@ void unprotect(AddrSpace *as) {
 
 void __am_get_cur_as(Context *c) {
   // MARK: 不知道对不对
-  void* old_pdir = (void *)get_satp();
-  if (old_pdir == kas.ptr) {
-    c->pdir = NULL;
-    return;
-  }
+  // void* old_pdir = (void *)get_satp();
+  // if (old_pdir == kas.ptr) {
+  //   c->pdir = NULL;
+  //   return;
+  // }
   c->pdir = (vme_enable ? (void *)get_satp() : NULL);
 }
 
