@@ -26,6 +26,7 @@ typedef struct {
   word_t mcause;
   word_t mtvec;
   word_t satp;
+  word_t mscratch; // 系统软件的临时寄存器, 用作ksp
   bool INTR;
 #ifdef CONFIG_IRINGBUF
   word_t iringbuf[20]; // 缓存20条指令
