@@ -25,6 +25,9 @@ typedef struct {
   word_t mstatus;
   word_t mcause;
   word_t mtvec;
+  word_t satp;
+  word_t mscratch; // 系统软件的临时寄存器, 用作ksp
+  bool INTR;
 #ifdef CONFIG_IRINGBUF
   word_t iringbuf[20]; // 缓存20条指令
   word_t iringbuf_pc[20];
@@ -37,6 +40,6 @@ typedef struct {
   uint32_t inst;
 } MUXDEF(CONFIG_RV64, riscv64_ISADecodeInfo, riscv32_ISADecodeInfo);
 
-#define isa_mmu_check(vaddr, len, type) (MMU_DIRECT)
+// #define isa_mmu_check(vaddr, len, type) (MMU_DIRECT)
 
 #endif

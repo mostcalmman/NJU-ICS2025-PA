@@ -16,12 +16,20 @@
 #include "common.h"
 #include <isa.h>
 
+#define IRQ_TIMER 0x80000007  // for riscv32
+
 word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
    * Then return the address of the interrupt/exception vector.
    */
   cpu.mepc = epc;
   cpu.mcause = NO;
+
+  // 让处理器进入关中断
+  bool MIE = (cpu.mstatus >> 3) & 0x1;
+  cpu.mstatus = cpu.mstatus & (~(1 << 3)); // MIE = 0
+  cpu.mstatus = cpu.mstatus & (~(1 << 7)); // MPIE = 0
+  cpu.mstatus = cpu.mstatus | (MIE << 7); // MPIE = old MIE
 
 #ifdef CONFIG_ETRACE
   Log("Exception NO: %d at pc = 0x%x, mstatus: %x, mtvec: %x", NO, epc, cpu.mstatus, cpu.mtvec);
@@ -30,6 +38,13 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
 
   return cpu.mtvec;
 }
+
 word_t isa_query_intr() {
+  // 只实现时钟中断, 所以中断引脚高电平就是时钟中断
+  // 检查mstatus确保处于开中断(也确保了初始化完成)
+  if (cpu.INTR && ((cpu.mstatus >> 3) & 0x1)) {
+    cpu.INTR = false;
+    return IRQ_TIMER;
+  }
   return INTR_EMPTY;
 }

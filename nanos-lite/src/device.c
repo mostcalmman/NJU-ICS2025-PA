@@ -14,7 +14,10 @@ static const char *keyname[256] __attribute__((used)) = {
   AM_KEYS(NAME)
 };
 
+void change_fg_pcb(int target);
+
 size_t serial_write(const void *buf, size_t offset, size_t len) {
+  // yield();
   for (size_t i = 0; i < len; i++) {
     putch(((char *)buf)[i]);
   }
@@ -22,11 +25,22 @@ size_t serial_write(const void *buf, size_t offset, size_t len) {
 }
 
 size_t events_read(void *buf, size_t offset, size_t len) {
+  // yield();
   AM_INPUT_KEYBRD_T kbd = io_read(AM_INPUT_KEYBRD);
   int keycode = kbd.keycode;
   if(keycode == AM_KEY_NONE) return 0;
   char tem[32];
   bool down  = kbd.keydown;
+
+  // 截获F1, F2, F3用于切换前台进程
+  if (down) {
+    switch(keycode) {
+      case AM_KEY_F1: change_fg_pcb(1); return 0;
+      case AM_KEY_F2: change_fg_pcb(2); return 0;
+      case AM_KEY_F3: change_fg_pcb(3); return 0;
+    }
+  }
+
   const char *key = keyname[keycode];
   if (down) {
     memcpy(tem, "kd ", 3);
@@ -54,6 +68,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
+  // yield();
   AM_GPU_CONFIG_T display = io_read(AM_GPU_CONFIG);
   assert(display.present);
   int screen_w = display.width;

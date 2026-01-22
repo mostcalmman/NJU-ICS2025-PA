@@ -9,7 +9,11 @@
 // 	long		tv_usec;	/* and microseconds */
 // };
 
+extern PCB *current;
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+void switch_boot_pcb();
+int mm_brk(uintptr_t brk);
 
 // #define CONFIG_STRACE
 
@@ -38,6 +42,10 @@ static const char *syscall_names[] = {
 };
 
 static void strace(Context *c){
+  if (c->GPR1 == SYS_write || c->GPR1 == SYS_read || c->GPR1 == SYS_close || c->GPR1 == SYS_lseek) {
+    if ( c->GPR2 == 3 || c->GPR2 == 4) return; // 忽略对 /dev/events 和 /dev/fb 的读写
+  }
+  if (c->GPR1 == SYS_gettimeofday) return; // 忽略 gettimeofday 调用
   Log("Strace: syscall event at pc = 0x%x, type = %s (id = %d), arg list: %d, %d, %d", c->mepc, syscall_names[c->GPR1], c->GPR1, c->GPR2, c->GPR3, c->GPR4);
   if (c->GPR1 == SYS_write || c->GPR1 == SYS_read || c->GPR1 == SYS_close || c->GPR1 == SYS_lseek) {
     Log("Strace: file operation on file %s (fd = %d)", fs_getname(c->GPR2), c->GPR2);
@@ -63,14 +71,13 @@ void do_syscall(Context *c) {
       yield();
       break;
     case SYS_exit:
-      if( a[1]!=0 ){
-        Log("Error: Program exited with code %d", a[1]);
-      }
-      naive_uload(NULL, "/bin/nterm");
-      // halt(a[1]);
+      context_uload(current, "/bin/nterm", NULL, NULL);
+      switch_boot_pcb();
+      yield();
       break;
     case SYS_brk: {
-      c->GPRx = 0;
+      c->GPRx = mm_brk((uintptr_t)a[1]);
+      // Log("Max brk: %p\n", (void*)current->max_brk);
       break;
     }
     case SYS_open: {
@@ -118,9 +125,17 @@ void do_syscall(Context *c) {
       c->GPRx = 0;
       break;
     }
+    // 让新进程接管旧进程, PCB覆盖, 但需要新的用户栈(因为执行系统调用是在旧进程的用户栈上的)
     case SYS_execve: {
-      Log("Switching to new program %s", (const char *)a[1]);
-      naive_uload(NULL, (const char *)a[1]);
+      int ret = fs_open((const char*)a[1], 0, 0);
+      if (ret < 0) {
+        c->GPRx = ret;
+        break;
+      }
+      Log("Execve: loading new program %s", (const char *)a[1]);
+      context_uload(current, (const char *)a[1], (char* const*)a[2], (char* const*)a[3]);
+      switch_boot_pcb(); // 切换current到boot pcb, 下一次yield就会切回0号进程
+      yield();
       break;
     }
     case SYS_getpid: {

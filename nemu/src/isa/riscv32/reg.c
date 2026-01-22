@@ -64,6 +64,8 @@ word_t* isa_csr_str2ptr(word_t csr) {
     case 0x300: return &cpu.mstatus;
     case 0x342: return &cpu.mcause;
     case 0x305: return &cpu.mtvec;
+    case 0x180: return &cpu.satp;
+    case 0x340: return &cpu.mscratch;
     default: panic("Unsupported CSR address: 0x%x", csr);
   }
 }

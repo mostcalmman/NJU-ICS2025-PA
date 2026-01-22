@@ -6,9 +6,9 @@
 #include <stdlib.h>
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
 
@@ -38,9 +38,9 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   int x, y, w, h;
   if (dstrect) {
     x = dstrect->x; y = dstrect->y; w = dstrect->w; h = dstrect->h;
@@ -69,9 +69,9 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(s);
   if (w == 0 && h == 0) {
     w = s->w;
@@ -129,9 +129,9 @@ static inline int maskToShift(uint32_t mask) {
 
 SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int depth,
     uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(depth == 8 || depth == 32);
   SDL_Surface *s = malloc(sizeof(SDL_Surface));
   assert(s);
@@ -171,9 +171,9 @@ SDL_Surface* SDL_CreateRGBSurface(uint32_t flags, int width, int height, int dep
 
 SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int depth,
     int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   SDL_Surface *s = SDL_CreateRGBSurface(SDL_PREALLOC, width, height, depth,
       Rmask, Gmask, Bmask, Amask);
   assert(pitch == s->pitch);
@@ -182,9 +182,9 @@ SDL_Surface* SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int d
 }
 
 void SDL_FreeSurface(SDL_Surface *s) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   if (s != NULL) {
     if (s->format != NULL) {
       if (s->format->palette != NULL) {
@@ -199,18 +199,18 @@ void SDL_FreeSurface(SDL_Surface *s) {
 }
 
 SDL_Surface* SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   if (flags & SDL_HWSURFACE) NDL_OpenCanvas(&width, &height);
   return SDL_CreateRGBSurface(flags, width, height, bpp,
       DEFAULT_RMASK, DEFAULT_GMASK, DEFAULT_BMASK, DEFAULT_AMASK);
 }
 
 void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(src && dst);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
   assert(dst->format->BitsPerPixel == 8);
@@ -238,9 +238,9 @@ void SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
 }
 
 void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor, int ncolors) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(s);
   assert(s->format);
   assert(s->format->palette);
@@ -261,9 +261,9 @@ void SDL_SetPalette(SDL_Surface *s, int flags, SDL_Color *colors, int firstcolor
 }
 
 static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   int i;
   uint8_t (*pdst)[4] = dst;
   uint8_t (*psrc)[4] = src;
@@ -291,9 +291,9 @@ static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len) {
 }
 
 SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t flags) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   assert(src->format->BitsPerPixel == 32);
   assert(src->w * src->format->BytesPerPixel == src->pitch);
   assert(src->format->BitsPerPixel == fmt->BitsPerPixel);
@@ -309,9 +309,9 @@ SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t
 }
 
 uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   if (fmt->BytesPerPixel == 1) {
     assert(fmt->palette);
     int best_diff = 0x7fffffff;
@@ -345,8 +345,8 @@ void SDL_UnlockSurface(SDL_Surface *s) {
 }
 
 void SDL_FillScreen(uint32_t color) {
-  // MARK: CallbackHelper
-  bool CallbackHelper();
-  CallbackHelper();
+  // // MARK: CallbackHelper
+  // bool CallbackHelper();
+  // CallbackHelper();
   NDL_FillScreen(color);
 }

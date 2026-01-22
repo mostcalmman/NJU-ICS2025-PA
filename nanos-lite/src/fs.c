@@ -2,7 +2,9 @@
 #include <fs.h>
 
 
-void naive_uload(PCB *pcb, const char *filename);
+extern PCB *current;
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+void switch_boot_pcb();
 size_t ramdisk_read(void *buf, size_t offset, size_t len);
 size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 size_t serial_write(const void *buf, size_t offset, size_t len);
@@ -78,8 +80,7 @@ int fs_open(const char *pathname, int flags, int mode) {
     }
   }
   Log("file %s not found", pathname);
-  naive_uload(NULL, "/bin/nterm");
-  panic("Should not reach here");
+  return -2; // 对应 No such file or directory
 }
 
 ssize_t fs_read(int fd, void *buf, size_t len) {

@@ -17,7 +17,12 @@
 #include <device/alarm.h>
 #include <utils.h>
 
+#define IRQ_TIMER_INTERVAL 10000 // 10ms
+
+static void timer_intr();
+
 static uint32_t *rtc_port_base = NULL;
+static uint64_t last_irq_us = 0;
 
 static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
   assert(offset == 0 || offset == 4);
@@ -25,6 +30,11 @@ static void rtc_io_handler(uint32_t offset, int len, bool is_write) {
     uint64_t us = get_time();
     rtc_port_base[0] = (uint32_t)us;
     rtc_port_base[1] = us >> 32;
+
+    if (us - last_irq_us >= IRQ_TIMER_INTERVAL) {
+      last_irq_us = us;
+      timer_intr();
+    }
   }
 }
 

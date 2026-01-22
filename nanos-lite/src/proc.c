@@ -5,7 +5,14 @@
 static PCB pcb[MAX_NR_PROC] __attribute__((used)) = {};
 static PCB pcb_boot = {};
 PCB *current = NULL;
+PCB *fg_pcb = NULL;
 void naive_uload(PCB *pcb, const char *filename);
+void context_uload(PCB *pcb, const char *filename, char *const argv[], char *const envp[]);
+
+static void inline context_kload(PCB* pcb, void (*entry)(void *), void *arg){
+  // Log("Context kload");
+  pcb->cp = kcontext((Area){pcb->stack, pcb->stack + STACK_SIZE}, entry, arg);
+}
 
 void switch_boot_pcb() {
   current = &pcb_boot;
@@ -14,22 +21,52 @@ void switch_boot_pcb() {
 void hello_fun(void *arg) {
   int j = 1;
   while (1) {
-    Log("Hello World from Nanos-lite with arg '%p' for the %dth time!", (uintptr_t)arg, j);
+    Log("Hello World from Nanos-lite with arg '%d' for the %dth time!", (int)arg, j);
     j ++;
     yield();
   }
 }
 
-void init_proc() {
-  switch_boot_pcb();
+const int arr[1];
+int const arr1[1];
 
+void init_proc() {
   Log("Initializing processes...");
+  
+  
+  context_kload(&pcb[0], hello_fun, (void*)1);
+  // context_uload(&pcb[0], "/bin/nterm", (char*[]){"/bin/nterm", NULL}, (char*[]) {NULL});
+  context_uload(&pcb[1], "/bin/nslider", (char*[]){"/bin/nslider", NULL}, (char*[]) {NULL});
+  context_uload(&pcb[2], "/bin/pal", (char*[]){"/bin/pal", NULL}, (char*[]) {NULL});
+  context_uload(&pcb[3], "/bin/bird", (char*[]){"/bin/bird", NULL}, (char*[]) {NULL});
+  fg_pcb = &pcb[1];
+  
+  switch_boot_pcb();
+  yield();
+
 
   // load program here
+  Log("Should not reach here. Switching to naive load...");
   naive_uload(NULL,"/bin/nterm");
 
 }
 
+void change_fg_pcb(int target){
+  assert(target == 1 || target ==2 || target ==3);
+  fg_pcb = &pcb[target];
+  // yield();
+}
+
 Context* schedule(Context *prev) {
-  return NULL;
+  // assert(current == &pcb_boot || current == &pcb[0] || current == &pcb[1]);
+  // if (current == &pcb_boot) {
+  //   Log("Switching from boot PCB to PCB 0");
+  // }
+  // else {
+  //   Log("Switching from PCB %d to PCB %d", (current == &pcb[0] ? 0 : 1), (current == &pcb[0] ? 1 : 0));
+  // }
+  current->cp = prev;
+  current = (current == &pcb[0] ? fg_pcb : &pcb[0]);
+  // current = &pcb[0];
+  return current->cp;
 }

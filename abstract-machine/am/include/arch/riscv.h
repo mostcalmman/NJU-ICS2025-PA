@@ -9,10 +9,9 @@
 #endif
 
 struct Context {
-  // TODO: fix the order of these members to match trap.S
   union {
     struct {
-      void *pdir;
+      uintptr_t *pdir; // GPR0 恒为0, 这个位置借用来存放 pdir
       uintptr_t gpr_body[NR_REGS - 1];
     };
     uintptr_t gpr[NR_REGS];
@@ -20,6 +19,7 @@ struct Context {
   uintptr_t mcause;
   uintptr_t mstatus;
   uintptr_t mepc;
+  uintptr_t np; // next previlege mode
 };
 
 #ifdef __riscv_e
